@@ -87,46 +87,31 @@ th{font-size:12px;text-transform:uppercase;color:#666;background:#fafafa}
 .checkbox{display:flex;align-items:center;gap:8px;margin:13px 0;font-weight:700}
 .checkbox input{width:auto}
 .loading{text-align:center;padding:35px;color:#666}
-/* =========================================================
-   PRESUPUESTO / e-Ppto
-   ========================================================= */
 .quote-preview{
   background:#fff;
   width:100%;
   max-width:none;
   margin:0 auto;
   padding:8mm;
+  box-sizing:border-box;
   color:#183746;
   font-family:Arial,Helvetica,sans-serif;
-  border:1px solid #d5dadd;
 }
-
 .quote-head{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:0;
-  min-height:50mm;
-  padding:4mm 3mm 4mm;
-  border-bottom:2px solid var(--rojo);
+  min-height:48mm;
+  padding:4mm 2mm 4mm;
+  border-bottom:2px solid #BE000F;
+  box-sizing:border-box;
 }
-
 .quote-company{padding-right:7mm}
-.quote-logo{
-  width:62mm;
-  max-width:100%;
-  height:auto;
-  display:block;
-  margin-bottom:2mm;
-}
-.quote-company-data{
-  font-size:3.2mm;
-  line-height:1.55;
-  color:#183746;
-}
+.quote-logo{width:62mm;max-width:100%;height:auto;display:block;margin-bottom:2mm}
+.quote-company-data{font-size:3.2mm;line-height:1.5;color:#183746}
 .quote-company-data strong{font-weight:800}
-
 .quote-presentation{
-  border-left:2px solid var(--rojo);
+  border-left:2px solid #BE000F;
   padding-left:8mm;
   display:flex;
   flex-direction:column;
@@ -134,63 +119,58 @@ th{font-size:12px;text-transform:uppercase;color:#666;background:#fafafa}
   justify-content:center;
   text-align:right;
 }
-
 .quote-title{
-  font-size:9mm;
+  font-size:11mm;
   line-height:1;
   font-weight:900;
   letter-spacing:.2mm;
   color:#183746;
-  margin-bottom:2mm;
+  white-space:nowrap;
 }
 .quote-number{
-  font-size:5.5mm;
+  margin-top:3mm;
+  font-size:6.2mm;
   line-height:1.1;
   font-weight:900;
-  color:var(--rojo);
+  color:#BE000F;
+  white-space:nowrap;
 }
 .quote-meta{
-  text-align:right;
-  color:#4b5563;
-  font-size:3.3mm;
+  margin-top:4mm;
+  color:#183746;
+  font-size:3.4mm;
   line-height:1.65;
-  margin-top:3mm;
+  text-align:right;
 }
-.quote-meta strong{color:#183746;font-weight:800}
-
+.quote-meta strong{font-weight:800}
 .quote-section{margin-top:3mm}
-.quote-section-line{
-  height:2px;
-  background:var(--rojo);
-  margin-bottom:2.5mm;
-}
+.quote-section-line{height:2px;background:#BE000F;margin-bottom:3mm}
 .quote-section-title{
   display:flex;
   align-items:center;
-  gap:2.5mm;
-  margin-bottom:2mm;
-  font-size:3.7mm;
+  gap:3mm;
+  margin-bottom:2.5mm;
+  font-size:4mm;
   font-weight:900;
   text-transform:uppercase;
   color:#183746;
 }
 .quote-section-title::before{
   content:"";
-  width:3.5mm;
-  height:3.5mm;
+  width:4mm;
+  height:4mm;
   border-radius:1mm;
   background:#C58A22;
   flex:0 0 auto;
 }
-
 .quote-customer{
   margin:0;
-  padding:2.5mm 2.5mm 1.5mm;
+  padding:3mm 2mm;
   background:#fff;
   border:0;
   border-radius:0;
-  font-size:3.2mm;
-  line-height:1.65;
+  font-size:3.4mm;
+  line-height:1.8;
   color:#263f4b;
 }
 .quote-customer-grid{
@@ -200,61 +180,26 @@ th{font-size:12px;text-transform:uppercase;color:#666;background:#fafafa}
   row-gap:1mm;
 }
 .quote-field{min-width:0}
-.quote-field.full{grid-column:1/-1}
 .quote-field strong{color:#183746;font-weight:800}
-
+.quote-field-value{color:#333}
 .quote-payment{
   margin-top:2mm;
-  padding:2.5mm;
+  padding:3mm 2mm;
   display:flex;
   align-items:center;
   gap:5mm;
   border-top:1px solid #d9dee1;
   border-bottom:1px solid #d9dee1;
-  font-size:3.1mm;
+  font-size:3.3mm;
 }
-.quote-payment-title{font-weight:900;color:#183746;margin-right:1mm}
-.quote-payment-option{display:inline-flex;align-items:center;gap:1.5mm;color:#344954}
-.quote-check{
-  width:3.8mm;
-  height:3.8mm;
-  border:1.2px solid #183746;
-  border-radius:.7mm;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  font-size:2.8mm;
-  font-weight:900;
-}
-.quote-payment-option.selected .quote-check{
-  background:var(--rojo);
-  border-color:var(--rojo);
-  color:#fff;
-}
-
+.quote-payment-title{font-weight:900;color:#183746;margin-right:2mm}
+.quote-payment-option{display:inline-flex;align-items:center;gap:2mm;color:#344954}
+.quote-check{width:4mm;height:4mm;border:1.3px solid #183746;border-radius:.8mm;display:inline-block;box-sizing:border-box}
+.quote-payment-selected{margin-left:auto;font-weight:700;color:#183746}
 .quote-detail{margin-top:3mm}
-.quote-table{
-  width:100%;
-  min-width:0;
-  border-collapse:collapse;
-  table-layout:fixed;
-}
-.quote-table th{
-  background:#183746;
-  color:#fff;
-  padding:2.6mm 1.8mm;
-  border:1px solid #183746;
-  font-size:3mm;
-  font-weight:800;
-  text-transform:uppercase;
-}
-.quote-table td{
-  padding:2.2mm 1.8mm;
-  border:1px solid #d7dde0;
-  font-size:3mm;
-  color:#263f4b;
-  vertical-align:middle;
-}
+.quote-table{width:100%;min-width:0;border-collapse:collapse;table-layout:fixed}
+.quote-table th{background:#183746;color:#fff;padding:3mm 2mm;border:1px solid #183746;font-size:3.1mm;font-weight:800;text-transform:uppercase}
+.quote-table td{padding:2.5mm 2mm;border:1px solid #d7dde0;font-size:3.1mm;color:#263f4b;vertical-align:middle}
 .quote-table tbody tr:nth-child(even){background:#f4f6f7}
 .quote-table th:nth-child(1),.quote-table td:nth-child(1){width:31%}
 .quote-table th:nth-child(2),.quote-table td:nth-child(2){width:12%}
@@ -262,55 +207,19 @@ th{font-size:12px;text-transform:uppercase;color:#666;background:#fafafa}
 .quote-table th:nth-child(4),.quote-table td:nth-child(4){width:10%;text-align:center}
 .quote-table th:nth-child(5),.quote-table td:nth-child(5){width:16%;text-align:right}
 .quote-table th:nth-child(6),.quote-table td:nth-child(6){width:20%;text-align:right}
-.quote-table small{color:#6b7280;font-size:2.7mm}
+.quote-table small{color:#6b7280;font-size:2.8mm}
 .money{text-align:right;white-space:nowrap}
-
-.quote-total{
-  display:flex;
-  justify-content:flex-end;
-  align-items:center;
-  gap:4mm;
-  margin-top:3.5mm;
-  font-size:4.8mm;
-  font-weight:900;
-  color:#183746;
-}
-.quote-total-value{
-  min-width:43mm;
-  padding:2.5mm 3.5mm;
-  text-align:right;
-  border:1.5px solid #183746;
-  border-radius:1.8mm;
-  background:#f2f5f6;
-  color:var(--rojo);
-}
-
-.quote-footer-line{
-  height:2px;
-  background:var(--rojo);
-  margin-top:4mm;
-  margin-bottom:2.5mm;
-}
-.quote-foot{
-  margin:0;
-  padding:0;
-  border:0;
-  font-size:2.8mm;
-  line-height:1.45;
-  color:#59666c;
-  display:grid;
-  grid-template-columns:1fr 1.6fr;
-  gap:8mm;
-  align-items:center;
-}
-.quote-thanks{font-size:3.6mm;font-weight:800;color:#183746}
+.quote-total{display:flex;justify-content:flex-end;align-items:center;gap:5mm;margin-top:4mm;font-size:5mm;font-weight:900;color:#183746}
+.quote-total-value{min-width:45mm;padding:3mm 4mm;text-align:right;border:2px solid #183746;border-radius:2mm;background:#f2f5f6;color:#BE000F}
+.quote-footer-line{height:2px;background:#BE000F;margin-top:5mm;margin-bottom:3mm}
+.quote-foot{margin:0;padding:0;border:0;font-size:3mm;line-height:1.5;color:#59666c;display:grid;grid-template-columns:1fr 1.5fr;gap:8mm;align-items:center}
+.quote-thanks{font-size:4mm;font-weight:800;color:#183746}
 .quote-thanks span{color:#C58A22}
 .quote-legal{text-align:right}
 .quote-legal strong{color:#183746}
-
 .historical-actions{display:flex;gap:10px;margin-bottom:15px}
 .badge{display:inline-block;font-size:11px;padding:4px 7px;border-radius:10px;background:#eee;color:#555}.badge-zocalo{background:#e5e7eb;color:#555}
- .modal-productos{width:min(760px,100%)}
+.modal-productos{width:min(760px,100%)}
 .catalogo-lista{margin-top:12px;display:flex;flex-direction:column;gap:7px;max-height:52vh;overflow:auto;padding-right:3px}
 .catalogo-item{width:100%;text-align:left;background:#fff;border:1px solid #d9dce1;border-radius:10px;padding:11px 13px;display:flex;flex-direction:column;gap:3px;transition:.15s}
 .catalogo-item:hover{border-color:var(--rojo);background:#fff7f7}
@@ -326,10 +235,7 @@ th{font-size:12px;text-transform:uppercase;color:#666;background:#fafafa}
   .modal-productos{width:min(820px,100%)}
   .catalogo-lista{max-height:58vh}
 }
-
-@media(max-width:800px){
-  .grid{grid-template-columns:1fr 1fr}
-}
+@media(max-width:800px){.grid{grid-template-columns:1fr 1fr}}
 @media(max-width:560px){
   header{position:relative}
   .header-inner{align-items:flex-start}
@@ -342,8 +248,14 @@ th{font-size:12px;text-transform:uppercase;color:#666;background:#fafafa}
   .add-btn{width:100%}
   .actions{flex-direction:column}
   .actions button{width:100%}
-  .quote-head{flex-direction:column}
-  .quote-number,.quote-meta{text-align:left}
+  .quote-head{grid-template-columns:1fr;gap:5mm}
+  .quote-presentation{border-left:0;border-top:2px solid #BE000F;padding:4mm 0 0;align-items:flex-start;text-align:left}
+  .quote-meta{text-align:left}
+  .quote-customer-grid{grid-template-columns:1fr}
+  .quote-payment{flex-wrap:wrap}
+  .quote-payment-selected{margin-left:0;width:100%}
+  .quote-foot{grid-template-columns:1fr}
+  .quote-legal{text-align:left}
 }
 @media print{
   @page{size:A4;margin:0}
@@ -352,9 +264,10 @@ th{font-size:12px;text-transform:uppercase;color:#666;background:#fafafa}
   header,.no-print{display:none!important}
   .wrap{width:210mm;max-width:none;margin:0;padding:0}
   .card{border:0;box-shadow:none;padding:0;margin:0}
-  .quote-preview{width:210mm;min-height:297mm;margin:0;padding:8mm;border:0}
+  .quote-preview{width:210mm;min-height:297mm;margin:0;padding:8mm;box-sizing:border-box;border:0}
   .quote-head,.quote-customer,.quote-payment,.quote-detail,.quote-total,.quote-foot{page-break-inside:avoid}
-  .quote-table tr{page-break-inside:avoid}
+  .quote-table{page-break-inside:auto}
+  .quote-table tr{page-break-inside:avoid;page-break-after:auto}
 }
 </style>
 </head>
@@ -1108,16 +1021,15 @@ function quoteHtml(numero,fecha,d){
     const cr=String(p.unidad||"")==="Unidades";
     return cr
       ? `<tr><td><strong>${esc(p.producto)}</strong>${p.tieneOferta?' <small>OFERTA</small>':''}</td><td>—</td><td>${fmt0(p.cantidad||0)} unidades</td><td>—</td><td class="money">$ ${fmt(p.precioM2)}</td><td class="money">$ ${fmt(p.subtotal)}</td></tr>`
-      : `<tr><td><strong>${esc(p.producto)}</strong><br><small>${esc(p.color||"")}${p.conZocalo?' · Incl. Zócalo':''}${p.tieneOferta?' · OFERTA':''}</small></td><td>${esc(p.medida||"—")}</td><td>${fmt(p.m2Solicitados)}</td><td>${p.cajas}</td><td class="money">$ ${fmt(p.precioM2)}</td><td class="money">$ ${fmt(p.subtotal)}</td></tr>`;
+      : `<tr><td><strong>${esc(p.producto)}</strong>${p.color?`<br><small>${esc(p.color)}</small>`:""}${p.conZocalo?`<br><small>Incl. Zócalo</small>`:""}${p.tieneOferta?`<br><small>OFERTA</small>`:""}</td><td>${esc(p.medida||"—")}</td><td>${fmt(p.m2Solicitados)}</td><td>${p.cajas}</td><td class="money">$ ${fmt(p.precioM2)}</td><td class="money">$ ${fmt(p.subtotal)}</td></tr>`;
   }).join("");
 
   const formaPago=String(d.formaPago||"Contado").trim();
 
-  const opcionPago=(valor,texto)=>`
-    <div class="quote-payment-option ${formaPago===valor?'selected':''}">
-      <span class="quote-check">${formaPago===valor?'✓':''}</span>
-      ${texto}
-    </div>`;
+  const check = valor =>
+    formaPago.toLocaleLowerCase("es-AR")===valor.toLocaleLowerCase("es-AR")
+      ? "☑"
+      : "☐";
 
   return `<section class="quote-preview" id="quote">
 
@@ -1135,7 +1047,7 @@ function quoteHtml(numero,fecha,d){
 
       <div class="quote-presentation">
         <div class="quote-title">PRESUPUESTO</div>
-        <div class="quote-number">e-Ppto - ${esc(numero)}</div>
+        <div class="quote-number">${esc(numero)}</div>
         <div class="quote-meta">
           <div><strong>Fecha:</strong> ${esc(fecha)}</div>
           <div><strong>Vendedor:</strong> ${esc(vendedor)}</div>
@@ -1147,29 +1059,44 @@ function quoteHtml(numero,fecha,d){
     <div class="quote-section">
       <div class="quote-section-line"></div>
       <div class="quote-section-title">Datos del Cliente</div>
+
       <div class="quote-customer">
         <div class="quote-customer-grid">
-          <div class="quote-field full"><strong>Señor / es:</strong> ${esc(d.cliente||"")}</div>
-          <div class="quote-field"><strong>DNI / CUIT:</strong> ${esc(d.dniCuit||"—")}</div>
-          <div class="quote-field"><strong>Teléfono:</strong> ${esc(d.telefono||"—")}</div>
-          <div class="quote-field full"><strong>Dirección:</strong> ${esc(d.direccion||"—")}</div>
-          ${d.email?`<div class="quote-field full"><strong>Email:</strong> ${esc(d.email)}</div>`:""}
+          <div class="quote-field">
+            <strong>Nombre:</strong> <span class="quote-field-value">${esc(d.cliente||"—")}</span>
+          </div>
+          <div class="quote-field">
+            <strong>DNI / CUIT:</strong> <span class="quote-field-value">${esc(d.dniCuit||"—")}</span>
+          </div>
+          <div class="quote-field">
+            <strong>Teléfono:</strong> <span class="quote-field-value">${esc(d.telefono||"—")}</span>
+          </div>
+          <div class="quote-field">
+            <strong>Dirección:</strong> <span class="quote-field-value">${esc(d.direccion||"—")}</span>
+          </div>
+          <div class="quote-field" style="grid-column:1/-1">
+            <strong>E-Mail:</strong> <span class="quote-field-value">${esc(d.email||"—")}</span>
+          </div>
         </div>
       </div>
     </div>
 
     <div class="quote-payment">
       <div class="quote-payment-title">Condición de Venta:</div>
-      ${opcionPago("Contado","Contado")}
-      ${opcionPago("Tarjeta","Tarjeta")}
-      ${opcionPago("Otro","Otro")}
+      <div class="quote-payment-option"><span>${check("Contado")}</span> Contado</div>
+      <div class="quote-payment-option"><span>${check("Tarjeta")}</span> Tarjeta</div>
+      <div class="quote-payment-option"><span>${check("Otro")}</span> Otro</div>
+      <div class="quote-payment-selected">Seleccionada: ${esc(formaPago)}</div>
     </div>
 
     <div class="quote-detail">
       <div class="quote-section-line"></div>
       <div class="quote-section-title">Detalle del Presupuesto</div>
+
       <table class="quote-table">
-        <thead><tr><th>Producto</th><th>Medida</th><th>Cantidad</th><th>Cajas</th><th>Precio Unit.</th><th>Importe</th></tr></thead>
+        <thead>
+          <tr><th>Producto</th><th>Medida</th><th>Cantidad</th><th>Cajas</th><th>Precio Unit.</th><th>Importe</th></tr>
+        </thead>
         <tbody>${rows}</tbody>
       </table>
     </div>
@@ -1182,7 +1109,10 @@ function quoteHtml(numero,fecha,d){
     <div class="quote-footer-line"></div>
 
     <div class="quote-foot">
-      <div class="quote-thanks">¡Gracias por confiar en nosotros!<br><span>G&T S.R.L.</span></div>
+      <div class="quote-thanks">
+        ¡Gracias por confiar en nosotros!<br>
+        <span>G&T S.R.L.</span>
+      </div>
       <div class="quote-legal">
         <div><strong>Validez: 15 días.</strong> Los precios y condiciones indicados corresponden al momento de emisión del presupuesto.</div>
         <div><strong>Documento no válido como factura.</strong></div>
