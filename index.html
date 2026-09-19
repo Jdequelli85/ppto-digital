@@ -826,8 +826,41 @@ async function guardarPresupuesto(){
     // EL GUARDADO TODAVÍA NO SE MODIFICA.
     // ==================================================
 
-    mostrarPresupuestoGuardado(numero,datos);
+// MOSTRAR EL PRESUPUESTO INMEDIATAMENTE
+mostrarPresupuestoGuardado(numero, datos);
 
+// GUARDAR EN SEGUNDO PLANO
+jsonp({
+  accion: "guardar",
+  token,
+  numero: numero,
+  datos: JSON.stringify(datos)
+})
+.then(rGuardado => {
+
+  if (!rGuardado?.ok) {
+    console.error(
+      "No se pudo guardar el presupuesto:",
+      rGuardado?.error || "Error desconocido"
+    );
+    return;
+  }
+
+  console.log(
+    "Presupuesto guardado correctamente:",
+    rGuardado.numero
+  );
+
+})
+.catch(error => {
+
+  console.error(
+    "Error al guardar el presupuesto:",
+    error
+  );
+
+});
+    
   }catch(e){
 
     st.className="status error";
