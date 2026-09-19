@@ -1,18 +1,800 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>G&T S.R.L. — Presupuesto Digital</title>
-</head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#BE000F">
+<title>G&T S.R.L. — Presupuesto Digital</title>
+<style>
+*{box-sizing:border-box}
+:root{
+  --rojo:#BE000F;
+  --rojo2:#98000c;
+  --gris:#f3f4f6;
+  --gris2:#e5e7eb;
+  --texto:#222;
+  --muted:#6b7280;
+  --verde:#176b2c;
+}
+html,body{margin:0;padding:0;background:var(--gris);color:var(--texto);font-family:Arial,Helvetica,sans-serif}
+body{min-height:100vh}
+button,input,select{font:inherit}
+button{cursor:pointer}
+header{
+  background:#fff;
+  border-bottom:1px solid var(--gris2);
+  padding:14px 18px;
+  position:sticky;top:0;z-index:20;
+}
+.header-inner{max-width:1050px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:15px}
+header img{width:150px;height:auto;display:block}
+.user-pill{font-size:13px;color:#555;background:#f7f7f7;border:1px solid #ddd;border-radius:20px;padding:8px 12px}
+.wrap{max-width:1050px;margin:24px auto;padding:0 15px 50px}
+.card{
+  background:#fff;border:1px solid #e2e2e2;border-radius:14px;
+  padding:20px;margin-bottom:16px;box-shadow:0 3px 14px rgba(0,0,0,.05)
+}
+.login-card{max-width:430px;margin:70px auto}
+.logo-login{width:190px;display:block;margin:0 auto 20px}
+h1{font-size:24px;margin:0 0 5px}
+h2{font-size:20px;margin:0}
+h3{margin:0 0 14px}
+.subtitle{color:var(--muted);font-size:14px;margin-bottom:24px}
+label{display:block;font-weight:700;font-size:13px;margin:0 0 6px}
+input,select{
+  width:100%;padding:12px;border:1px solid #cfd2d7;border-radius:9px;background:#fff;outline:none
+}
+input:focus,select:focus{border-color:var(--rojo);box-shadow:0 0 0 3px rgba(190,0,15,.10)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.field-full{grid-column:1/-1}
+.btn{
+  border:0;border-radius:9px;padding:12px 16px;font-weight:800;min-height:44px
+}
+.btn-primary{background:var(--rojo);color:#fff}
+.btn-primary:hover{background:var(--rojo2)}
+.btn-secondary{background:#fff;color:#333;border:1px solid #cfd2d7}
+.btn-danger{background:#fff;color:var(--rojo);border:1px solid #e5a6ab}
+.btn-large{width:100%;margin-top:16px}
+.status{margin-top:14px;padding:11px;border-radius:9px;font-size:14px;display:none}
+.status.error{display:block;background:#fff0f1;color:#9d0010;border:1px solid #f2b7bd}
+.status.ok{display:block;background:#edf8f0;color:var(--verde);border:1px solid #b9dfc2}
+.titlebar{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:14px}
+.add-btn{white-space:nowrap}
+.empty{padding:28px;text-align:center;color:#777;border:1px dashed #ccc;border-radius:10px}
+.table-wrap{overflow:auto}
+table{width:100%;border-collapse:collapse;min-width:760px}
+th,td{padding:10px 8px;border-bottom:1px solid #e5e7eb;text-align:left;vertical-align:top;font-size:13px}
+th{font-size:12px;text-transform:uppercase;color:#666;background:#fafafa}
+.money{text-align:right;white-space:nowrap}
+.total-box{text-align:right;margin-top:15px;font-size:22px;font-weight:800}
+.total-box small{display:block;font-size:12px;color:#777;font-weight:400;margin-bottom:3px}
+.actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}
+.modal-backdrop{
+  position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:100;
+  display:none;align-items:center;justify-content:center;padding:15px
+}
+.modal-backdrop.open{display:flex}
+.modal{
+  width:min(560px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:15px;padding:20px;
+  box-shadow:0 15px 50px rgba(0,0,0,.3)
+}
+.modal-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
+.close{border:0;background:#eee;border-radius:50%;width:34px;height:34px}
+#reader{width:100%;max-width:430px;margin:15px auto}
+.scan-note{font-size:13px;color:#666;text-align:center}
+.product-info{background:#f7f7f7;border-radius:10px;padding:14px;margin-bottom:15px;line-height:1.55}
+.calc-info{margin-top:10px;color:#555;font-size:13px;line-height:1.5}
+.checkbox{display:flex;align-items:center;gap:8px;margin:13px 0;font-weight:700}
+.checkbox input{width:auto}
+.loading{text-align:center;padding:35px;color:#666}
+.quote-preview{background:#fff;border:1px solid #ddd;padding:28px;max-width:850px;margin:auto}
+.quote-head{display:flex;justify-content:space-between;gap:20px;border-bottom:2px solid var(--rojo);padding-bottom:15px}
+.quote-head img{width:175px;height:max-content}
+.quote-number{font-size:22px;font-weight:800;text-align:right}
+.quote-meta{text-align:right;color:#555;font-size:13px;margin-top:6px}
+.quote-customer{margin:20px 0;padding:13px;background:#f7f7f7;border-radius:8px}
+.quote-table{min-width:0}
+.quote-table th,.quote-table td{font-size:12px}
+.quote-total{text-align:right;font-size:21px;font-weight:800;margin-top:18px}
+.quote-foot{margin-top:28px;padding-top:12px;border-top:1px solid #ddd;font-size:12px;color:#666;line-height:1.5}
+.historical-actions{display:flex;gap:10px;margin-bottom:15px}
+.badge{display:inline-block;font-size:11px;padding:4px 7px;border-radius:10px;background:#eee;color:#555}.badge-zocalo{background:#e5e7eb;color:#555}
+ .modal-productos{width:min(760px,100%)}
+.catalogo-lista{margin-top:12px;display:flex;flex-direction:column;gap:7px;max-height:52vh;overflow:auto;padding-right:3px}
+.catalogo-item{width:100%;text-align:left;background:#fff;border:1px solid #d9dce1;border-radius:10px;padding:11px 13px;display:flex;flex-direction:column;gap:3px;transition:.15s}
+.catalogo-item:hover{border-color:var(--rojo);background:#fff7f7}
+.catalogo-item strong{font-size:14px}
+.catalogo-item span{font-size:12px;color:#666}
+.loading-catalogo{margin-top:70px;text-align:center}
+.catalog-spinner{width:32px;height:32px;margin:20px auto;border:4px solid #e5e7eb;border-top-color:var(--rojo);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(min-width:1000px){
+  .wrap{max-width:1180px}
+  .header-inner{max-width:1180px}
+  .grid{grid-template-columns:repeat(3,1fr)}
+  .modal-productos{width:min(820px,100%)}
+  .catalogo-lista{max-height:58vh}
+}
 
+@media(max-width:800px){
+  .grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:560px){
+  header{position:relative}
+  .header-inner{align-items:flex-start}
+  header img{width:125px}
+  .user-pill{font-size:11px}
+  .wrap{margin:12px auto}
+  .card{padding:15px;border-radius:11px}
+  .grid{grid-template-columns:1fr}
+  .titlebar{align-items:stretch;flex-direction:column}
+  .add-btn{width:100%}
+  .actions{flex-direction:column}
+  .actions button{width:100%}
+  .quote-head{flex-direction:column}
+  .quote-number,.quote-meta{text-align:left}
+}
+@media print{
+  body{background:#fff}
+  header,.no-print{display:none!important}
+  .wrap{max-width:none;margin:0;padding:0}
+  .card{border:0;box-shadow:none;padding:0;margin:0}
+  .quote-preview{border:0;padding:0;max-width:none}
+}
+</style>
+</head>
 <body>
 
-  <h1>G&T S.R.L.</h1>
-  <h2>Presupuesto Digital</h2>
+<div id="app"></div>
 
-  <p>Versión PC</p>
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycby_3DebaIbZZW2qZ7ShkePBD40Bzo8wGyaHAw8w0omsKahF6CpuUEEPaG2ox3fGkAqk0w/exec";
+const LOGO_URL = "https://raw.githubusercontent.com/Jdequelli85/qr-corralon/main/logo.png";
 
+let token = sessionStorage.getItem("gt_token") || "";
+let vendedor = sessionStorage.getItem("gt_usuario") || "";
+let productos = [];
+let catalogoProductos = [];
+let catalogoOpciones = [];
+let productoActual = null;
+let verNumero = new URLSearchParams(location.search).get("ver") || "";
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+const fmt = n => Number(n || 0).toLocaleString("es-AR",{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmt0 = n => Number(n || 0).toLocaleString("es-AR",{maximumFractionDigits:0});
+
+function categoriaProducto(p){
+  const id=String(p?.["ID"]||"").trim().toUpperCase();
+  if(id.startsWith("CRRL-")) return "CRRL";
+  if(id.startsWith("CER-")) return "CER";
+  if(id.startsWith("POR-")) return "POR";
+  if(id.startsWith("REV-")) return "REV";
+  if(id.startsWith("PSO-")) return "PSO";
+  return "OTRO";
+}
+
+function esMaterialCorralon(p){ return categoriaProducto(p)==="CRRL"; }
+
+function sonidoQR(){
+  try{
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if(!AudioCtx)return;
+    const ctx = new AudioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = "sine";
+    osc.frequency.value = 880;
+
+    gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.16, ctx.currentTime + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.13);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start();
+    osc.stop(ctx.currentTime + 0.14);
+    osc.onended = () => ctx.close();
+  }catch(e){}
+}
+
+function nuevoPresupuesto(){
+  productos = [];
+  productoActual = null;
+  verNumero = "";
+  renderApp();
+}
+
+function jsonp(params){
+  return new Promise((resolve,reject)=>{
+    const callback = "gtcb_" + Date.now() + "_" + Math.floor(Math.random()*100000);
+    const script = document.createElement("script");
+    const q = new URLSearchParams({...params,callback,_ts:Date.now()});
+    let timer = setTimeout(()=>{cleanup();reject(new Error("Tiempo de espera agotado."));},20000);
+    function cleanup(){clearTimeout(timer);delete window[callback];script.remove();}
+    window[callback] = data => {cleanup();resolve(data)};
+    script.onerror = ()=>{cleanup();reject(new Error("No se pudo conectar con el servidor."))};
+    script.src = API_URL + "?" + q.toString();
+    document.body.appendChild(script);
+  });
+}
+
+async function cargarCatalogo(){
+  const r = await jsonp({accion:"catalogo",token});
+  if(!r?.ok) throw new Error(r?.error || "No se pudo cargar el catálogo de productos.");
+
+  catalogoProductos = Array.isArray(r.productos)
+    ? r.productos
+    : (Array.isArray(r.catalogo) ? r.catalogo : []);
+
+  catalogoOpciones = [];
+  catalogoProductos.forEach(p=>{
+    const categoria = categoriaProducto(p);
+    if(categoria === "OTRO") return;
+
+    const colores = String(p["Color"] || "").trim()
+      .split(/\s*-\s*/)
+      .map(c=>c.trim())
+      .filter(Boolean);
+
+    if(categoria === "CRRL" || colores.length === 0){
+      catalogoOpciones.push({...p,_colorSeleccionado:""});
+      return;
+    }
+
+    colores.forEach(color=>{
+      catalogoOpciones.push({...p,_colorSeleccionado:color});
+    });
+  });
+
+  if(!catalogoOpciones.length) throw new Error("El catálogo no contiene productos disponibles.");
+}
+
+function mostrarCargaCatalogo(){
+  $("app").innerHTML = `
+    <main class="wrap">
+      <section class="card login-card loading-catalogo">
+        <img class="logo-login" src="${LOGO_URL}" alt="G&T S.R.L.">
+        <h1>Cargando productos...</h1>
+        <div class="subtitle">Preparando el catálogo para esta sesión.</div>
+        <div class="catalog-spinner" aria-label="Cargando"></div>
+      </section>
+    </main>`;
+}
+
+function mostrarLogin(mensaje=""){
+  document.title="G&T S.R.L. — Presupuesto Digital";
+  $("app").innerHTML = `
+    <main class="wrap">
+      <section class="card login-card">
+        <img class="logo-login" src="${LOGO_URL}" alt="G&T S.R.L.">
+        <h1>Presupuesto Digital</h1>
+        <div class="subtitle">Acceso para personal autorizado</div>
+        <form id="loginForm">
+          <label>Vendedor</label>
+          <select id="loginUsuario" required>
+            <option value="">Seleccioná tu nombre</option>
+            <option value="Agustin">Agustin</option>
+            <option value="Gaston">Gaston</option>
+            <option value="Tomito">Tomito</option>
+            <option value="Julio">Julio</option>
+          </select>
+          <div style="height:12px"></div>
+          <label>PIN</label>
+          <input id="loginPin" type="password" inputmode="numeric" autocomplete="off" required>
+          <button class="btn btn-primary btn-large" id="loginBtn">INGRESAR</button>
+          <div id="loginStatus" class="status ${mensaje?'error':''}">${esc(mensaje)}</div>
+        </form>
+        <div style="margin-top:22px;text-align:center;color:#888;font-size:12px">G&T S.R.L. · Presupuesto Digital</div>
+      </section>
+    </main>`;
+  $("loginForm").onsubmit=async e=>{
+    e.preventDefault();
+    const btn=$("loginBtn"), st=$("loginStatus");
+    btn.disabled=true; btn.textContent="VERIFICANDO...";
+    st.className="status"; st.textContent="";
+    try{
+      const r=await jsonp({accion:"login",usuario:$("loginUsuario").value,pin:$("loginPin").value});
+      if(!r || !r.ok) throw new Error(r?.error || "Usuario o PIN incorrecto.");
+      token=r.token; vendedor=r.usuario;
+      sessionStorage.setItem("gt_token",token);
+      sessionStorage.setItem("gt_usuario",vendedor);
+      mostrarCargaCatalogo();
+      await cargarCatalogo();
+      renderApp();
+    }catch(err){
+      st.className="status error"; st.textContent=err.message;
+      btn.disabled=false; btn.textContent="INGRESAR";
+    }
+  };
+}
+
+function header(){
+  return `<header><div class="header-inner">
+    <img src="${LOGO_URL}" alt="G&T S.R.L.">
+    <div class="user-pill">Vendedor: <strong>${esc(vendedor)}</strong></div>
+  </div></header>`;
+}
+
+async function renderApp(){
+  if(!token){mostrarLogin();return;}
+  if(verNumero){renderLoadingHistorico();cargarHistorico(verNumero);return;}
+  if(!catalogoOpciones.length){
+    try{
+      mostrarCargaCatalogo();
+      await cargarCatalogo();
+    }catch(e){
+      mostrarLogin("No se pudo cargar el catálogo: " + e.message);
+      return;
+    }
+  }
+  document.title="G&T S.R.L. — Presupuesto Digital";
+  $("app").innerHTML = header()+`
+  <main class="wrap">
+    <section class="card">
+      <h1>Presupuesto Digital</h1>
+      <div class="subtitle">Nuevo presupuesto · el número se asigna al guardar</div>
+      <div class="grid">
+        <div><label>Cliente *</label><input id="cliente" placeholder="Nombre y apellido / Razón social"></div>
+        <div><label>DNI / CUIT</label><input id="dni"></div>
+        <div><label>Teléfono</label><input id="telefono"></div>
+        <div><label>Email</label><input id="email" type="email"></div>
+        <div><label>Dirección</label><input id="direccion"></div>
+        <div><label>Forma de pago</label>
+          <select id="forma"><option value="Contado">Contado</option><option value="Tarjeta">Tarjeta</option><option value="Otro">Otro</option></select>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="titlebar">
+        <h2>Productos</h2>
+        <button class="btn btn-primary add-btn" id="add">＋ AGREGAR PRODUCTO</button>
+      </div>
+      <div id="empty" class="empty">Todavía no se agregaron productos.</div>
+<div class="table-wrap"><table id="table" hidden>
+  <thead>
+    <tr>
+      <th>Producto</th>
+      <th>Medida</th>
+      <th>Cantidad</th>
+      <th>Cajas</th>
+      <th>P. UNIT.</th>
+      <th>Subtotal</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody id="rows"></tbody>
+</table></div>
+      <div class="total-box"><small>Total presupuesto</small>$ <span id="total">0,00</span></div>
+      <div class="actions">
+        <button class="btn btn-secondary" id="cancel">CANCELAR</button>
+        <button class="btn btn-primary" id="generate">GENERAR PRESUPUESTO</button>
+      </div>
+      <div id="appStatus" class="status"></div>
+    </section>
+  </main>
+
+  <div class="modal-backdrop" id="modal">
+    <div class="modal modal-productos">
+      <div class="modal-head"><h3>Agregar producto</h3><button class="close" id="close">×</button></div>
+      <div id="catalogArea">
+        <p class="scan-note">Seleccioná un producto del catálogo.</p>
+        <input id="buscarProducto" type="search" placeholder="🔎 Buscar por producto, color o medida..." autocomplete="off">
+        <div id="catalogoLista" class="catalogo-lista"></div>
+        <div id="catalogoError" class="status"></div>
+      </div>
+      <div id="calcArea" hidden>
+        <div id="productInfo" class="product-info"></div>
+        <div id="m2Area">
+          <label>Metros cuadrados necesarios *</label>
+          <input id="m2" type="number" min="0.01" step="0.01" placeholder="Ej.: 28">
+          <label class="checkbox"><input id="zocalo" type="checkbox"> Con zócalo (+10%)</label>
+        </div>
+        <div id="cantidadArea" hidden>
+          <label>Cantidad *</label>
+          <input id="cantidad" type="number" min="1" step="1" placeholder="Ej.: 10">
+        </div>
+        <div id="calcInfo" class="calc-info"></div>
+        <button class="btn btn-primary btn-large" id="confirm">AGREGAR AL PRESUPUESTO</button>
+      </div>
+    </div>
+  </div>`;
+  $("add").onclick=abrirModal;
+  $("close").onclick=cerrarModal;
+  $("buscarProducto").oninput=renderCatalogo;
+  $("cancel").onclick=()=>{if(confirm("¿Cancelar este presupuesto?")){productos=[];limpiarFormulario();renderProductos()}};
+  $("generate").onclick=guardarPresupuesto;
+  $("m2").oninput=calcularActual;
+  $("zocalo").onchange=calcularActual;
+  $("cantidad").oninput=calcularActual;
+  renderProductos();
+}
+
+function limpiarFormulario(){
+  ["cliente","dni","telefono","email","direccion"].forEach(id=>{if($(id))$(id).value=""});
+  if($("forma"))$("forma").value="Contado";
+}
+
+function abrirModal(){
+  productoActual = null;
+  $("modal").classList.add("open");
+  $("catalogArea").hidden=false;
+  $("calcArea").hidden=true;
+  $("catalogoError").className="status";
+  $("catalogoError").textContent="";
+  $("buscarProducto").value="";
+  renderCatalogo();
+  setTimeout(()=>$("buscarProducto")?.focus(),50);
+}
+
+function cerrarModal(){
+  $("modal")?.classList.remove("open");
+  productoActual=null;
+}
+
+function textoOpcionCatalogo(p){
+  const producto=String(p["Producto"]||"").trim();
+  const color=String(p._colorSeleccionado||"").trim();
+  const medida=String(p["Medida"]||"").trim();
+  if(categoriaProducto(p)==="CRRL") return producto;
+  const detalle=[color,medida].filter(Boolean).join(" - ");
+  return detalle ? `${producto} (${detalle})` : producto;
+}
+
+function renderCatalogo(){
+  const lista=$("catalogoLista");
+  if(!lista)return;
+  const q=String($("buscarProducto")?.value||"").trim().toLocaleLowerCase("es-AR");
+  const resultados=catalogoOpciones.filter(p=>{
+    if(!q)return true;
+    return textoOpcionCatalogo(p).toLocaleLowerCase("es-AR").includes(q);
+  });
+
+  if(!resultados.length){
+    lista.innerHTML='<div class="empty">No se encontraron productos.</div>';
+    return;
+  }
+
+  lista.innerHTML=resultados.map((p,i)=>`
+    <button type="button" class="catalogo-item" data-catalogo-index="${catalogoOpciones.indexOf(p)}">
+      <strong>${esc(p["Producto"]||"")}</strong>
+      <span>${esc([p._colorSeleccionado,p["Medida"]].filter(Boolean).join(" · "))}</span>
+    </button>`).join("");
+}
+
+function seleccionarProductoCatalogo(indice){
+  const p=catalogoOpciones[indice];
+  if(!p)return;
+  productoActual={...p};
+  $("catalogArea").hidden=true;
+  $("calcArea").hidden=false;
+  mostrarProducto();
+}
+
+function mostrarProducto(){
+  const p=productoActual;
+  const crrl=esMaterialCorralon(p);
+
+  const oferta=Number(p["OFERTA"]||0);
+  const tieneOferta=Number.isFinite(oferta)&&oferta>0;
+
+  const precioContado=Number(p["Precio Contado"]||0);
+  const precioTarjeta=Number(p["Precio Tarjeta"]||0);
+  const forma=$("forma")?.value||"Contado";
+
+  const precio=
+    forma==="Tarjeta"&&precioTarjeta>0
+      ? precioTarjeta
+      : (tieneOferta?oferta:precioContado);
+
+  /* =========================
+     MATERIAL DE CORRALÓN
+     ========================= */
+  if(crrl){
+    $("productInfo").innerHTML=`
+      <strong>${esc(p["Producto"])}</strong><br>
+      <strong>${tieneOferta?"🔥 OFERTA":"Precio"}: $ ${fmt(precio)} /unidad</strong>`;
+
+    $("m2Area").hidden=true;
+    $("cantidadArea").hidden=false;
+
+    $("cantidad").value="";
+    $("calcInfo").textContent="";
+    $("calcArea").hidden=false;
+
+    $("cantidad").focus();
+    return;
+  }
+
+  /* =========================
+     CERÁMICOS / PORCELANATOS /
+     REVESTIMIENTOS / PISOS
+     ========================= */
+
+  const coloresRaw=String(p["Color"]||"").trim();
+
+  const colores=coloresRaw
+    .split(/\s*-\s*/)
+    .map(c=>c.trim())
+    .filter(Boolean);
+
+  let selectorColor="";
+
+  if(colores.length>1){
+    selectorColor=`
+      <br>
+      <label>Color *</label>
+      <select id="colorSelect">
+        <option value="">Seleccioná un color</option>
+        ${colores.map(c=>`
+          <option value="${esc(c)}">${esc(c)}</option>
+        `).join("")}
+      </select>
+    `;
+  }
+
+  $("productInfo").innerHTML=`
+    <strong>${esc(p["Producto"])}</strong><br>
+    ${esc(p["Medida"]||"")}
+    ${selectorColor}
+    <br>
+    <strong>${tieneOferta?"🔥 OFERTA":"Precio"}: $ ${fmt(precio)} /m²</strong><br>
+    Caja: ${fmt(p["Caja m²"])} m² · ${fmt0(p["Kg/Caja"]||0)} kg/caja`;
+
+  $("m2Area").hidden=false;
+  $("cantidadArea").hidden=true;
+
+  $("m2").value="";
+  $("zocalo").checked=false;
+  $("calcInfo").textContent="";
+  $("calcArea").hidden=false;
+
+  if(colores.length===1){
+    productoActual._colorSeleccionado=colores[0];
+  }else{
+    productoActual._colorSeleccionado="";
+  }
+
+  $("colorSelect")?.addEventListener("change",function(){
+    productoActual._colorSeleccionado=this.value;
+  });
+
+  $("m2").focus();
+  calcularActual();
+}
+  
+function calcularActual(){
+  if(!productoActual)return null;
+  const crrl=esMaterialCorralon(productoActual);
+  const oferta=Number(productoActual["OFERTA"]||0);
+  const tieneOferta=Number.isFinite(oferta)&&oferta>0;
+  const forma=$("forma").value||"Contado";
+  const precioTarjeta=Number(productoActual["Precio Tarjeta"]||0);
+  const precio=(forma==="Tarjeta"&&precioTarjeta>0)?precioTarjeta:(tieneOferta?oferta:Number(productoActual["Precio Contado"]||0));
+
+  if(crrl){
+    const cantidad=Number($("cantidad")?.value||0);
+    if(cantidad<=0){$("calcInfo").textContent="";return null}
+    const subtotal=cantidad*precio;
+    $("calcInfo").textContent=`${cantidad} unidades · Subtotal: $ ${fmt(subtotal)}`;
+    return {unidad:"Unidades",cantidad, m2Solicitados:0,conZocalo:false,porcentajeAdicional:0,m2Calculados:0,cajas:0,m2Reales:0,precioM2:precio,precioCaja:precio,subtotal,tieneOferta,oferta};
+  }
+
+  const m2=Number($("m2").value||0);if(m2<=0){$("calcInfo").textContent="";return null}
+  const conZ=$("zocalo").checked, extra=conZ?10:0, m2Calc=m2*(1+extra/100);
+  const caja=Number(productoActual["Caja m²"]||0);
+  const cajas=Math.ceil(m2Calc/caja), reales=cajas*caja;
+  const subtotal=reales*precio;
+  $("calcInfo").textContent=`${conZ?"Con zócalo (+10%) · ":""}${cajas} cajas · ${fmt(reales)} m² reales · Subtotal: $ ${fmt(subtotal)}`;
+  return {unidad:"m²",cantidad:m2,m2Solicitados:m2,conZocalo:conZ,porcentajeAdicional:extra,m2Calculados:m2Calc,cajas,m2Reales:reales,precioM2:precio,precioCaja:precio*caja,subtotal,tieneOferta,oferta};
+}
+
+function renderProductos(){
+  if(!$("rows"))return;
+
+  $("rows").innerHTML="";
+  let total=0;
+
+  productos.forEach((p,i)=>{
+    total+=Number(p.subtotal||0);
+
+    const esCRRL = String(p.id||"").toUpperCase().startsWith("CRRL-");
+
+    let cantidadHTML="";
+
+    if(esCRRL){
+
+      cantidadHTML=`
+        <strong>${fmt0(p.cantidad||0)} unidades</strong>
+      `;
+
+    }else{
+
+      const m2Solicitados=Number(p.m2Solicitados||0);
+      const m2Calculados=Number(p.m2Reales||0);
+      const m2Zocalo=p.conZocalo
+        ? Math.max(0,m2Calculados-m2Solicitados)
+        : 0;
+
+      cantidadHTML=`
+        <strong>${fmt(m2Solicitados)} m²</strong>
+        ${p.conZocalo && m2Zocalo>0
+          ? `<br><small>+ ${fmt(m2Zocalo)} m² zócalo</small>`
+          : ""
+        }
+      `;
+    }
+
+    const precioUnitario=Number(p.precioM2||0);
+
+    const tr=document.createElement("tr");
+
+    tr.innerHTML=`
+      <td>
+        <strong>${esc(p.producto)}</strong>
+        ${p.color ? `<br><small>${esc(p.color)}</small>` : ""}
+        ${p.tieneOferta ? ' <span class="badge">OFERTA</span>' : ""}
+        ${p.conZocalo
+          ? ' <span class="badge">INCLUIDO ZÓCALO</span>'
+          : ""
+        }
+      </td>
+
+      <td>${esc(p.medida||"—")}</td>
+
+      <td>${cantidadHTML}</td>
+
+      <td>${esCRRL ? "—" : p.cajas}</td>
+
+      <td class="money">$ ${fmt(precioUnitario)}</td>
+
+      <td class="money">$ ${fmt(p.subtotal)}</td>
+
+      <td>
+        <button class="btn btn-danger" data-remove="${i}" title="Eliminar">🗑</button>
+      </td>
+    `;
+
+    $("rows").appendChild(tr);
+  });
+
+  $("total").textContent=fmt(total);
+  $("empty").hidden=productos.length>0;
+  $("table").hidden=productos.length===0;
+}
+  
+$("cantidad")?.addEventListener("input",calcularActual);
+
+$("app").addEventListener("click",e=>{
+  const item=e.target.closest("[data-catalogo-index]");
+  if(item){
+    seleccionarProductoCatalogo(Number(item.dataset.catalogoIndex));
+    return;
+  }
+  const btn=e.target.closest("[data-remove]");
+  if(btn){
+    productos.splice(Number(btn.dataset.remove),1);
+    renderProductos();
+    return;
+  }
+
+  if(e.target.id==="confirm"){
+    const c=calcularActual();
+
+    if(!c){
+      return alert(
+        esMaterialCorralon(productoActual)
+          ? "Ingresá la cantidad de unidades."
+          : "Ingresá los metros cuadrados."
+      );
+    }
+
+    const p=productoActual;
+
+const colorSeleccionado = $("colorSelect")?.value || p._colorSeleccionado || p["Color"] || "";
+
+productos.push({
+  id:p["ID"],
+  producto:p["Producto"],
+  medida:p["Medida"]||"",
+  color:colorSeleccionado,
+  ...c
+});
+
+    cerrarModal();
+    renderProductos();
+  }
+});
+
+async function guardarPresupuesto(){
+  if(!productos.length)return alert("Agregá al menos un producto.");
+  const cliente=$("cliente").value.trim();
+  if(!cliente)return alert("Ingresá el cliente.");
+  const total=productos.reduce((s,p)=>s+Number(p.subtotal||0),0);
+  const datos={
+    cliente,dniCuit:$("dni").value.trim(),telefono:$("telefono").value.trim(),
+    email:$("email").value.trim(),direccion:$("direccion").value.trim(),
+    formaPago:$("forma").value,subtotal:total,descuento:0,total,
+    observaciones:"",productos
+  };
+  const btn=$("generate"),st=$("appStatus");
+  btn.disabled=true;btn.textContent="GUARDANDO...";
+  st.className="status";st.textContent="";
+  try{
+    const r=await jsonp({accion:"guardar",token,datos:JSON.stringify(datos)});
+    if(!r?.ok)throw new Error(r?.error||"No se pudo guardar el presupuesto.");
+    mostrarPresupuestoGuardado(r.numero,datos);
+  }catch(e){
+    st.className="status error";st.textContent=e.message;
+  }finally{btn.disabled=false;btn.textContent="GENERAR PRESUPUESTO"}
+}
+
+function mostrarPresupuestoGuardado(numero,datos){
+  verNumero="";
+  const fecha=new Date().toLocaleDateString("es-AR");
+  $("app").innerHTML=header()+`<main class="wrap">
+    <div class="historical-actions no-print">
+      <button class="btn btn-primary" id="printQuote">🖨 IMPRIMIR / GUARDAR PDF</button>
+      <button class="btn btn-secondary" id="newQuote">NUEVO PRESUPUESTO</button>
+    </div>
+    ${quoteHtml(numero,fecha,datos)}
+  </main>`;
+  $("printQuote").onclick=()=>window.print();
+  $("newQuote").onclick=nuevoPresupuesto;
+}
+
+function quoteHtml(numero,fecha,d){
+  const rows=d.productos.map(p=>{
+    const cr=String(p.unidad||"")==="Unidades";
+    return cr
+      ? `<tr><td>${esc(p.producto)}${p.tieneOferta?' <small>OFERTA</small>':''}</td><td>—</td><td>${fmt0(p.cantidad||0)} unidades</td><td>—</td><td class="money">$ ${fmt(p.precioM2)}</td><td class="money">$ ${fmt(p.subtotal)}</td></tr>`
+      : `<tr><td>${esc(p.producto)}<br><small>${esc(p.color)}${p.conZocalo?' · Incl. Zócalo':''}</small></td><td>${esc(p.medida)}</td><td>${fmt(p.m2Solicitados)}</td><td>${p.cajas}</td><td class="money">$ ${fmt(p.precioM2)}</td><td class="money">$ ${fmt(p.subtotal)}</td></tr>`;
+  }).join("");
+  return `<section class="quote-preview" id="quote">
+    <div class="quote-head"><img src="${LOGO_URL}" alt="G&T S.R.L."><div><div class="quote-number">${esc(numero)}</div><div class="quote-meta">Fecha: ${esc(fecha)}<br>Vendedor: ${esc(vendedor)}</div></div></div>
+    <div class="quote-customer"><strong>Cliente:</strong> ${esc(d.cliente)}<br>
+      ${d.dniCuit?`<strong>DNI/CUIT:</strong> ${esc(d.dniCuit)} · `:""}${d.telefono?`<strong>Tel.:</strong> ${esc(d.telefono)}<br>`:""}
+      ${d.email?`<strong>Email:</strong> ${esc(d.email)}<br>`:""}${d.direccion?`<strong>Dirección:</strong> ${esc(d.direccion)}<br>`:""}
+      <strong>Forma de pago:</strong> ${esc(d.formaPago||"Contado")}
+    </div>
+    <table class="quote-table"><thead><tr><th>Producto</th><th>Medida</th><th>Cantidad</th><th>Cajas</th><th>Precio</th><th>Subtotal</th></tr></thead><tbody>${rows}</tbody></table>
+    <div class="quote-total">TOTAL: $ ${fmt(d.total)}</div>
+    <div class="quote-foot"><strong>Validez:</strong> 15 días. Los precios y condiciones indicados corresponden al momento de emisión del presupuesto.<br>
+      G&T S.R.L. · ${esc("Conquistadores del Desierto 3400")} · Neuquén, Argentina · Tel. ${esc("299 520-7382")}
+    </div>
+  </section>`;
+}
+
+function renderLoadingHistorico(){
+  $("app").innerHTML=header()+`<main class="wrap"><section class="card loading">Cargando presupuesto ${esc(verNumero)}...</section></main>`;
+}
+
+async function cargarHistorico(numero){
+  try{
+    const r=await jsonp({accion:"presupuesto",numero,token});
+    if(!r?.ok)throw new Error(r?.error||"No se pudo cargar el presupuesto.");
+    const p=r.presupuesto;
+    const productosHistoricos=(r.productos||[]).map(x=>({
+      producto:x["Producto"]||"",color:x["Color"]||"",medida:x["Medida"]||"",
+      unidad:x["Unidad"]||"",cantidad:Number(x["Cantidad"]||0),
+      m2Solicitados:Number(x["m² solicitados"]||x["m² Solicitados"]||x["m2 Solicitados"]||0),
+      cajas:Number(x["Cajas"]||0),precioM2:Number(x["Precio/m²"]||0),subtotal:Number(x["Subtotal"]||0),
+      conZocalo:String(x["Con zócalo"]||"")==="Sí",tieneOferta:Number(x["Oferta"]||0)>0
+    }));
+    const datos={cliente:p["Cliente"]||"",dniCuit:p["DNI/CUIT"]||"",telefono:p["Teléfono"]||"",email:p["Email"]||"",direccion:p["Dirección"]||"",formaPago:p["Forma de pago"]||"",total:Number(p["Total"]||0),productos:productosHistoricos};
+    const fecha=p["Fecha"]?new Date(p["Fecha"]).toLocaleDateString("es-AR"):new Date().toLocaleDateString("es-AR");
+    $("app").innerHTML=header()+`<main class="wrap"><div class="historical-actions no-print"><button class="btn btn-primary" id="printQuote">🖨 IMPRIMIR / GUARDAR PDF</button><button class="btn btn-secondary" id="newQuote">NUEVO PRESUPUESTO</button></div>${quoteHtml(numero,fecha,datos)}</main>`;
+    $("printQuote").onclick=()=>window.print();$("newQuote").onclick=nuevoPresupuesto;
+  }catch(e){
+    $("app").innerHTML=header()+`<main class="wrap"><section class="card"><div class="status error" style="display:block">${esc(e.message)}</div><div class="actions no-print"><button class="btn btn-secondary" id="back">VOLVER</button></div></section></main>`;
+    $("back").onclick=()=>{verNumero="";renderApp()};
+  }
+}
+
+if(token) renderApp(); else mostrarLogin();
+</script>
 </body>
 </html>
