@@ -208,6 +208,7 @@ th{font-size:12px;text-transform:uppercase;color:#666;background:#fafafa}
 .quote-table th:nth-child(5),.quote-table td:nth-child(5){width:16%;text-align:right}
 .quote-table th:nth-child(6),.quote-table td:nth-child(6){width:20%;text-align:right}
 .quote-table small{color:#6b7280;font-size:2.8mm}
+.quote-medida-unidades{display:block;margin-top:.8mm;color:#6b7280;font-size:2.5mm;line-height:1.1;white-space:nowrap}
 .money{text-align:right;white-space:nowrap}
 .quote-total{display:flex;justify-content:flex-end;align-items:center;gap:5mm;margin-top:4mm;font-size:5mm;font-weight:900;color:#183746}
 .quote-total-value{min-width:45mm;padding:3mm 4mm;text-align:right;border:2px solid #183746;border-radius:2mm;background:#f2f5f6;color:#BE000F}
@@ -219,23 +220,9 @@ th{font-size:12px;text-transform:uppercase;color:#666;background:#fafafa}
 .quote-legal strong{color:#183746}
 .historical-actions{display:flex;gap:10px;margin-bottom:15px}
 .badge{display:inline-block;font-size:11px;padding:4px 7px;border-radius:10px;background:#eee;color:#555}.badge-zocalo{background:#e5e7eb;color:#555}
-.modal-productos{width:min(760px,100%)}
-.catalogo-lista{margin-top:12px;display:flex;flex-direction:column;gap:7px;max-height:52vh;overflow:auto;padding-right:3px}
-.catalogo-item{width:100%;text-align:left;background:#fff;border:1px solid #d9dce1;border-radius:10px;padding:11px 13px;display:flex;flex-direction:column;gap:3px;transition:.15s}
-.catalogo-item:hover{border-color:var(--rojo);background:#fff7f7}
-.catalogo-item strong{font-size:14px}
-.catalogo-item span{font-size:12px;color:#666}
-.loading-catalogo{margin-top:70px;text-align:center}
-.catalog-spinner{width:32px;height:32px;margin:20px auto;border:4px solid #e5e7eb;border-top-color:var(--rojo);border-radius:50%;animation:spin .8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-@media(min-width:1000px){
-  .wrap{max-width:1180px}
-  .header-inner{max-width:1180px}
-  .grid{grid-template-columns:repeat(3,1fr)}
-  .modal-productos{width:min(820px,100%)}
-  .catalogo-lista{max-height:58vh}
+@media(max-width:800px){
+  .grid{grid-template-columns:1fr 1fr}
 }
-@media(max-width:800px){.grid{grid-template-columns:1fr 1fr}}
 @media(max-width:560px){
   header{position:relative}
   .header-inner{align-items:flex-start}
@@ -248,14 +235,8 @@ th{font-size:12px;text-transform:uppercase;color:#666;background:#fafafa}
   .add-btn{width:100%}
   .actions{flex-direction:column}
   .actions button{width:100%}
-  .quote-head{grid-template-columns:1fr;gap:5mm}
-  .quote-presentation{border-left:0;border-top:2px solid #BE000F;padding:4mm 0 0;align-items:flex-start;text-align:left}
-  .quote-meta{text-align:left}
-  .quote-customer-grid{grid-template-columns:1fr}
-  .quote-payment{flex-wrap:wrap}
-  .quote-payment-selected{margin-left:0;width:100%}
-  .quote-foot{grid-template-columns:1fr}
-  .quote-legal{text-align:left}
+  .quote-head{flex-direction:column}
+  .quote-number,.quote-meta{text-align:left}
 }
 @media print{
   @page{size:A4;margin:0}
@@ -275,6 +256,7 @@ th{font-size:12px;text-transform:uppercase;color:#666;background:#fafafa}
 
 <div id="app"></div>
 
+<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycby_3DebaIbZZW2qZ7ShkePBD40Bzo8wGyaHAw8w0omsKahF6CpuUEEPaG2ox3fGkAqk0w/exec";
 const LOGO_URL = "https://raw.githubusercontent.com/Jdequelli85/qr-corralon/main/logo.png";
@@ -282,9 +264,9 @@ const LOGO_URL = "https://raw.githubusercontent.com/Jdequelli85/qr-corralon/main
 let token = sessionStorage.getItem("gt_token") || "";
 let vendedor = sessionStorage.getItem("gt_usuario") || "";
 let productos = [];
-let catalogoProductos = [];
-let catalogoOpciones = [];
 let productoActual = null;
+let scanner = null;
+let scanProcesando = false;
 let verNumero = new URLSearchParams(location.search).get("ver") || "";
 
 const $ = id => document.getElementById(id);
@@ -349,96 +331,6 @@ function jsonp(params){
   });
 }
 
-async function cargarCatalogo(){
-  const r = await jsonp({accion:"catalogo",token});
-
-  if(!r?.ok) {
-    throw new Error(r?.error || "No se pudo cargar el catálogo de productos.");
-  }
-
-  catalogoProductos = Array.isArray(r.productos)
-    ? r.productos
-    : (Array.isArray(r.catalogo) ? r.catalogo : []);
-
-  catalogoOpciones = [];
-
-  /*
-   * CATÁLOGO PC
-   * -------------------------
-   * Una sola opción por:
-   * PRODUCTO + MEDIDA
-   *
-   * Los colores NO se duplican.
-   * Se seleccionan posteriormente
-   * en la ventana de configuración.
-   */
-
-  const claves = new Set();
-
-  catalogoProductos.forEach(p => {
-
-    const categoria = categoriaProducto(p);
-
-    if(categoria === "OTRO") return;
-
-    const producto = String(p["Producto"] || "").trim();
-    const medida = String(p["Medida"] || "").trim();
-
-    /*
-     * CRRL:
-     * No tiene color ni medida como
-     * característica del producto.
-     */
-    if(categoria === "CRRL"){
-      const clave = `CRRL|${producto.toUpperCase()}`;
-
-      if(claves.has(clave)) return;
-
-      claves.add(clave);
-
-      catalogoOpciones.push({
-        ...p,
-        _colorSeleccionado: ""
-      });
-
-      return;
-    }
-
-    /*
-     * CER / POR / REV / PSO
-     *
-     * Una sola opción por Producto + Medida.
-     */
-    const clave =
-      `${categoria}|${producto.toUpperCase()}|${medida.toUpperCase()}`;
-
-    if(claves.has(clave)) return;
-
-    claves.add(clave);
-
-    catalogoOpciones.push({
-      ...p,
-      _colorSeleccionado: ""
-    });
-  });
-
-  if(!catalogoOpciones.length) {
-    throw new Error("El catálogo no contiene productos disponibles.");
-  }
-}
-
-function mostrarCargaCatalogo(){
-  $("app").innerHTML = `
-    <main class="wrap">
-      <section class="card login-card loading-catalogo">
-        <img class="logo-login" src="${LOGO_URL}" alt="G&T S.R.L.">
-        <h1>Cargando productos...</h1>
-        <div class="subtitle">Preparando el catálogo para esta sesión.</div>
-        <div class="catalog-spinner" aria-label="Cargando"></div>
-      </section>
-    </main>`;
-}
-
 function mostrarLogin(mensaje=""){
   document.title="G&T S.R.L. — Presupuesto Digital";
   $("app").innerHTML = `
@@ -476,8 +368,6 @@ function mostrarLogin(mensaje=""){
       token=r.token; vendedor=r.usuario;
       sessionStorage.setItem("gt_token",token);
       sessionStorage.setItem("gt_usuario",vendedor);
-      mostrarCargaCatalogo();
-      await cargarCatalogo();
       renderApp();
     }catch(err){
       st.className="status error"; st.textContent=err.message;
@@ -493,24 +383,15 @@ function header(){
   </div></header>`;
 }
 
-async function renderApp(){
+function renderApp(){
   if(!token){mostrarLogin();return;}
   if(verNumero){renderLoadingHistorico();cargarHistorico(verNumero);return;}
-  if(!catalogoOpciones.length){
-    try{
-      mostrarCargaCatalogo();
-      await cargarCatalogo();
-    }catch(e){
-      mostrarLogin("No se pudo cargar el catálogo: " + e.message);
-      return;
-    }
-  }
   document.title="G&T S.R.L. — Presupuesto Digital";
   $("app").innerHTML = header()+`
   <main class="wrap">
     <section class="card">
       <h1>Presupuesto Digital</h1>
-      <div class="subtitle">Nuevo presupuesto · el número se asigna al generar</div>
+      <div class="subtitle">Nuevo presupuesto · el número se asigna al guardar</div>
       <div class="grid">
         <div><label>Cliente *</label><input id="cliente" placeholder="Nombre y apellido / Razón social"></div>
         <div><label>DNI / CUIT</label><input id="dni"></div>
@@ -553,13 +434,12 @@ async function renderApp(){
   </main>
 
   <div class="modal-backdrop" id="modal">
-    <div class="modal modal-productos">
+    <div class="modal">
       <div class="modal-head"><h3>Agregar producto</h3><button class="close" id="close">×</button></div>
-      <div id="catalogArea">
-        <p class="scan-note">Seleccioná un producto del catálogo.</p>
-        <input id="buscarProducto" type="search" placeholder="🔎 Buscar por producto o medida..." autocomplete="off">
-        <div id="catalogoLista" class="catalogo-lista"></div>
-        <div id="catalogoError" class="status"></div>
+      <div id="scanArea">
+        <p class="scan-note">Escaneá el QR del producto con la cámara.</p>
+        <div id="reader"></div>
+        <div id="scanError" class="status"></div>
       </div>
       <div id="calcArea" hidden>
         <div id="productInfo" class="product-info"></div>
@@ -579,7 +459,6 @@ async function renderApp(){
   </div>`;
   $("add").onclick=abrirModal;
   $("close").onclick=cerrarModal;
-  $("buscarProducto").oninput=renderCatalogo;
   $("cancel").onclick=()=>{if(confirm("¿Cancelar este presupuesto?")){productos=[];limpiarFormulario();renderProductos()}};
   $("generate").onclick=guardarPresupuesto;
   $("m2").oninput=calcularActual;
@@ -593,64 +472,62 @@ function limpiarFormulario(){
   if($("forma"))$("forma").value="Contado";
 }
 
-function abrirModal(){
-  productoActual = null;
+async function abrirModal(){
+  scanProcesando = false;
   $("modal").classList.add("open");
-  $("catalogArea").hidden=false;
-  $("calcArea").hidden=true;
-  $("catalogoError").className="status";
-  $("catalogoError").textContent="";
-  $("buscarProducto").value="";
-  renderCatalogo();
-  setTimeout(()=>$("buscarProducto")?.focus(),50);
+  $("scanArea").hidden=false;$("calcArea").hidden=true;
+  $("scanError").className="status";$("scanError").textContent="";
+  try{
+    scanner = new Html5Qrcode("reader");
+    await scanner.start({facingMode:"environment"},{fps:10,qrbox:{width:250,height:250}},onScan);
+  }catch(e){
+    $("scanError").className="status error";
+    $("scanError").textContent="No se pudo abrir la cámara. Verificá el permiso del navegador.";
+  }
 }
 
-function cerrarModal(){
+async function cerrarModal(){
+  scanProcesando = false;
+  if(scanner){
+    try{await scanner.stop();}catch(e){}
+    try{scanner.clear();}catch(e){}
+    scanner=null;
+  }
   $("modal")?.classList.remove("open");
-  productoActual=null;
 }
 
-function textoOpcionCatalogo(p){
-  const producto = String(p["Producto"] || "").trim();
-  const medida = String(p["Medida"] || "").trim();
+async function onScan(text){
+  if(scanProcesando)return;
 
-  if(categoriaProducto(p) === "CRRL"){
-    return producto;
+  const id=extraerId(text);
+  if(!id)return;
+
+  scanProcesando = true;
+
+  if(scanner){try{await scanner.stop();}catch(e){}}
+  $("scanArea").hidden=true;
+
+  try{
+    const r=await jsonp({accion:"producto",id});
+    if(!r?.ok)throw new Error(r?.error||"Producto no encontrado.");
+
+    sonidoQR();
+
+    productoActual=r.producto;
+    mostrarProducto();
+  }catch(e){
+    $("scanArea").hidden=false;
+    $("scanError").className="status error";
+    $("scanError").textContent=e.message;
+    scanProcesando = false;
+    setTimeout(()=>abrirModal(),300);
   }
-
-  return medida
-    ? `${producto} (${medida})`
-    : producto;
 }
 
-function renderCatalogo(){
-  const lista=$("catalogoLista");
-  if(!lista)return;
-  const q=String($("buscarProducto")?.value||"").trim().toLocaleLowerCase("es-AR");
-  const resultados=catalogoOpciones.filter(p=>{
-    if(!q)return true;
-    return textoOpcionCatalogo(p).toLocaleLowerCase("es-AR").includes(q);
-  });
-
-  if(!resultados.length){
-    lista.innerHTML='<div class="empty">No se encontraron productos.</div>';
-    return;
-  }
-
-  lista.innerHTML=resultados.map((p,i)=>`
-    <button type="button" class="catalogo-item" data-catalogo-index="${catalogoOpciones.indexOf(p)}">
-      <strong>${esc(p["Producto"]||"")}</strong>
-      <span>${esc(p["Medida"] || "")}</span>
-    </button>`).join("");
-}
-
-function seleccionarProductoCatalogo(indice){
-  const p=catalogoOpciones[indice];
-  if(!p)return;
-  productoActual={...p};
-  $("catalogArea").hidden=true;
-  $("calcArea").hidden=false;
-  mostrarProducto();
+function extraerId(text){
+  const t=String(text||"").trim();
+  const m=t.match(/[?&]id=([^&]+)/i);
+  return m?decodeURIComponent(m[1]):t;
 }
 
 function mostrarProducto(){
@@ -848,11 +725,6 @@ function renderProductos(){
 $("cantidad")?.addEventListener("input",calcularActual);
 
 $("app").addEventListener("click",e=>{
-  const item=e.target.closest("[data-catalogo-index]");
-  if(item){
-    seleccionarProductoCatalogo(Number(item.dataset.catalogoIndex));
-    return;
-  }
   const btn=e.target.closest("[data-remove]");
   if(btn){
     productos.splice(Number(btn.dataset.remove),1);
@@ -880,6 +752,7 @@ productos.push({
   producto:p["Producto"],
   medida:p["Medida"]||"",
   color:colorSeleccionado,
+  cajaM2:Number(p["Caja m²"]||0),
   ...c
 });
 
@@ -889,122 +762,30 @@ productos.push({
 });
 
 async function guardarPresupuesto(){
-
-  if(!productos.length){
-    return alert("Agregá al menos un producto.");
-  }
-
+  if(!productos.length)return alert("Agregá al menos un producto.");
   const cliente=$("cliente").value.trim();
-
-  if(!cliente){
-    return alert("Ingresá el cliente.");
-  }
-
-  const total=productos.reduce(
-    (s,p)=>s+Number(p.subtotal||0),
-    0
-  );
-
+  if(!cliente)return alert("Ingresá el cliente.");
+  const total=productos.reduce((s,p)=>s+Number(p.subtotal||0),0);
   const datos={
-    cliente,
-    dniCuit:$("dni").value.trim(),
-    telefono:$("telefono").value.trim(),
-    email:$("email").value.trim(),
-    direccion:$("direccion").value.trim(),
-    formaPago:$("forma").value,
-    subtotal:total,
-    descuento:0,
-    total,
-    observaciones:"",
-    productos
+    cliente,dniCuit:$("dni").value.trim(),telefono:$("telefono").value.trim(),
+    email:$("email").value.trim(),direccion:$("direccion").value.trim(),
+    formaPago:$("forma").value,subtotal:total,descuento:0,total,
+    observaciones:"",productos
   };
-
-  const btn=$("generate");
-  const st=$("appStatus");
-
-  btn.disabled=true;
-  btn.textContent="RESERVANDO NÚMERO...";
-  st.className="status";
-  st.textContent="";
-
+  const btn=$("generate"),st=$("appStatus");
+  btn.disabled=true;btn.textContent="GUARDANDO...";
+  st.className="status";st.textContent="";
   try{
-
-    // ==================================================
-    // PASO 1 — RESERVAR NÚMERO
-    // ==================================================
-
-    const rNumero=await jsonp({
-      accion:"nuevoNumero",
-      token
-    });
-
-    if(!rNumero?.ok){
-      throw new Error(
-        rNumero?.error ||
-        "No se pudo reservar el número de presupuesto."
-      );
-    }
-
-    const numero=rNumero.numero;
-
-    // ==================================================
-    // POR AHORA:
-    // mostramos el presupuesto inmediatamente.
-    //
-    // EL GUARDADO TODAVÍA NO SE MODIFICA.
-    // ==================================================
-
-// MOSTRAR EL PRESUPUESTO INMEDIATAMENTE
-mostrarPresupuestoGuardado(numero, datos);
-
-// GUARDAR EN SEGUNDO PLANO
-jsonp({
-  accion: "guardar",
-  token,
-  numero: numero,
-  datos: JSON.stringify(datos)
-})
-.then(rGuardado => {
-
-  if (!rGuardado?.ok) {
-    console.error(
-      "No se pudo guardar el presupuesto:",
-      rGuardado?.error || "Error desconocido"
-    );
-    return;
-  }
-
-  console.log(
-    "Presupuesto guardado correctamente:",
-    rGuardado.numero
-  );
-
-})
-.catch(error => {
-
-  console.error(
-    "Error al guardar el presupuesto:",
-    error
-  );
-
-});
-    
+    const r=await jsonp({accion:"guardar",token,datos:JSON.stringify(datos)});
+    if(!r?.ok)throw new Error(r?.error||"No se pudo guardar el presupuesto.");
+    mostrarPresupuestoGuardado(r.numero,datos);
   }catch(e){
-
-    st.className="status error";
-    st.textContent=e.message;
-
-  }finally{
-
-    btn.disabled=false;
-    btn.textContent="GENERAR PRESUPUESTO";
-
-  }
+    st.className="status error";st.textContent=e.message;
+  }finally{btn.disabled=false;btn.textContent="GENERAR PRESUPUESTO"}
 }
 
 function mostrarPresupuestoGuardado(numero,datos){
   verNumero="";
-  document.title = "G&T S.R.L. - " + numero.replace("e-Ptto - ", "ePpto ");
   const fecha=new Date().toLocaleDateString("es-AR");
   $("app").innerHTML=header()+`<main class="wrap">
     <div class="historical-actions no-print">
@@ -1015,6 +796,43 @@ function mostrarPresupuestoGuardado(numero,datos){
   </main>`;
   $("printQuote").onclick=()=>window.print();
   $("newQuote").onclick=nuevoPresupuesto;
+}
+
+function unidadesPorCaja(p){
+  if(!p || String(p.unidad||"")==="Unidades") return 0;
+
+  const medida=String(p.medida||"").trim();
+  let cajaM2=Number(p.cajaM2||0);
+
+  if((!Number.isFinite(cajaM2) || cajaM2<=0) && Number(p.m2Reales||0)>0 && Number(p.cajas||0)>0){
+    cajaM2=Number(p.m2Reales)/Number(p.cajas);
+  }
+
+  if(!medida || !Number.isFinite(cajaM2) || cajaM2<=0) return 0;
+
+  // Acepta medidas como:
+  // 42,5x42,5 | 60X60 | 120X60 | 57,5x117
+  const m=medida
+    .replace(/\s/g,"")
+    .replace(/,/g,".")
+    .toLowerCase()
+    .match(/^(\d+(?:\.\d+)?)x(\d+(?:\.\d+)?)$/);
+
+  if(!m) return 0;
+
+  const anchoCm=Number(m[1]);
+  const altoCm=Number(m[2]);
+
+  if(!anchoCm || !altoCm) return 0;
+
+  const superficiePieza=(anchoCm/100)*(altoCm/100);
+  if(!superficiePieza) return 0;
+
+  // La caja puede estar expresada con redondeo a 2 decimales.
+  // Redondeamos la cantidad de piezas al entero físico más cercano.
+  const unidades=Math.round(cajaM2/superficiePieza);
+
+  return unidades>0 ? unidades : 0;
 }
 
 function quoteHtml(numero,fecha,d){
@@ -1060,7 +878,12 @@ const rows=d.productos.map(p=>{
           ${p.conZocalo?`<br><small>Incl. Zócalo</small>`:""}
           ${p.tieneOferta?`<br><small>OFERTA</small>`:""}
         </td>
-        <td>${esc(p.medida||"—")}</td>
+        <td>
+          ${esc(p.medida||"—")}
+          ${unidadesPorCaja(p)>0
+            ? `<span class="quote-medida-unidades">${fmt0(unidadesPorCaja(p))} un./caja</span>`
+            : ""}
+        </td>
         <td>${fmt(p.m2Solicitados)}</td>
         <td>${p.cajas}</td>
         <td class="money">$ ${fmt(precioUnitarioMostrar)}</td>
@@ -1180,6 +1003,8 @@ async function cargarHistorico(numero){
       producto:x["Producto"]||"",color:x["Color"]||"",medida:x["Medida"]||"",
       unidad:x["Unidad"]||"",cantidad:Number(x["Cantidad"]||0),
       m2Solicitados:Number(x["m² solicitados"]||x["m² Solicitados"]||x["m2 Solicitados"]||0),
+      m2Reales:Number(x["m² reales"]||x["m² Reales"]||x["m2 reales"]||x["m2 Reales"]||0),
+      cajaM2:Number(x["Caja m²"]||x["Caja m2"]||0),
       cajas:Number(x["Cajas"]||0),precioM2:Number(x["Precio/m²"]||0),subtotal:Number(x["Subtotal"]||0),
       conZocalo:String(x["Con zócalo"]||"")==="Sí",tieneOferta:Number(x["Oferta"]||0)>0
     }));
