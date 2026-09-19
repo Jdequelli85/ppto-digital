@@ -223,33 +223,80 @@ function jsonp(params){
 
 async function cargarCatalogo(){
   const r = await jsonp({accion:"catalogo",token});
-  if(!r?.ok) throw new Error(r?.error || "No se pudo cargar el catálogo de productos.");
+
+  if(!r?.ok) {
+    throw new Error(r?.error || "No se pudo cargar el catálogo de productos.");
+  }
 
   catalogoProductos = Array.isArray(r.productos)
     ? r.productos
     : (Array.isArray(r.catalogo) ? r.catalogo : []);
 
   catalogoOpciones = [];
-  catalogoProductos.forEach(p=>{
+
+  /*
+   * CATÁLOGO PC
+   * -------------------------
+   * Una sola opción por:
+   * PRODUCTO + MEDIDA
+   *
+   * Los colores NO se duplican.
+   * Se seleccionan posteriormente
+   * en la ventana de configuración.
+   */
+
+  const claves = new Set();
+
+  catalogoProductos.forEach(p => {
+
     const categoria = categoriaProducto(p);
+
     if(categoria === "OTRO") return;
 
-    const colores = String(p["Color"] || "").trim()
-      .split(/\s*-\s*/)
-      .map(c=>c.trim())
-      .filter(Boolean);
+    const producto = String(p["Producto"] || "").trim();
+    const medida = String(p["Medida"] || "").trim();
 
-    if(categoria === "CRRL" || colores.length === 0){
-      catalogoOpciones.push({...p,_colorSeleccionado:""});
+    /*
+     * CRRL:
+     * No tiene color ni medida como
+     * característica del producto.
+     */
+    if(categoria === "CRRL"){
+      const clave = `CRRL|${producto.toUpperCase()}`;
+
+      if(claves.has(clave)) return;
+
+      claves.add(clave);
+
+      catalogoOpciones.push({
+        ...p,
+        _colorSeleccionado: ""
+      });
+
       return;
     }
 
-    colores.forEach(color=>{
-      catalogoOpciones.push({...p,_colorSeleccionado:color});
+    /*
+     * CER / POR / REV / PSO
+     *
+     * Una sola opción por Producto + Medida.
+     */
+    const clave =
+      `${categoria}|${producto.toUpperCase()}|${medida.toUpperCase()}`;
+
+    if(claves.has(clave)) return;
+
+    claves.add(clave);
+
+    catalogoOpciones.push({
+      ...p,
+      _colorSeleccionado: ""
     });
   });
 
-  if(!catalogoOpciones.length) throw new Error("El catálogo no contiene productos disponibles.");
+  if(!catalogoOpciones.length) {
+    throw new Error("El catálogo no contiene productos disponibles.");
+  }
 }
 
 function mostrarCargaCatalogo(){
@@ -382,7 +429,7 @@ async function renderApp(){
       <div class="modal-head"><h3>Agregar producto</h3><button class="close" id="close">×</button></div>
       <div id="catalogArea">
         <p class="scan-note">Seleccioná un producto del catálogo.</p>
-        <input id="buscarProducto" type="search" placeholder="🔎 Buscar por producto, color o medida..." autocomplete="off">
+        <input id="buscarProducto" type="search" placeholder="🔎 Buscar por producto o medida..." autocomplete="off">
         <div id="catalogoLista" class="catalogo-lista"></div>
         <div id="catalogoError" class="status"></div>
       </div>
@@ -440,8 +487,18 @@ function textoOpcionCatalogo(p){
   const color=String(p._colorSeleccionado||"").trim();
   const medida=String(p["Medida"]||"").trim();
   if(categoriaProducto(p)==="CRRL") return producto;
-  const detalle=[color,medida].filter(Boolean).join(" - ");
-  return detalle ? `${producto} (${detalle})` : producto;
+function textoOpcionCatalogo(p){
+  const producto = String(p["Producto"] || "").trim();
+  const medida = String(p["Medida"] || "").trim();
+
+  if(categoriaProducto(p) === "CRRL") {
+    return producto;
+  }
+
+  return medida
+    ? `${producto} (${medida})`
+    : producto;
+}
 }
 
 function renderCatalogo(){
@@ -461,7 +518,7 @@ function renderCatalogo(){
   lista.innerHTML=resultados.map((p,i)=>`
     <button type="button" class="catalogo-item" data-catalogo-index="${catalogoOpciones.indexOf(p)}">
       <strong>${esc(p["Producto"]||"")}</strong>
-      <span>${esc([p._colorSeleccionado,p["Medida"]].filter(Boolean).join(" · "))}</span>
+      <span>${esc(p["Medida"] || "")}</span>
     </button>`).join("");
 }
 
