@@ -208,6 +208,7 @@ th{font-size:12px;text-transform:uppercase;color:#666;background:#fafafa}
 .quote-table th:nth-child(5),.quote-table td:nth-child(5){width:16%;text-align:right}
 .quote-table th:nth-child(6),.quote-table td:nth-child(6){width:20%;text-align:right}
 .quote-table small{color:#6b7280;font-size:2.8mm}
+.quote-unidades-caja{display:block;color:#777;font-size:2.7mm;line-height:1.25;margin-top:1mm}
 .money{text-align:right;white-space:nowrap}
 .quote-total{display:flex;justify-content:flex-end;align-items:center;gap:5mm;margin-top:4mm;font-size:5mm;font-weight:900;color:#183746}
 .quote-total-value{min-width:45mm;padding:3mm 4mm;text-align:right;border:2px solid #183746;border-radius:2mm;background:#f2f5f6;color:#BE000F}
@@ -745,6 +746,19 @@ function mostrarProducto(){
   calcularActual();
 }
   
+function unidadesPorCaja(p){
+  const medida = String(p?.["Medida"] || "").trim().toLowerCase();
+  const cajaM2 = Number(p?.["Caja m²"] || 0);
+  if(!medida || !Number.isFinite(cajaM2) || cajaM2 <= 0) return null;
+
+  const partes = medida.split("x").map(v => Number(String(v).trim().replace(",", ".")));
+  if(partes.length !== 2 || !Number.isFinite(partes[0]) || !Number.isFinite(partes[1]) || partes[0] <= 0 || partes[1] <= 0) return null;
+
+  const areaPieza = (partes[0] / 100) * (partes[1] / 100);
+  const unidades = Math.round(cajaM2 / areaPieza);
+  return unidades > 0 ? unidades : null;
+}
+
 function calcularActual(){
   if(!productoActual)return null;
   const crrl=esMaterialCorralon(productoActual);
@@ -822,7 +836,7 @@ function renderProductos(){
         }
       </td>
 
-      <td>${esc(p.medida||"—")}</td>
+      <td>${esc(p.medida||"—")}${p.unidadesPorCaja ? `<span class="quote-unidades-caja">${fmt0(p.unidadesPorCaja)} un./caja</span>` : ""}</td>
 
       <td>${cantidadHTML}</td>
 
@@ -879,6 +893,8 @@ productos.push({
   id:p["ID"],
   producto:p["Producto"],
   medida:p["Medida"]||"",
+  cajaM2:Number(p["Caja m²"]||0),
+  unidadesPorCaja:unidadesPorCaja(p),
   color:colorSeleccionado,
   ...c
 });
@@ -1060,7 +1076,7 @@ const rows=d.productos.map(p=>{
           ${p.conZocalo?`<br><small>Incl. Zócalo</small>`:""}
           ${p.tieneOferta?`<br><small>OFERTA</small>`:""}
         </td>
-        <td>${esc(p.medida||"—")}</td>
+        <td>${esc(p.medida||"—")}${p.unidadesPorCaja ? `<span class="quote-unidades-caja">${fmt0(p.unidadesPorCaja)} un./caja</span>` : ""}</td>
         <td>${fmt(p.m2Solicitados)}</td>
         <td>${p.cajas}</td>
         <td class="money">$ ${fmt(precioUnitarioMostrar)}</td>
