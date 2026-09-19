@@ -382,7 +382,7 @@ async function renderApp(){
   <main class="wrap">
     <section class="card">
       <h1>Presupuesto Digital</h1>
-      <div class="subtitle">Nuevo presupuesto · el número se asigna al guardar</div>
+      <div class="subtitle">Nuevo presupuesto · el número se asigna al generar</div>
       <div class="grid">
         <div><label>Cliente *</label><input id="cliente" placeholder="Nombre y apellido / Razón social"></div>
         <div><label>DNI / CUIT</label><input id="dni"></div>
@@ -761,26 +761,84 @@ productos.push({
 });
 
 async function guardarPresupuesto(){
-  if(!productos.length)return alert("Agregá al menos un producto.");
+
+  if(!productos.length){
+    return alert("Agregá al menos un producto.");
+  }
+
   const cliente=$("cliente").value.trim();
-  if(!cliente)return alert("Ingresá el cliente.");
-  const total=productos.reduce((s,p)=>s+Number(p.subtotal||0),0);
+
+  if(!cliente){
+    return alert("Ingresá el cliente.");
+  }
+
+  const total=productos.reduce(
+    (s,p)=>s+Number(p.subtotal||0),
+    0
+  );
+
   const datos={
-    cliente,dniCuit:$("dni").value.trim(),telefono:$("telefono").value.trim(),
-    email:$("email").value.trim(),direccion:$("direccion").value.trim(),
-    formaPago:$("forma").value,subtotal:total,descuento:0,total,
-    observaciones:"",productos
+    cliente,
+    dniCuit:$("dni").value.trim(),
+    telefono:$("telefono").value.trim(),
+    email:$("email").value.trim(),
+    direccion:$("direccion").value.trim(),
+    formaPago:$("forma").value,
+    subtotal:total,
+    descuento:0,
+    total,
+    observaciones:"",
+    productos
   };
-  const btn=$("generate"),st=$("appStatus");
-  btn.disabled=true;btn.textContent="GUARDANDO...";
-  st.className="status";st.textContent="";
+
+  const btn=$("generate");
+  const st=$("appStatus");
+
+  btn.disabled=true;
+  btn.textContent="RESERVANDO NÚMERO...";
+  st.className="status";
+  st.textContent="";
+
   try{
-    const r=await jsonp({accion:"guardar",token,datos:JSON.stringify(datos)});
-    if(!r?.ok)throw new Error(r?.error||"No se pudo guardar el presupuesto.");
-    mostrarPresupuestoGuardado(r.numero,datos);
+
+    // ==================================================
+    // PASO 1 — RESERVAR NÚMERO
+    // ==================================================
+
+    const rNumero=await jsonp({
+      accion:"nuevoNumero",
+      token
+    });
+
+    if(!rNumero?.ok){
+      throw new Error(
+        rNumero?.error ||
+        "No se pudo reservar el número de presupuesto."
+      );
+    }
+
+    const numero=rNumero.numero;
+
+    // ==================================================
+    // POR AHORA:
+    // mostramos el presupuesto inmediatamente.
+    //
+    // EL GUARDADO TODAVÍA NO SE MODIFICA.
+    // ==================================================
+
+    mostrarPresupuestoGuardado(numero,datos);
+
   }catch(e){
-    st.className="status error";st.textContent=e.message;
-  }finally{btn.disabled=false;btn.textContent="GENERAR PRESUPUESTO"}
+
+    st.className="status error";
+    st.textContent=e.message;
+
+  }finally{
+
+    btn.disabled=false;
+    btn.textContent="GENERAR PRESUPUESTO";
+
+  }
 }
 
 function mostrarPresupuestoGuardado(numero,datos){
