@@ -87,27 +87,63 @@ th{font-size:12px;text-transform:uppercase;color:#666;background:#fafafa}
 .checkbox{display:flex;align-items:center;gap:8px;margin:13px 0;font-weight:700}
 .checkbox input{width:auto}
 .loading{text-align:center;padding:35px;color:#666}
-.quote-preview{background:#fff;border:1px solid #ddd;padding:28px;max-width:850px;margin:auto}
-.quote-head{display:flex;justify-content:space-between;gap:20px;border-bottom:2px solid var(--rojo);padding-bottom:15px}
-.quote-head img{width:175px;height:max-content}
-.quote-number{font-size:22px;font-weight:800;text-align:right}
-.quote-meta{text-align:right;color:#555;font-size:13px;margin-top:6px}
-.quote-customer{margin:20px 0;padding:13px;background:#f7f7f7;border-radius:8px}
-.quote-table{min-width:0}
-.quote-table th,.quote-table td{font-size:12px}
-.quote-total{text-align:right;font-size:21px;font-weight:800;margin-top:18px}
-.quote-foot{margin-top:28px;padding-top:12px;border-top:1px solid #ddd;font-size:12px;color:#666;line-height:1.5}
-.historical-actions{display:flex;gap:10px;margin-bottom:15px}
-.badge{display:inline-block;font-size:11px;padding:4px 7px;border-radius:10px;background:#eee;color:#555}.badge-zocalo{background:#e5e7eb;color:#555}
- .modal-productos{width:min(760px,100%)}
-.catalogo-lista{margin-top:12px;display:flex;flex-direction:column;gap:7px;max-height:52vh;overflow:auto;padding-right:3px}
-.catalogo-item{width:100%;text-align:left;background:#fff;border:1px solid #d9dce1;border-radius:10px;padding:11px 13px;display:flex;flex-direction:column;gap:3px;transition:.15s}
-.catalogo-item:hover{border-color:var(--rojo);background:#fff7f7}
-.catalogo-item strong{font-size:14px}
-.catalogo-item span{font-size:12px;color:#666}
-.loading-catalogo{margin-top:70px;text-align:center}
-.catalog-spinner{width:32px;height:32px;margin:20px auto;border:4px solid #e5e7eb;border-top-color:var(--rojo);border-radius:50%;animation:spin .8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
+.quote-preview{background:#fff;border:1px solid #d5dadd;max-width:none;width:100%;margin:auto;padding:8mm;color:#183746;font-family:Arial,Helvetica,sans-serif}
+.quote-head{display:grid;grid-template-columns:1fr 1fr;gap:0;min-height:52mm;padding:4mm 3mm 4mm;border-bottom:2px solid var(--rojo)}
+.quote-company{padding-right:7mm}
+.quote-logo{width:62mm;max-width:100%;height:auto;display:block;margin-bottom:2mm}
+.quote-company-data{font-size:3.3mm;line-height:1.5;color:#183746}
+.quote-contact{margin-top:1mm}
+.quote-presentation{border-left:2px solid var(--rojo);padding-left:8mm;display:flex;flex-direction:column;align-items:flex-end;justify-content:center;text-align:right}
+.quote-brand{font-size:14mm;line-height:.9;font-weight:900;letter-spacing:-.7mm;color:#183746;white-space:nowrap}
+.quote-brand .gold{color:#C58A22}.quote-brand .red{color:#BE000F}
+.quote-number{margin-top:3mm;font-size:7mm;line-height:1;font-weight:900;color:#183746;text-align:right}
+.quote-number span{color:#BE000F}
+.quote-meta{margin-top:4mm;font-size:3.5mm;line-height:1.7;color:#4b5563;text-align:right}
+.quote-meta strong{color:#183746;font-weight:800}
+.quote-section{margin-top:4mm}
+.quote-section-title{display:flex;align-items:center;gap:3mm;margin-bottom:2.5mm;font-size:4mm;font-weight:900;text-transform:uppercase;color:#183746}
+.quote-section-title::before{content:"";width:4mm;height:4mm;border-radius:1mm;background:#C58A22;flex:0 0 auto}
+.quote-section-line{height:2px;background:var(--rojo);margin-bottom:3mm}
+.quote-customer{margin:0;padding:3mm 3mm;background:#fff;border:0;border-radius:0;font-size:3.5mm;line-height:1.8;color:#263f4b}
+.quote-customer-grid{display:grid;grid-template-columns:1.6fr 1fr;column-gap:8mm;row-gap:1mm}
+.quote-field{min-width:0}.quote-field.full{grid-column:1/-1}
+.quote-field strong{color:#183746;font-weight:800}.quote-field-value{display:inline-block;color:#333}
+.quote-payment{margin-top:3mm;padding:3mm;display:flex;align-items:center;gap:6mm;border-top:1px solid #d9dee1;border-bottom:1px solid #d9dee1;font-size:3.4mm}
+.quote-payment-title{font-weight:900;color:#183746;margin-right:2mm}
+.quote-payment-option{display:inline-flex;align-items:center;gap:2mm;color:#344954}
+.quote-check{width:4mm;height:4mm;border:1.3px solid #183746;border-radius:.8mm;display:inline-block}
+.quote-payment-selected{margin-left:auto;color:#183746}
+.quote-detail{margin-top:4mm}
+.quote-table{width:100%;min-width:0;border-collapse:collapse;table-layout:fixed}
+.quote-table th{background:#183746;color:#fff;padding:3mm 2mm;border:1px solid #183746;font-size:3.2mm;font-weight:800;text-transform:uppercase}
+.quote-table td{padding:2.6mm 2mm;border:1px solid #d7dde0;font-size:3.1mm;color:#263f4b;vertical-align:middle}
+.quote-table tbody tr:nth-child(even){background:#f4f6f7}
+.quote-table th:nth-child(1),.quote-table td:nth-child(1){width:31%}
+.quote-table th:nth-child(2),.quote-table td:nth-child(2){width:12%}
+.quote-table th:nth-child(3),.quote-table td:nth-child(3){width:11%;text-align:center}
+.quote-table th:nth-child(4),.quote-table td:nth-child(4){width:10%;text-align:center}
+.quote-table th:nth-child(5),.quote-table td:nth-child(5){width:16%;text-align:right}
+.quote-table th:nth-child(6),.quote-table td:nth-child(6){width:20%;text-align:right}
+.quote-table small{color:#6b7280;font-size:2.8mm}
+.quote-total{display:flex;justify-content:flex-end;align-items:center;gap:5mm;margin-top:4mm;font-size:5mm;font-weight:900;color:#183746}
+.quote-total-label{text-transform:uppercase}
+.quote-total-value{min-width:45mm;padding:3mm 4mm;text-align:right;border:2px solid #183746;border-radius:2mm;background:#f2f5f6;color:var(--rojo)}
+.quote-footer-line{height:2px;background:var(--rojo);margin-top:5mm;margin-bottom:3mm}
+.quote-foot{margin:0;padding:0;border:0;font-size:3mm;line-height:1.5;color:#59666c;display:grid;grid-template-columns:1fr 1.5fr;gap:8mm;align-items:center}
+.quote-thanks{font-size:4mm;font-weight:800;color:#183746}.quote-thanks span{color:#C58A22}
+.quote-legal{text-align:right}.quote-legal strong{color:#183746}
+@media print{
+@page{size:A4;margin:0}
+html,body{width:210mm;min-height:297mm;margin:0;padding:0;background:#fff}
+body{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+header,.no-print{display:none!important}
+.wrap{width:210mm;max-width:none;margin:0;padding:0}
+.card{border:0;box-shadow:none;padding:0;margin:0}
+.quote-preview{width:210mm;min-height:297mm;margin:0;padding:8mm;border:0}
+.quote-table{page-break-inside:auto}.quote-table tr{page-break-inside:avoid;page-break-after:auto}
+.quote-head,.quote-customer,.quote-payment,.quote-total,.quote-foot{page-break-inside:avoid}
+}
+
 @media(min-width:1000px){
   .wrap{max-width:1180px}
   .header-inner{max-width:1180px}
@@ -131,8 +167,14 @@ th{font-size:12px;text-transform:uppercase;color:#666;background:#fafafa}
   .add-btn{width:100%}
   .actions{flex-direction:column}
   .actions button{width:100%}
-  .quote-head{flex-direction:column}
+  .quote-head{grid-template-columns:1fr}
+  .quote-company{padding-right:0}
+  .quote-presentation{border-left:0;border-top:2px solid var(--rojo);padding-left:0;padding-top:5mm;margin-top:4mm;align-items:flex-start;text-align:left}
   .quote-number,.quote-meta{text-align:left}
+  .quote-payment{flex-wrap:wrap;gap:3mm 5mm}
+  .quote-payment-selected{width:100%;margin-left:0}
+  .quote-foot{grid-template-columns:1fr}
+  .quote-legal{text-align:left}
 }
 @media print{
   body{background:#fff}
@@ -889,25 +931,163 @@ function mostrarPresupuestoGuardado(numero,datos){
 }
 
 function quoteHtml(numero,fecha,d){
+
   const rows=d.productos.map(p=>{
     const cr=String(p.unidad||"")==="Unidades";
+
     return cr
-      ? `<tr><td>${esc(p.producto)}${p.tieneOferta?' <small>OFERTA</small>':''}</td><td>—</td><td>${fmt0(p.cantidad||0)} unidades</td><td>—</td><td class="money">$ ${fmt(p.precioM2)}</td><td class="money">$ ${fmt(p.subtotal)}</td></tr>`
-      : `<tr><td>${esc(p.producto)}<br><small>${esc(p.color)}${p.conZocalo?' · Incl. Zócalo':''}</small></td><td>${esc(p.medida)}</td><td>${fmt(p.m2Solicitados)}</td><td>${p.cajas}</td><td class="money">$ ${fmt(p.precioM2)}</td><td class="money">$ ${fmt(p.subtotal)}</td></tr>`;
+      ? `<tr>
+          <td><strong>${esc(p.producto)}</strong>${p.tieneOferta?`<br><small>OFERTA</small>`:""}</td>
+          <td>—</td>
+          <td>${fmt0(p.cantidad||0)} unidades</td>
+          <td>—</td>
+          <td class="money">$ ${fmt(p.precioM2)}</td>
+          <td class="money">$ ${fmt(p.subtotal)}</td>
+        </tr>`
+      : `<tr>
+          <td>
+            <strong>${esc(p.producto)}</strong>
+            ${p.color?`<br><small>${esc(p.color)}</small>`:""}
+            ${p.conZocalo?`<br><small>Incl. Zócalo</small>`:""}
+            ${p.tieneOferta?`<br><small>OFERTA</small>`:""}
+          </td>
+          <td>${esc(p.medida||"—")}</td>
+          <td>${fmt(p.m2Solicitados)}</td>
+          <td>${p.cajas}</td>
+          <td class="money">$ ${fmt(p.precioM2)}</td>
+          <td class="money">$ ${fmt(p.subtotal)}</td>
+        </tr>`;
   }).join("");
-  return `<section class="quote-preview" id="quote">
-    <div class="quote-head"><img src="${LOGO_URL}" alt="G&T S.R.L."><div><div class="quote-number">${esc(numero)}</div><div class="quote-meta">Fecha: ${esc(fecha)}<br>Vendedor: ${esc(vendedor)}</div></div></div>
-    <div class="quote-customer"><strong>Cliente:</strong> ${esc(d.cliente)}<br>
-      ${d.dniCuit?`<strong>DNI/CUIT:</strong> ${esc(d.dniCuit)} · `:""}${d.telefono?`<strong>Tel.:</strong> ${esc(d.telefono)}<br>`:""}
-      ${d.email?`<strong>Email:</strong> ${esc(d.email)}<br>`:""}${d.direccion?`<strong>Dirección:</strong> ${esc(d.direccion)}<br>`:""}
-      <strong>Forma de pago:</strong> ${esc(d.formaPago||"Contado")}
+
+  const formaPago=String(d.formaPago||"Contado").trim();
+
+  return `
+  <section class="quote-preview" id="quote">
+
+    <div class="quote-head">
+
+      <div class="quote-company">
+        <img class="quote-logo" src="${LOGO_URL}" alt="G&T S.R.L.">
+
+        <div class="quote-company-data">
+          <div class="quote-contact"><strong>WhatsApp:</strong> 299 - 5207382</div>
+          <div><strong>Dirección:</strong> Conquistadores del Desierto 3400</div>
+          <div><strong>Parque Industrial de Neuquén</strong></div>
+          <div><strong>IVA RESPONSABLE INSCRIPTO</strong></div>
+        </div>
+      </div>
+
+      <div class="quote-presentation">
+        <div class="quote-brand"><span class="gold">e-</span>Ppto<span class="red">.</span></div>
+        <div class="quote-number">Nº <span>${esc(numero)}</span></div>
+        <div class="quote-meta">
+          <div><strong>Fecha:</strong> ${esc(fecha)}</div>
+          <div><strong>Vendedor:</strong> ${esc(vendedor)}</div>
+        </div>
+      </div>
+
     </div>
-    <table class="quote-table"><thead><tr><th>Producto</th><th>Medida</th><th>Cantidad</th><th>Cajas</th><th>Precio</th><th>Subtotal</th></tr></thead><tbody>${rows}</tbody></table>
-    <div class="quote-total">TOTAL: $ ${fmt(d.total)}</div>
-    <div class="quote-foot"><strong>Validez:</strong> 15 días. Los precios y condiciones indicados corresponden al momento de emisión del presupuesto.<br>
-      G&T S.R.L. · ${esc("Conquistadores del Desierto 3400")} · Neuquén, Argentina · Tel. ${esc("299 520-7382")}
+
+    <div class="quote-section">
+      <div class="quote-section-line"></div>
+      <div class="quote-section-title">Datos del Cliente</div>
+
+      <div class="quote-customer">
+        <div class="quote-customer-grid">
+
+          <div class="quote-field full">
+            <strong>Señor / es:</strong>
+            <span class="quote-field-value">${esc(d.cliente||"")}</span>
+          </div>
+
+          <div class="quote-field">
+            <strong>DNI / CUIT:</strong>
+            <span class="quote-field-value">${esc(d.dniCuit||"—")}</span>
+          </div>
+
+          <div class="quote-field">
+            <strong>Teléfono:</strong>
+            <span class="quote-field-value">${esc(d.telefono||"—")}</span>
+          </div>
+
+          <div class="quote-field full">
+            <strong>Dirección:</strong>
+            <span class="quote-field-value">${esc(d.direccion||"—")}</span>
+          </div>
+
+          ${d.email?`
+            <div class="quote-field full">
+              <strong>Email:</strong>
+              <span class="quote-field-value">${esc(d.email)}</span>
+            </div>`:""}
+
+        </div>
+      </div>
     </div>
-  </section>`;
+
+    <div class="quote-payment">
+      <div class="quote-payment-title">Condición de Venta:</div>
+
+      <div class="quote-payment-option">
+        <span class="quote-check"></span> Contado
+      </div>
+
+      <div class="quote-payment-option">
+        <span class="quote-check"></span> Tarjeta
+      </div>
+
+      <div class="quote-payment-option">
+        <span class="quote-check"></span> Otro
+      </div>
+
+      <div class="quote-payment-selected">
+        <strong>Seleccionada:</strong> ${esc(formaPago)}
+      </div>
+    </div>
+
+    <div class="quote-detail">
+      <div class="quote-section-line"></div>
+      <div class="quote-section-title">Detalle del Presupuesto</div>
+
+      <table class="quote-table">
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Medida</th>
+            <th>Cantidad</th>
+            <th>Cajas</th>
+            <th>Precio Unit.</th>
+            <th>Importe</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+
+    <div class="quote-total">
+      <div class="quote-total-label">Total</div>
+      <div class="quote-total-value">$ ${fmt(d.total)}</div>
+    </div>
+
+    <div class="quote-footer-line"></div>
+
+    <div class="quote-foot">
+      <div class="quote-thanks">
+        ¡Gracias por confiar en nosotros!
+        <br><span>G&T S.R.L.</span>
+      </div>
+
+      <div class="quote-legal">
+        <div>
+          <strong>Validez: 15 días.</strong>
+          Los precios y condiciones indicados corresponden al momento de emisión del presupuesto.
+        </div>
+        <div><strong>Documento no válido como factura.</strong></div>
+      </div>
+    </div>
+
+  </section>
+  `;
 }
 
 function renderLoadingHistorico(){
