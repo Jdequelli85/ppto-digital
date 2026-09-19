@@ -1004,6 +1004,7 @@ jsonp({
 
 function mostrarPresupuestoGuardado(numero,datos){
   verNumero="";
+  document.title = "G&T S.R.L. - " + numero.replace("e-Ptto - ", "ePpto ");
   const fecha=new Date().toLocaleDateString("es-AR");
   $("app").innerHTML=header()+`<main class="wrap">
     <div class="historical-actions no-print">
