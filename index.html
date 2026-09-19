@@ -483,22 +483,16 @@ function cerrarModal(){
 }
 
 function textoOpcionCatalogo(p){
-  const producto=String(p["Producto"]||"").trim();
-  const color=String(p._colorSeleccionado||"").trim();
-  const medida=String(p["Medida"]||"").trim();
-  if(categoriaProducto(p)==="CRRL") return producto;
-function textoOpcionCatalogo(p){
   const producto = String(p["Producto"] || "").trim();
   const medida = String(p["Medida"] || "").trim();
 
-  if(categoriaProducto(p) === "CRRL") {
+  if(categoriaProducto(p) === "CRRL"){
     return producto;
   }
 
   return medida
     ? `${producto} (${medida})`
     : producto;
-}
 }
 
 function renderCatalogo(){
