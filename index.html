@@ -578,6 +578,7 @@ async function renderApp(){
       </div>
     </div>
   </div>`;
+  $("forma").onchange=recalcularPreciosPorFormaPago;
   $("add").onclick=abrirModal;
   $("close").onclick=cerrarModal;
   $("buscarProducto").oninput=renderCatalogo;
@@ -757,6 +758,70 @@ function unidadesPorCaja(p){
   const areaPieza = (partes[0] / 100) * (partes[1] / 100);
   const unidades = Math.round(cajaM2 / areaPieza);
   return unidades > 0 ? unidades : null;
+}
+
+function precioSegunFormaPago(p, forma){
+  const id=String(p?.id||p?.["ID"]||"").trim();
+  const catalogo=catalogoProductos.find(x=>String(x?.["ID"]||"").trim()===id) || p;
+
+  const oferta=Number(catalogo?.["OFERTA"]||0);
+  const tieneOferta=Number.isFinite(oferta)&&oferta>0;
+  const precioContado=Number(catalogo?.["Precio Contado"]||0);
+  const precioTarjeta=Number(catalogo?.["Precio Tarjeta"]||0);
+
+  /*
+   * FORMA DE PAGO
+   * -------------------------
+   * Contado  -> Precio Contado / Oferta
+   * Tarjeta  -> Precio Tarjeta
+   * Otro     -> Por ahora mismo criterio que Contado
+   *
+   * FUTURO:
+   * En "Otro" se podrá aplicar un porcentaje
+   * adicional, por ejemplo para operaciones con cheque.
+   * Ejemplo:
+   * const porcentajeOtro = 5;
+   * precio = precioContado * (1 + porcentajeOtro / 100);
+   */
+
+  if(forma==="Tarjeta" && precioTarjeta>0){
+    return {
+      precio:precioTarjeta,
+      tieneOferta:false,
+      oferta
+    };
+  }
+
+  return {
+    precio:tieneOferta ? oferta : precioContado,
+    tieneOferta,
+    oferta
+  };
+}
+
+function recalcularPreciosPorFormaPago(){
+  if(!productos.length)return;
+
+  const forma=$("forma")?.value||"Contado";
+
+  productos.forEach(p=>{
+    const datosPrecio=precioSegunFormaPago(p,forma);
+    const precio=datosPrecio.precio;
+
+    p.precioM2=precio;
+    p.tieneOferta=datosPrecio.tieneOferta;
+    p.oferta=datosPrecio.oferta;
+
+    if(String(p.unidad||"")==="Unidades"){
+      p.precioCaja=precio;
+      p.subtotal=Number(p.cantidad||0)*precio;
+    }else{
+      p.precioCaja=precio*Number(p.cajaM2||0);
+      p.subtotal=Number(p.m2Reales||0)*precio;
+    }
+  });
+
+  renderProductos();
 }
 
 function calcularActual(){
