@@ -886,7 +886,16 @@ function renderProductos(){
       `;
     }
 
-    const precioUnitario=Number(p.precioM2||0);
+    // En pastinas se muestra el precio de la caja, sin modificar
+    // el cálculo interno por m² ni el subtotal.
+    const idProducto = String(p.id||"").trim().toUpperCase();
+    const esPastina =
+      idProducto==="PSO-PTNA-1K" ||
+      idProducto==="PSO-PTNA-5K";
+
+    const precioUnitario = esPastina
+      ? Number(p.precioCaja||p.precioM2||0)
+      : Number(p.precioM2||0);
 
     const tr=document.createElement("tr");
 
@@ -1142,7 +1151,7 @@ const rows=d.productos.map(p=>{
           ${p.tieneOferta?`<br><small>OFERTA</small>`:""}
         </td>
         <td>${esc(p.medida||"—")}${p.unidadesPorCaja ? `<span class="quote-unidades-caja">${fmt0(p.unidadesPorCaja)} un./caja</span>` : ""}</td>
-        <td>${fmt(p.m2Solicitados)}</td>
+        <td>${fmt(p.m2Solicitados)} m²</td>
         <td>${p.cajas}</td>
         <td class="money">$ ${fmt(precioUnitarioMostrar)}</td>
         <td class="money">$ ${fmt(p.subtotal)}</td>
