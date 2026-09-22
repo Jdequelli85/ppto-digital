@@ -276,6 +276,1119 @@ th{font-size:12px;text-transform:uppercase;color:#666;background:#fafafa}
 
 <div id="app"></div>
 
-<script src="app-NUEVO.js"></script>
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycby_3DebaIbZZW2qZ7ShkePBD40Bzo8wGyaHAw8w0omsKahF6CpuUEEPaG2ox3fGkAqk0w/exec";
+const LOGO_URL = "https://raw.githubusercontent.com/Jdequelli85/qr-corralon/main/logo.png";
+
+/*
+ * CARGA OPTIMIZADA DEL CATÁLOGO
+ * ------------------------------
+ * El HTML sigue siendo autocontenido.
+ * El catálogo se guarda localmente para evitar volver a descargarlo
+ * completo cada vez que se recarga la página.
+ */
+const CATALOGO_CACHE_KEY = "gt_catalogo_cache_v1";
+const CATALOGO_CACHE_MAX_AGE = 24 * 60 * 60 * 1000; // 24 horas
+
+
+let token = sessionStorage.getItem("gt_token") || "";
+let vendedor = sessionStorage.getItem("gt_usuario") || "";
+let productos = [];
+let catalogoProductos = [];
+let catalogoOpciones = [];
+let productoActual = null;
+let verNumero = new URLSearchParams(location.search).get("ver") || "";
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+const fmt = n => Number(n || 0).toLocaleString("es-AR",{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmt0 = n => Number(n || 0).toLocaleString("es-AR",{maximumFractionDigits:0});
+
+function categoriaProducto(p){
+  const id=String(p?.["ID"]||"").trim().toUpperCase();
+  if(id.startsWith("CRRL-")) return "CRRL";
+  if(id.startsWith("CER-")) return "CER";
+  if(id.startsWith("POR-")) return "POR";
+  if(id.startsWith("REV-")) return "REV";
+  if(id.startsWith("PSO-")) return "PSO";
+  return "OTRO";
+}
+
+function esMaterialCorralon(p){ return categoriaProducto(p)==="CRRL"; }
+
+function sonidoQR(){
+  try{
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if(!AudioCtx)return;
+    const ctx = new AudioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = "sine";
+    osc.frequency.value = 880;
+
+    gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.16, ctx.currentTime + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.13);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start();
+    osc.stop(ctx.currentTime + 0.14);
+    osc.onended = () => ctx.close();
+  }catch(e){}
+}
+
+function nuevoPresupuesto(){
+  productos = [];
+  productoActual = null;
+  verNumero = "";
+  renderApp();
+}
+
+function jsonp(params, timeoutMs=20000){
+  return new Promise((resolve,reject)=>{
+    const callback = "gtcb_" + Date.now() + "_" + Math.floor(Math.random()*100000);
+    const script = document.createElement("script");
+    const q = new URLSearchParams({...params,callback,_ts:Date.now()});
+    let timer = setTimeout(()=>{cleanup();reject(new Error("Tiempo de espera agotado."));},timeoutMs);
+    let terminado = false;
+
+    function cleanup(){
+      if(terminado)return;
+      terminado=true;
+      clearTimeout(timer);
+      delete window[callback];
+      script.remove();
+    }
+
+    window[callback] = data => {cleanup();resolve(data)};
+    script.onerror = ()=>{cleanup();reject(new Error("No se pudo conectar con el servidor."))};
+    script.src = API_URL + "?" + q.toString();
+    document.body.appendChild(script);
+  });
+}
+
+function guardarCatalogoCache(){
+  try{
+    localStorage.setItem(CATALOGO_CACHE_KEY, JSON.stringify({
+      fecha: Date.now(),
+      productos: catalogoProductos
+    }));
+  }catch(e){
+    // Si el almacenamiento local está lleno/bloqueado,
+    // la aplicación continúa funcionando normalmente.
+  }
+}
+
+function cargarCatalogoDesdeCache(){
+  try{
+    const raw = localStorage.getItem(CATALOGO_CACHE_KEY);
+    if(!raw)return false;
+
+    const cache = JSON.parse(raw);
+    if(!cache || !Array.isArray(cache.productos) || !cache.productos.length){
+      localStorage.removeItem(CATALOGO_CACHE_KEY);
+      return false;
+    }
+
+    const antiguedad = Date.now() - Number(cache.fecha || 0);
+    if(antiguedad > CATALOGO_CACHE_MAX_AGE){
+      localStorage.removeItem(CATALOGO_CACHE_KEY);
+      return false;
+    }
+
+    construirCatalogo(cache.productos);
+    return !!catalogoOpciones.length;
+  }catch(e){
+    try{localStorage.removeItem(CATALOGO_CACHE_KEY)}catch(_e){}
+    return false;
+  }
+}
+
+function construirCatalogo(productos){
+  catalogoProductos = Array.isArray(productos) ? productos : [];
+  catalogoOpciones = [];
+
+  /*
+   * CATÁLOGO PC
+   * -------------------------
+   * Una sola opción por:
+   * PRODUCTO + MEDIDA
+   *
+   * Los colores NO se duplican.
+   * Se seleccionan posteriormente
+   * en la ventana de configuración.
+   */
+
+  const claves = new Set();
+
+  catalogoProductos.forEach(p => {
+
+    const categoria = categoriaProducto(p);
+
+    if(categoria === "OTRO") return;
+
+    const producto = String(p["Producto"] || "").trim();
+    const medida = String(p["Medida"] || "").trim();
+
+    /*
+     * CRRL:
+     * No tiene color ni medida como
+     * característica del producto.
+     */
+    if(categoria === "CRRL"){
+      const clave = `CRRL|${producto.toUpperCase()}`;
+
+      if(claves.has(clave)) return;
+
+      claves.add(clave);
+
+      catalogoOpciones.push({
+        ...p,
+        _colorSeleccionado: ""
+      });
+
+      return;
+    }
+
+    /*
+     * CER / POR / REV / PSO
+     *
+     * Una sola opción por Producto + Medida.
+     */
+    const clave =
+      `${categoria}|${producto.toUpperCase()}|${medida.toUpperCase()}`;
+
+    if(claves.has(clave)) return;
+
+    claves.add(clave);
+
+    catalogoOpciones.push({
+      ...p,
+      _colorSeleccionado: ""
+    });
+  });
+
+  if(!catalogoOpciones.length) {
+    throw new Error("El catálogo no contiene productos disponibles.");
+  }
+}
+
+async function actualizarCatalogoServidor(){
+  const r = await jsonp({accion:"catalogo",token});
+
+  if(!r?.ok) {
+    throw new Error(r?.error || "No se pudo cargar el catálogo de productos.");
+  }
+
+  const productosNuevos = Array.isArray(r.productos)
+    ? r.productos
+    : (Array.isArray(r.catalogo) ? r.catalogo : []);
+
+  construirCatalogo(productosNuevos);
+  guardarCatalogoCache();
+  return true;
+}
+
+async function cargarCatalogo({usarCache=true,esperarServidor=true}={}){
+  /*
+   * PRIMERA ETAPA:
+   * si ya tenemos catálogo local, lo mostramos inmediatamente.
+   */
+  if(usarCache && cargarCatalogoDesdeCache()){
+    /*
+     * SEGUNDA ETAPA:
+     * actualizar en segundo plano. No bloqueamos la interfaz.
+     */
+    actualizarCatalogoServidor().catch(err=>{
+      console.warn("No se pudo actualizar el catálogo en segundo plano:", err.message);
+    });
+    return true;
+  }
+
+  /*
+   * Primera carga o caché inexistente:
+   * aquí sí necesitamos esperar al servidor.
+   */
+  if(esperarServidor){
+    await actualizarCatalogoServidor();
+    return true;
+  }
+
+  return false;
+}
+
+function mostrarCargaCatalogo(){
+  $("app").innerHTML = `
+    <main class="wrap">
+      <section class="card login-card loading-catalogo">
+        <img class="logo-login" src="${LOGO_URL}" alt="G&T S.R.L.">
+        <h1>Cargando productos...</h1>
+        <div class="subtitle">Preparando el catálogo para esta sesión.</div>
+        <div class="catalog-spinner" aria-label="Cargando"></div>
+      </section>
+    </main>`;
+}
+
+function mostrarLogin(mensaje=""){
+  document.title="G&T S.R.L. — Presupuesto Digital";
+  $("app").innerHTML = `
+    <main class="wrap">
+      <section class="card login-card">
+        <img class="logo-login" src="${LOGO_URL}" alt="G&T S.R.L.">
+        <h1>Presupuesto Digital</h1>
+        <div class="subtitle">Acceso para personal autorizado</div>
+        <form id="loginForm">
+          <label>Vendedor</label>
+          <select id="loginUsuario" required>
+            <option value="">Seleccioná tu nombre</option>
+            <option value="Agustin">Agustin</option>
+            <option value="Gaston">Gaston</option>
+            <option value="Tomito">Tomito</option>
+            <option value="Julio">Julio</option>
+          </select>
+          <div style="height:12px"></div>
+          <label>PIN</label>
+          <input id="loginPin" type="password" inputmode="numeric" autocomplete="off" required>
+          <button class="btn btn-primary btn-large" id="loginBtn">INGRESAR</button>
+          <div id="loginStatus" class="status ${mensaje?'error':''}">${esc(mensaje)}</div>
+        </form>
+        <div style="margin-top:22px;text-align:center;color:#888;font-size:12px">G&T S.R.L. · Presupuesto Digital</div>
+      </section>
+    </main>`;
+  $("loginForm").onsubmit=async e=>{
+    e.preventDefault();
+    const btn=$("loginBtn"), st=$("loginStatus");
+    btn.disabled=true; btn.textContent="VERIFICANDO...";
+    st.className="status"; st.textContent="";
+    try{
+      const r=await jsonp({accion:"login",usuario:$("loginUsuario").value,pin:$("loginPin").value});
+      if(!r || !r.ok) throw new Error(r?.error || "Usuario o PIN incorrecto.");
+      token=r.token; vendedor=r.usuario;
+      sessionStorage.setItem("gt_token",token);
+      sessionStorage.setItem("gt_usuario",vendedor);
+      mostrarCargaCatalogo();
+      await cargarCatalogo({usarCache:true,esperarServidor:true});
+      renderApp();
+    }catch(err){
+      st.className="status error"; st.textContent=err.message;
+      btn.disabled=false; btn.textContent="INGRESAR";
+    }
+  };
+}
+
+function header(){
+  return `<header><div class="header-inner">
+    <img src="${LOGO_URL}" alt="G&T S.R.L.">
+    <div class="user-pill">Vendedor: <strong>${esc(vendedor)}</strong></div>
+  </div></header>`;
+}
+
+async function renderApp(){
+  if(!token){mostrarLogin();return;}
+  if(verNumero){renderLoadingHistorico();cargarHistorico(verNumero);return;}
+  if(!catalogoOpciones.length){
+    try{
+      /*
+       * Primero intenta el catálogo local. Si existe,
+       * la pantalla se construye inmediatamente y la
+       * actualización al servidor continúa en segundo plano.
+       */
+      const teniaCache = cargarCatalogoDesdeCache();
+
+      if(!teniaCache){
+        mostrarCargaCatalogo();
+        await actualizarCatalogoServidor();
+      }else{
+        actualizarCatalogoServidor().catch(err=>{
+          console.warn("No se pudo actualizar el catálogo en segundo plano:", err.message);
+        });
+      }
+    }catch(e){
+      mostrarLogin("No se pudo cargar el catálogo: " + e.message);
+      return;
+    }
+  }
+  document.title="G&T S.R.L. — Presupuesto Digital";
+  $("app").innerHTML = header()+`
+  <main class="wrap">
+    <section class="card">
+      <h1>Presupuesto Digital</h1>
+      <div class="subtitle">Nuevo presupuesto · el número se asigna al generar</div>
+      <div class="grid">
+        <div><label>Cliente *</label><input id="cliente" placeholder="Nombre y apellido / Razón social"></div>
+        <div><label>DNI / CUIT</label><input id="dni"></div>
+        <div><label>Teléfono</label><input id="telefono"></div>
+        <div><label>Email</label><input id="email" type="email"></div>
+        <div><label>Dirección</label><input id="direccion"></div>
+        <div><label>Forma de pago</label>
+          <select id="forma"><option value="Contado">Contado</option><option value="Tarjeta">Tarjeta</option><option value="Otro">Otro</option></select>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="titlebar">
+        <h2>Productos</h2>
+        <button class="btn btn-primary add-btn" id="add">＋ AGREGAR PRODUCTO</button>
+      </div>
+      <div id="empty" class="empty">Todavía no se agregaron productos.</div>
+<div class="table-wrap"><table id="table" hidden>
+  <thead>
+    <tr>
+      <th>Producto</th>
+      <th>Medida</th>
+      <th>Cantidad</th>
+      <th>Cajas</th>
+      <th>P. UNIT.</th>
+      <th>Subtotal</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody id="rows"></tbody>
+</table></div>
+      <div class="total-box"><small>Total presupuesto</small>$ <span id="total">0,00</span></div>
+      <div class="actions">
+        <button class="btn btn-secondary" id="cancel">CANCELAR</button>
+        <button class="btn btn-primary" id="generate">GENERAR PRESUPUESTO</button>
+      </div>
+      <div id="appStatus" class="status"></div>
+    </section>
+  </main>
+
+  <div class="modal-backdrop" id="modal">
+    <div class="modal modal-productos">
+      <div class="modal-head"><h3>Agregar producto</h3><button class="close" id="close">×</button></div>
+      <div id="catalogArea">
+        <p class="scan-note">Seleccioná un producto del catálogo.</p>
+        <input id="buscarProducto" type="search" placeholder="🔎 Buscar por producto o medida..." autocomplete="off">
+        <div id="catalogoLista" class="catalogo-lista"></div>
+        <div id="catalogoError" class="status"></div>
+      </div>
+      <div id="calcArea" hidden>
+        <div id="productInfo" class="product-info"></div>
+        <div id="m2Area">
+          <label>Metros cuadrados necesarios *</label>
+          <input id="m2" type="number" min="0.01" step="0.01" placeholder="Ej.: 28">
+          <label class="checkbox"><input id="zocalo" type="checkbox"> Con zócalo (+10%)</label>
+        </div>
+        <div id="cantidadArea" hidden>
+          <label>Cantidad *</label>
+          <input id="cantidad" type="number" min="1" step="1" placeholder="Ej.: 10">
+        </div>
+        <div id="calcInfo" class="calc-info"></div>
+        <button class="btn btn-primary btn-large" id="confirm">AGREGAR AL PRESUPUESTO</button>
+      </div>
+    </div>
+  </div>`;
+  $("forma").onchange=recalcularPreciosPorFormaPago;
+  $("add").onclick=abrirModal;
+  $("close").onclick=cerrarModal;
+  $("buscarProducto").oninput=renderCatalogo;
+  $("cancel").onclick=()=>{if(confirm("¿Cancelar este presupuesto?")){productos=[];limpiarFormulario();renderProductos()}};
+  $("generate").onclick=guardarPresupuesto;
+  $("m2").oninput=calcularActual;
+  $("zocalo").onchange=calcularActual;
+  $("cantidad").oninput=calcularActual;
+  renderProductos();
+}
+
+function limpiarFormulario(){
+  ["cliente","dni","telefono","email","direccion"].forEach(id=>{if($(id))$(id).value=""});
+  if($("forma"))$("forma").value="Contado";
+}
+
+function abrirModal(){
+  productoActual = null;
+  $("modal").classList.add("open");
+  $("catalogArea").hidden=false;
+  $("calcArea").hidden=true;
+  $("catalogoError").className="status";
+  $("catalogoError").textContent="";
+  $("buscarProducto").value="";
+  renderCatalogo();
+  setTimeout(()=>$("buscarProducto")?.focus(),50);
+}
+
+function cerrarModal(){
+  $("modal")?.classList.remove("open");
+  productoActual=null;
+}
+
+function textoOpcionCatalogo(p){
+  const producto = String(p["Producto"] || "").trim();
+  const medida = String(p["Medida"] || "").trim();
+
+  if(categoriaProducto(p) === "CRRL"){
+    return producto;
+  }
+
+  return medida
+    ? `${producto} (${medida})`
+    : producto;
+}
+
+function renderCatalogo(){
+  const lista=$("catalogoLista");
+  if(!lista)return;
+  const q=String($("buscarProducto")?.value||"").trim().toLocaleLowerCase("es-AR");
+  const resultados=catalogoOpciones.filter(p=>{
+    if(!q)return true;
+    return textoOpcionCatalogo(p).toLocaleLowerCase("es-AR").includes(q);
+  });
+
+  if(!resultados.length){
+    lista.innerHTML='<div class="empty">No se encontraron productos.</div>';
+    return;
+  }
+
+  lista.innerHTML=resultados.map((p,i)=>`
+    <button type="button" class="catalogo-item" data-catalogo-index="${catalogoOpciones.indexOf(p)}">
+      <strong>${esc(p["Producto"]||"")}</strong>
+      <span>${esc(p["Medida"] || "")}</span>
+    </button>`).join("");
+}
+
+function seleccionarProductoCatalogo(indice){
+  const p=catalogoOpciones[indice];
+  if(!p)return;
+  productoActual={...p};
+  $("catalogArea").hidden=true;
+  $("calcArea").hidden=false;
+  mostrarProducto();
+}
+
+function mostrarProducto(){
+  const p=productoActual;
+  const crrl=esMaterialCorralon(p);
+
+  const oferta=Number(p["OFERTA"]||0);
+  const tieneOferta=Number.isFinite(oferta)&&oferta>0;
+
+  const precioContado=Number(p["Precio Contado"]||0);
+  const precioTarjeta=Number(p["Precio Tarjeta"]||0);
+  const forma=$("forma")?.value||"Contado";
+
+  const precio=
+    forma==="Tarjeta"&&precioTarjeta>0
+      ? precioTarjeta
+      : (tieneOferta?oferta:precioContado);
+
+  /* =========================
+     MATERIAL DE CORRALÓN
+     ========================= */
+  if(crrl){
+    $("productInfo").innerHTML=`
+      <strong>${esc(p["Producto"])}</strong><br>
+      <strong>${tieneOferta?"🔥 OFERTA":"Precio"}: $ ${fmt(precio)} /unidad</strong>`;
+
+    $("m2Area").hidden=true;
+    $("cantidadArea").hidden=false;
+
+    $("cantidad").value="";
+    $("calcInfo").textContent="";
+    $("calcArea").hidden=false;
+
+    $("cantidad").focus();
+    return;
+  }
+
+  /* =========================
+     CERÁMICOS / PORCELANATOS /
+     REVESTIMIENTOS / PISOS
+     ========================= */
+
+  const coloresRaw=String(p["Color"]||"").trim();
+
+  const colores=coloresRaw
+    .split(/\s*-\s*/)
+    .map(c=>c.trim())
+    .filter(Boolean);
+
+  let selectorColor="";
+
+  if(colores.length>1){
+    selectorColor=`
+      <br>
+      <label>Color *</label>
+      <select id="colorSelect">
+        <option value="">Seleccioná un color</option>
+        ${colores.map(c=>`
+          <option value="${esc(c)}">${esc(c)}</option>
+        `).join("")}
+      </select>
+    `;
+  }
+
+  $("productInfo").innerHTML=`
+    <strong>${esc(p["Producto"])}</strong><br>
+    ${esc(p["Medida"]||"")}
+    ${selectorColor}
+    <br>
+    <strong>${tieneOferta?"🔥 OFERTA":"Precio"}: $ ${fmt(precio)} /m²</strong><br>
+    Caja: ${fmt(p["Caja m²"])} m² · ${fmt0(p["Kg/Caja"]||0)} kg/caja`;
+
+  $("m2Area").hidden=false;
+  $("cantidadArea").hidden=true;
+
+  $("m2").value="";
+  $("zocalo").checked=false;
+  $("calcInfo").textContent="";
+  $("calcArea").hidden=false;
+
+  if(colores.length===1){
+    productoActual._colorSeleccionado=colores[0];
+  }else{
+    productoActual._colorSeleccionado="";
+  }
+
+  $("colorSelect")?.addEventListener("change",function(){
+    productoActual._colorSeleccionado=this.value;
+  });
+
+  $("m2").focus();
+  calcularActual();
+}
+  
+function unidadesPorCaja(p){
+  const medida = String(p?.["Medida"] || "").trim().toLowerCase();
+  const cajaM2 = Number(p?.["Caja m²"] || 0);
+  if(!medida || !Number.isFinite(cajaM2) || cajaM2 <= 0) return null;
+
+  const partes = medida.split("x").map(v => Number(String(v).trim().replace(",", ".")));
+  if(partes.length !== 2 || !Number.isFinite(partes[0]) || !Number.isFinite(partes[1]) || partes[0] <= 0 || partes[1] <= 0) return null;
+
+  const areaPieza = (partes[0] / 100) * (partes[1] / 100);
+  const unidades = Math.round(cajaM2 / areaPieza);
+  return unidades > 0 ? unidades : null;
+}
+
+function precioSegunFormaPago(p, forma){
+  const id=String(p?.id||p?.["ID"]||"").trim();
+  const catalogo=catalogoProductos.find(x=>String(x?.["ID"]||"").trim()===id) || p;
+
+  const oferta=Number(catalogo?.["OFERTA"]||0);
+  const tieneOferta=Number.isFinite(oferta)&&oferta>0;
+  const precioContado=Number(catalogo?.["Precio Contado"]||0);
+  const precioTarjeta=Number(catalogo?.["Precio Tarjeta"]||0);
+
+  /*
+   * FORMA DE PAGO
+   * -------------------------
+   * Contado  -> Precio Contado / Oferta
+   * Tarjeta  -> Precio Tarjeta
+   * Otro     -> Por ahora mismo criterio que Contado
+   *
+   * FUTURO:
+   * En "Otro" se podrá aplicar un porcentaje
+   * adicional, por ejemplo para operaciones con cheque.
+   * Ejemplo:
+   * const porcentajeOtro = 5;
+   * precio = precioContado * (1 + porcentajeOtro / 100);
+   */
+
+  if(forma==="Tarjeta" && precioTarjeta>0){
+    return {
+      precio:precioTarjeta,
+      tieneOferta:false,
+      oferta
+    };
+  }
+
+  return {
+    precio:tieneOferta ? oferta : precioContado,
+    tieneOferta,
+    oferta
+  };
+}
+
+function recalcularPreciosPorFormaPago(){
+  if(!productos.length)return;
+
+  const forma=$("forma")?.value||"Contado";
+
+  productos.forEach(p=>{
+    const datosPrecio=precioSegunFormaPago(p,forma);
+    const precio=datosPrecio.precio;
+
+    p.precioM2=precio;
+    p.tieneOferta=datosPrecio.tieneOferta;
+    p.oferta=datosPrecio.oferta;
+
+    if(String(p.unidad||"")==="Unidades"){
+      p.precioCaja=precio;
+      p.subtotal=Number(p.cantidad||0)*precio;
+    }else{
+      p.precioCaja=precio*Number(p.cajaM2||0);
+      p.subtotal=Number(p.m2Reales||0)*precio;
+    }
+  });
+
+  renderProductos();
+}
+
+function calcularActual(){
+  if(!productoActual)return null;
+  const crrl=esMaterialCorralon(productoActual);
+  const oferta=Number(productoActual["OFERTA"]||0);
+  const tieneOferta=Number.isFinite(oferta)&&oferta>0;
+  const forma=$("forma").value||"Contado";
+  const precioTarjeta=Number(productoActual["Precio Tarjeta"]||0);
+  const precio=(forma==="Tarjeta"&&precioTarjeta>0)?precioTarjeta:(tieneOferta?oferta:Number(productoActual["Precio Contado"]||0));
+
+  if(crrl){
+    const cantidad=Number($("cantidad")?.value||0);
+    if(cantidad<=0){$("calcInfo").textContent="";return null}
+    const subtotal=cantidad*precio;
+    $("calcInfo").textContent=`${cantidad} unidades · Subtotal: $ ${fmt(subtotal)}`;
+    return {unidad:"Unidades",cantidad, m2Solicitados:0,conZocalo:false,porcentajeAdicional:0,m2Calculados:0,cajas:0,m2Reales:0,precioM2:precio,precioCaja:precio,subtotal,tieneOferta,oferta};
+  }
+
+  const m2=Number($("m2").value||0);if(m2<=0){$("calcInfo").textContent="";return null}
+  const conZ=$("zocalo").checked, extra=conZ?10:0, m2Calc=m2*(1+extra/100);
+  const caja=Number(productoActual["Caja m²"]||0);
+  const cajas=Math.ceil(m2Calc/caja), reales=cajas*caja;
+  const subtotal=reales*precio;
+  $("calcInfo").textContent=`${conZ?"Con zócalo (+10%) · ":""}${cajas} cajas · ${fmt(reales)} m² reales · Subtotal: $ ${fmt(subtotal)}`;
+  return {unidad:"m²",cantidad:m2,m2Solicitados:m2,conZocalo:conZ,porcentajeAdicional:extra,m2Calculados:m2Calc,cajas,m2Reales:reales,precioM2:precio,precioCaja:precio*caja,subtotal,tieneOferta,oferta};
+}
+
+function renderProductos(){
+  if(!$("rows"))return;
+
+  $("rows").innerHTML="";
+  let total=0;
+
+  productos.forEach((p,i)=>{
+    total+=Number(p.subtotal||0);
+
+    const esCRRL = String(p.id||"").toUpperCase().startsWith("CRRL-");
+
+    let cantidadHTML="";
+
+    if(esCRRL){
+
+      cantidadHTML=`
+        <strong>${fmt0(p.cantidad||0)} unidades</strong>
+      `;
+
+    }else{
+
+      const m2Solicitados=Number(p.m2Solicitados||0);
+      const m2Calculados=Number(p.m2Reales||0);
+      const m2Zocalo=p.conZocalo
+        ? Math.max(0,m2Calculados-m2Solicitados)
+        : 0;
+
+      cantidadHTML=`
+        <strong>${fmt(m2Solicitados)} m²</strong>
+        ${p.conZocalo && m2Zocalo>0
+          ? `<br><small>+ ${fmt(m2Zocalo)} m² zócalo</small>`
+          : ""
+        }
+      `;
+    }
+
+    // En pastinas se muestra el precio de la caja, sin modificar
+    // el cálculo interno por m² ni el subtotal.
+    const idProducto = String(p.id||"").trim().toUpperCase();
+    const esPastina =
+      idProducto==="PSO-PTNA-1K" ||
+      idProducto==="PSO-PTNA-5K";
+
+    const precioUnitario = esPastina
+      ? Number(p.precioCaja||p.precioM2||0)
+      : Number(p.precioM2||0);
+
+    const tr=document.createElement("tr");
+
+    tr.innerHTML=`
+      <td>
+        <strong>${esc(p.producto)}</strong>
+        ${p.color ? `<br><small>${esc(p.color)}</small>` : ""}
+        ${p.tieneOferta ? ' <span class="badge">OFERTA</span>' : ""}
+        ${p.conZocalo
+          ? ' <span class="badge">INCLUIDO ZÓCALO</span>'
+          : ""
+        }
+      </td>
+
+      <td>${esc(p.medida||"—")}${p.unidadesPorCaja ? `<span class="quote-unidades-caja">${fmt0(p.unidadesPorCaja)} un./caja</span>` : ""}</td>
+
+      <td>${cantidadHTML}</td>
+
+      <td>${esCRRL ? "—" : p.cajas}</td>
+
+      <td class="money">$ ${fmt(precioUnitario)}</td>
+
+      <td class="money">$ ${fmt(p.subtotal)}</td>
+
+      <td>
+        <button class="btn btn-danger" data-remove="${i}" title="Eliminar">🗑</button>
+      </td>
+    `;
+
+    $("rows").appendChild(tr);
+  });
+
+  $("total").textContent=fmt(total);
+  $("empty").hidden=productos.length>0;
+  $("table").hidden=productos.length===0;
+}
+  
+$("cantidad")?.addEventListener("input",calcularActual);
+
+$("app").addEventListener("click",e=>{
+  const item=e.target.closest("[data-catalogo-index]");
+  if(item){
+    seleccionarProductoCatalogo(Number(item.dataset.catalogoIndex));
+    return;
+  }
+  const btn=e.target.closest("[data-remove]");
+  if(btn){
+    productos.splice(Number(btn.dataset.remove),1);
+    renderProductos();
+    return;
+  }
+
+  if(e.target.id==="confirm"){
+    const c=calcularActual();
+
+    if(!c){
+      return alert(
+        esMaterialCorralon(productoActual)
+          ? "Ingresá la cantidad de unidades."
+          : "Ingresá los metros cuadrados."
+      );
+    }
+
+    const p=productoActual;
+
+const colorSeleccionado = $("colorSelect")?.value || p._colorSeleccionado || p["Color"] || "";
+
+productos.push({
+  id:p["ID"],
+  producto:p["Producto"],
+  medida:p["Medida"]||"",
+  cajaM2:Number(p["Caja m²"]||0),
+  unidadesPorCaja:unidadesPorCaja(p),
+  color:colorSeleccionado,
+  ...c
+});
+
+    cerrarModal();
+    renderProductos();
+  }
+});
+
+async function guardarPresupuesto(){
+
+  if(!productos.length){
+    return alert("Agregá al menos un producto.");
+  }
+
+  const cliente=$("cliente").value.trim();
+
+  if(!cliente){
+    return alert("Ingresá el cliente.");
+  }
+
+  const total=productos.reduce(
+    (s,p)=>s+Number(p.subtotal||0),
+    0
+  );
+
+  const datos={
+    cliente,
+    dniCuit:$("dni").value.trim(),
+    telefono:$("telefono").value.trim(),
+    email:$("email").value.trim(),
+    direccion:$("direccion").value.trim(),
+    formaPago:$("forma").value,
+    subtotal:total,
+    descuento:0,
+    total,
+    observaciones:"",
+    productos
+  };
+
+  const btn=$("generate");
+  const st=$("appStatus");
+
+  btn.disabled=true;
+  btn.textContent="RESERVANDO NÚMERO...";
+  st.className="status";
+  st.textContent="";
+
+  try{
+
+    // ==================================================
+    // PASO 1 — RESERVAR NÚMERO
+    // ==================================================
+
+    const rNumero=await jsonp({
+      accion:"nuevoNumero",
+      token
+    });
+
+    if(!rNumero?.ok){
+      throw new Error(
+        rNumero?.error ||
+        "No se pudo reservar el número de presupuesto."
+      );
+    }
+
+    const numero=rNumero.numero;
+
+    // ==================================================
+    // POR AHORA:
+    // mostramos el presupuesto inmediatamente.
+    //
+    // EL GUARDADO TODAVÍA NO SE MODIFICA.
+    // ==================================================
+
+// MOSTRAR EL PRESUPUESTO INMEDIATAMENTE
+mostrarPresupuestoGuardado(numero, datos);
+
+// GUARDAR EN SEGUNDO PLANO
+jsonp({
+  accion: "guardar",
+  token,
+  numero: numero,
+  datos: JSON.stringify(datos)
+})
+.then(rGuardado => {
+
+  if (!rGuardado?.ok) {
+    console.error(
+      "No se pudo guardar el presupuesto:",
+      rGuardado?.error || "Error desconocido"
+    );
+    return;
+  }
+
+  console.log(
+    "Presupuesto guardado correctamente:",
+    rGuardado.numero
+  );
+
+})
+.catch(error => {
+
+  console.error(
+    "Error al guardar el presupuesto:",
+    error
+  );
+
+});
+    
+  }catch(e){
+
+    st.className="status error";
+    st.textContent=e.message;
+
+  }finally{
+
+    btn.disabled=false;
+    btn.textContent="GENERAR PRESUPUESTO";
+
+  }
+}
+
+function mostrarPresupuestoGuardado(numero,datos){
+  verNumero="";
+  document.title = "G&T S.R.L. - " + numero.replace("e-Ptto - ", "ePpto ");
+  const fecha=new Date().toLocaleDateString("es-AR");
+  $("app").innerHTML=header()+`<main class="wrap">
+    <div class="historical-actions no-print">
+      <button class="btn btn-primary" id="printQuote">🖨 IMPRIMIR / GUARDAR PDF</button>
+      <button class="btn btn-secondary" id="newQuote">NUEVO PRESUPUESTO</button>
+    </div>
+    ${quoteHtml(numero,fecha,datos)}
+  </main>`;
+  $("printQuote").onclick=()=>window.print();
+  $("newQuote").onclick=nuevoPresupuesto;
+}
+
+function quoteHtml(numero,fecha,d){
+const rows=d.productos.map(p=>{
+
+  const cr=String(p.unidad||"")==="Unidades";
+
+  // ==================================================
+  // PRECIO UNITARIO MOSTRADO EN EL PRESUPUESTO
+  // Excepción exclusiva para las pastinas:
+  // PSO-PTNA-1K → precio por bolsa de 1 Kg
+  // PSO-PTNA-5K → precio por bolsa de 5 Kg
+  // ==================================================
+
+  const idProducto=String(p.id||"").trim().toUpperCase();
+
+  const esPastina=
+    idProducto==="PSO-PTNA-1K" ||
+    idProducto==="PSO-PTNA-5K";
+
+  const precioUnitarioMostrar=
+    esPastina
+      ? Number(p.precioCaja||p.precioM2||0)
+      : Number(p.precioM2||0);
+
+  return cr
+    ? `<tr>
+        <td>
+          <strong>${esc(p.producto)}</strong>
+          ${p.tieneOferta?' <small>OFERTA</small>':''}
+        </td>
+        <td>—</td>
+        <td>${fmt0(p.cantidad||0)} unidades</td>
+        <td>—</td>
+        <td class="money">$ ${fmt(precioUnitarioMostrar)}</td>
+        <td class="money">$ ${fmt(p.subtotal)}</td>
+      </tr>`
+
+    : `<tr>
+        <td>
+          <strong>${esc(p.producto)}</strong>
+          ${p.color?`<br><small>${esc(p.color)}</small>`:""}
+          ${p.conZocalo?`<br><small>Incl. Zócalo</small>`:""}
+          ${p.tieneOferta?`<br><small>OFERTA</small>`:""}
+        </td>
+        <td>${esc(p.medida||"—")}${p.unidadesPorCaja ? `<span class="quote-unidades-caja">${fmt0(p.unidadesPorCaja)} un./caja</span>` : ""}</td>
+        <td>${fmt(p.m2Solicitados)} m²</td>
+        <td>${p.cajas}</td>
+        <td class="money">$ ${fmt(precioUnitarioMostrar)}</td>
+        <td class="money">$ ${fmt(p.subtotal)}</td>
+      </tr>`;
+
+}).join("");
+
+  const formaPago=String(d.formaPago||"Contado").trim();
+
+  const check = valor =>
+    formaPago.toLocaleLowerCase("es-AR")===valor.toLocaleLowerCase("es-AR")
+      ? "☑"
+      : "☐";
+
+  return `<section class="quote-preview" id="quote">
+
+    <div class="quote-head">
+
+      <div class="quote-company">
+        <img class="quote-logo" src="${LOGO_URL}" alt="G&T S.R.L.">
+        <div class="quote-company-data">
+          <div><strong>WhatsApp:</strong> 299 - 5207382</div>
+          <div><strong>Dirección:</strong> Conquistadores del Desierto 3400</div>
+          <div><strong>Parque Industrial de Neuquén</strong></div>
+          <div><strong>IVA RESPONSABLE INSCRIPTO</strong></div>
+        </div>
+      </div>
+
+      <div class="quote-presentation">
+        <div class="quote-title">PRESUPUESTO</div>
+        <div class="quote-number">${esc(numero)}</div>
+        <div class="quote-meta">
+          <div><strong>Fecha:</strong> ${esc(fecha)}</div>
+          <div><strong>Vendedor:</strong> ${esc(vendedor)}</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="quote-section">
+      <div class="quote-section-line"></div>
+      <div class="quote-section-title">Datos del Cliente</div>
+
+      <div class="quote-customer">
+        <div class="quote-customer-grid">
+          <div class="quote-field">
+            <strong>Nombre:</strong> <span class="quote-field-value">${esc(d.cliente||"—")}</span>
+          </div>
+          <div class="quote-field">
+            <strong>DNI / CUIT:</strong> <span class="quote-field-value">${esc(d.dniCuit||"—")}</span>
+          </div>
+          <div class="quote-field">
+            <strong>Teléfono:</strong> <span class="quote-field-value">${esc(d.telefono||"—")}</span>
+          </div>
+          <div class="quote-field">
+            <strong>Dirección:</strong> <span class="quote-field-value">${esc(d.direccion||"—")}</span>
+          </div>
+          <div class="quote-field" style="grid-column:1/-1">
+            <strong>E-Mail:</strong> <span class="quote-field-value">${esc(d.email||"—")}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="quote-payment">
+      <div class="quote-payment-title">Condición de Venta:</div>
+      <div class="quote-payment-option"><span>${check("Contado")}</span> Contado</div>
+      <div class="quote-payment-option"><span>${check("Tarjeta")}</span> Tarjeta</div>
+      <div class="quote-payment-option"><span>${check("Otro")}</span> Otro</div>
+      <div class="quote-payment-selected">Seleccionada: ${esc(formaPago)}</div>
+    </div>
+
+    <div class="quote-detail">
+      <div class="quote-section-line"></div>
+      <div class="quote-section-title">Detalle del Presupuesto</div>
+
+      <table class="quote-table">
+        <thead>
+          <tr><th>Producto</th><th>Medida</th><th>Cantidad</th><th>Cajas</th><th>Precio Unit.</th><th>Importe</th></tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+
+    <div class="quote-total">
+      <div>TOTAL</div>
+      <div class="quote-total-value">$ ${fmt(d.total)}</div>
+    </div>
+
+    <div class="quote-footer-line"></div>
+
+    <div class="quote-foot">
+      <div class="quote-thanks">
+        ¡Gracias por confiar en nosotros!<br>
+        <span>G&T S.R.L.</span>
+      </div>
+      <div class="quote-legal">
+        <div><strong>Validez: 15 días.</strong> Los precios y condiciones indicados corresponden al momento de emisión del presupuesto.</div>
+        <div><strong>Documento no válido como factura.</strong></div>
+      </div>
+    </div>
+
+  </section>`;
+}
+
+function renderLoadingHistorico(){
+  $("app").innerHTML=header()+`<main class="wrap"><section class="card loading">Cargando presupuesto ${esc(verNumero)}...</section></main>`;
+}
+
+async function cargarHistorico(numero){
+  try{
+    const r=await jsonp({accion:"presupuesto",numero,token});
+    if(!r?.ok)throw new Error(r?.error||"No se pudo cargar el presupuesto.");
+    const p=r.presupuesto;
+    const productosHistoricos=(r.productos||[]).map(x=>({
+      producto:x["Producto"]||"",color:x["Color"]||"",medida:x["Medida"]||"",
+      unidad:x["Unidad"]||"",cantidad:Number(x["Cantidad"]||0),
+      m2Solicitados:Number(x["m² solicitados"]||x["m² Solicitados"]||x["m2 Solicitados"]||0),
+      cajas:Number(x["Cajas"]||0),precioM2:Number(x["Precio/m²"]||0),subtotal:Number(x["Subtotal"]||0),
+      conZocalo:String(x["Con zócalo"]||"")==="Sí",tieneOferta:Number(x["Oferta"]||0)>0
+    }));
+    const datos={cliente:p["Cliente"]||"",dniCuit:p["DNI/CUIT"]||"",telefono:p["Teléfono"]||"",email:p["Email"]||"",direccion:p["Dirección"]||"",formaPago:p["Forma de pago"]||"",total:Number(p["Total"]||0),productos:productosHistoricos};
+    const fecha=p["Fecha"]?new Date(p["Fecha"]).toLocaleDateString("es-AR"):new Date().toLocaleDateString("es-AR");
+    $("app").innerHTML=header()+`<main class="wrap"><div class="historical-actions no-print"><button class="btn btn-primary" id="printQuote">🖨 IMPRIMIR / GUARDAR PDF</button><button class="btn btn-secondary" id="newQuote">NUEVO PRESUPUESTO</button></div>${quoteHtml(numero,fecha,datos)}</main>`;
+    $("printQuote").onclick=()=>window.print();$("newQuote").onclick=nuevoPresupuesto;
+  }catch(e){
+    $("app").innerHTML=header()+`<main class="wrap"><section class="card"><div class="status error" style="display:block">${esc(e.message)}</div><div class="actions no-print"><button class="btn btn-secondary" id="back">VOLVER</button></div></section></main>`;
+    $("back").onclick=()=>{verNumero="";renderApp()};
+  }
+}
+
+if(token) renderApp(); else mostrarLogin();
+</script>
 </body>
 </html>
