@@ -229,6 +229,47 @@ th{font-size:12px;text-transform:uppercase;color:#666;background:#fafafa}
 .loading-catalogo{margin-top:70px;text-align:center}
 .catalog-spinner{width:32px;height:32px;margin:20px auto;border:4px solid #e5e7eb;border-top-color:var(--rojo);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
+@media(min-width:1000px){
+  .wrap{max-width:1180px}
+  .header-inner{max-width:1180px}
+  .grid{grid-template-columns:repeat(3,1fr)}
+  .modal-productos{width:min(820px,100%)}
+  .catalogo-lista{max-height:58vh}
+}
+@media(max-width:800px){.grid{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){
+  header{position:relative}
+  .header-inner{align-items:flex-start}
+  header img{width:125px}
+  .user-pill{font-size:11px}
+  .wrap{margin:12px auto}
+  .card{padding:15px;border-radius:11px}
+  .grid{grid-template-columns:1fr}
+  .titlebar{align-items:stretch;flex-direction:column}
+  .add-btn{width:100%}
+  .actions{flex-direction:column}
+  .actions button{width:100%}
+  .quote-head{grid-template-columns:1fr;gap:5mm}
+  .quote-presentation{border-left:0;border-top:2px solid #BE000F;padding:4mm 0 0;align-items:flex-start;text-align:left}
+  .quote-meta{text-align:left}
+  .quote-customer-grid{grid-template-columns:1fr}
+  .quote-payment{flex-wrap:wrap}
+  .quote-payment-selected{margin-left:0;width:100%}
+  .quote-foot{grid-template-columns:1fr}
+  .quote-legal{text-align:left}
+}
+@media print{
+  @page{size:A4;margin:0}
+  html,body{width:210mm;min-height:297mm;margin:0;padding:0;background:#fff}
+  body{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  header,.no-print{display:none!important}
+  .wrap{width:210mm;max-width:none;margin:0;padding:0}
+  .card{border:0;box-shadow:none;padding:0;margin:0}
+  .quote-preview{width:210mm;min-height:297mm;margin:0;padding:8mm;box-sizing:border-box;border:0}
+  .quote-head,.quote-customer,.quote-payment,.quote-detail,.quote-total,.quote-foot{page-break-inside:avoid}
+  .quote-table{page-break-inside:auto}
+  .quote-table tr{page-break-inside:avoid;page-break-after:auto}
+}
 
 /* =========================================================
    CONSULTA DE CATÁLOGO V7 — POPUP INTEGRADO
@@ -382,6 +423,7 @@ th{font-size:12px;text-transform:uppercase;color:#666;background:#fafafa}
   .quote-table{page-break-inside:auto}
   .quote-table tr{page-break-inside:avoid;page-break-after:auto}
 }
+
 </style>
 </head>
 <body>
@@ -870,7 +912,6 @@ function limpiarFormulario(){
   if($("forma"))$("forma").value="Contado";
 }
 
-
 /* =========================================================
    CONSULTA DE CATÁLOGO V7 — LÓGICA DEL POPUP
    Usa el catálogo y la sesión ya cargados por Presupuesto Digital.
@@ -986,6 +1027,7 @@ function mostrarConsultaV7Producto(p){
   }
   inferior.innerHTML=h;
 }
+
 
 function abrirModal(){
   productoActual = null;
@@ -1326,14 +1368,6 @@ function renderProductos(){
 }
   
 $("cantidad")?.addEventListener("input",calcularActual);
-
-document.addEventListener("click",e=>{
-  const item=e.target.closest("[data-consulta-v7-index]");
-  if(item){
-    consultaV7Seleccionar(Number(item.dataset.consultaV7Index));
-    return;
-  }
-});
 
 $("app").addEventListener("click",e=>{
   const item=e.target.closest("[data-catalogo-index]");
@@ -1683,12 +1717,19 @@ async function cargarHistorico(numero){
   }
 }
 
-
-$(document).addEventListener("click",e=>{
-  if(e.target.id==="consultaV7Modal")cerrarConsultaCatalogo();
+document.addEventListener("click",e=>{
+  const item=e.target.closest("[data-consulta-v7-index]");
+  if(item){
+    consultaV7Seleccionar(Number(item.dataset.consultaV7Index));
+    return;
+  }
+  if(e.target.id==="consultaV7Modal") cerrarConsultaCatalogo();
 });
+
 document.addEventListener("keydown",e=>{
-  if(e.key==="Escape" && $("consultaV7Modal")?.classList.contains("open"))cerrarConsultaCatalogo();
+  if(e.key==="Escape" && $("consultaV7Modal")?.classList.contains("open")){
+    cerrarConsultaCatalogo();
+  }
 });
 
 if(token) renderApp(); else mostrarLogin();
