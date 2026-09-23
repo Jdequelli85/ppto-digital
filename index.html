@@ -4,7 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#BE000F">
-<title>G&T S.R.L. — Presupuesto Digital</title>
+<title>G&T S.R.L. — Consulta de Productos</title>
+
 <style>
 *{box-sizing:border-box}
 :root{
@@ -15,425 +16,322 @@
   --texto:#222;
   --muted:#6b7280;
   --verde:#176b2c;
+  --azul:#183746;
+  --dorado:#C58A22;
 }
-html,body{margin:0;padding:0;background:var(--gris);color:var(--texto);font-family:Arial,Helvetica,sans-serif}
+
+html,body{
+  margin:0;
+  padding:0;
+  background:var(--gris);
+  color:var(--texto);
+  font-family:Arial,Helvetica,sans-serif
+}
 body{min-height:100vh}
 button,input,select{font:inherit}
 button{cursor:pointer}
+
 header{
   background:#fff;
   border-bottom:1px solid var(--gris2);
   padding:14px 18px;
-  position:sticky;top:0;z-index:20;
-}
-.header-inner{max-width:1050px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:15px}
-header img{width:150px;height:auto;display:block}
-.user-pill{font-size:13px;color:#555;background:#f7f7f7;border:1px solid #ddd;border-radius:20px;padding:8px 12px}
-.wrap{max-width:1050px;margin:24px auto;padding:0 15px 50px}
-.card{
-  background:#fff;border:1px solid #e2e2e2;border-radius:14px;
-  padding:20px;margin-bottom:16px;box-shadow:0 3px 14px rgba(0,0,0,.05)
-}
-.login-card{max-width:430px;margin:70px auto}
-.logo-login{width:190px;display:block;margin:0 auto 20px}
-h1{font-size:24px;margin:0 0 5px}
-h2{font-size:20px;margin:0}
-h3{margin:0 0 14px}
-.subtitle{color:var(--muted);font-size:14px;margin-bottom:24px}
-label{display:block;font-weight:700;font-size:13px;margin:0 0 6px}
-input,select{
-  width:100%;padding:12px;border:1px solid #cfd2d7;border-radius:9px;background:#fff;outline:none
-}
-input:focus,select:focus{border-color:var(--rojo);box-shadow:0 0 0 3px rgba(190,0,15,.10)}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-.field-full{grid-column:1/-1}
-.btn{
-  border:0;border-radius:9px;padding:12px 16px;font-weight:800;min-height:44px
-}
-.btn-primary{background:var(--rojo);color:#fff}
-.btn-primary:hover{background:var(--rojo2)}
-.btn-secondary{background:#fff;color:#333;border:1px solid #cfd2d7}
-.btn-danger{background:#fff;color:var(--rojo);border:1px solid #e5a6ab}
-.btn-large{width:100%;margin-top:16px}
-.status{margin-top:14px;padding:11px;border-radius:9px;font-size:14px;display:none}
-.status.error{display:block;background:#fff0f1;color:#9d0010;border:1px solid #f2b7bd}
-.status.ok{display:block;background:#edf8f0;color:var(--verde);border:1px solid #b9dfc2}
-.titlebar{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:14px}
-.add-btn{white-space:nowrap}
-.empty{padding:28px;text-align:center;color:#777;border:1px dashed #ccc;border-radius:10px}
-.table-wrap{overflow:auto}
-table{width:100%;border-collapse:collapse;min-width:760px}
-th,td{padding:10px 8px;border-bottom:1px solid #e5e7eb;text-align:left;vertical-align:top;font-size:13px}
-th{font-size:12px;text-transform:uppercase;color:#666;background:#fafafa}
-.money{text-align:right;white-space:nowrap}
-.total-box{text-align:right;margin-top:15px;font-size:22px;font-weight:800}
-.total-box small{display:block;font-size:12px;color:#777;font-weight:400;margin-bottom:3px}
-.actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}
-.modal-backdrop{
-  position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:100;
-  display:none;align-items:center;justify-content:center;padding:15px
-}
-.modal-backdrop.open{display:flex}
-.modal{
-  width:min(560px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:15px;padding:20px;
-  box-shadow:0 15px 50px rgba(0,0,0,.3)
-}
-.modal-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
-.close{border:0;background:#eee;border-radius:50%;width:34px;height:34px}
-#reader{width:100%;max-width:430px;margin:15px auto}
-.scan-note{font-size:13px;color:#666;text-align:center}
-.product-info{background:#f7f7f7;border-radius:10px;padding:14px;margin-bottom:15px;line-height:1.55}
-.calc-info{margin-top:10px;color:#555;font-size:13px;line-height:1.5}
-.checkbox{display:flex;align-items:center;gap:8px;margin:13px 0;font-weight:700}
-.checkbox input{width:auto}
-.loading{text-align:center;padding:35px;color:#666}
-.quote-preview{
-  background:#fff;
-  width:100%;
-  max-width:none;
-  margin:0 auto;
-  padding:8mm;
-  box-sizing:border-box;
-  color:#183746;
-  font-family:Arial,Helvetica,sans-serif;
-}
-.quote-head{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:0;
-  min-height:48mm;
-  padding:4mm 2mm 4mm;
-  border-bottom:2px solid #BE000F;
-  box-sizing:border-box;
-}
-.quote-company{padding-right:7mm}
-.quote-logo{width:62mm;max-width:100%;height:auto;display:block;margin-bottom:2mm}
-.quote-company-data{font-size:3.2mm;line-height:1.5;color:#183746}
-.quote-company-data strong{font-weight:800}
-.quote-presentation{
-  border-left:2px solid #BE000F;
-  padding-left:8mm;
-  display:flex;
-  flex-direction:column;
-  align-items:flex-end;
-  justify-content:center;
-  text-align:right;
-}
-.quote-title{
-  font-size:11mm;
-  line-height:1;
-  font-weight:900;
-  letter-spacing:.2mm;
-  color:#183746;
-  white-space:nowrap;
-}
-.quote-number{
-  margin-top:3mm;
-  font-size:6.2mm;
-  line-height:1.1;
-  font-weight:900;
-  color:#BE000F;
-  white-space:nowrap;
-}
-.quote-meta{
-  margin-top:4mm;
-  color:#183746;
-  font-size:3.4mm;
-  line-height:1.65;
-  text-align:right;
-}
-.quote-meta strong{font-weight:800}
-.quote-section{margin-top:3mm}
-.quote-section-line{height:2px;background:#BE000F;margin-bottom:3mm}
-.quote-section-title{
-  display:flex;
-  align-items:center;
-  gap:3mm;
-  margin-bottom:2.5mm;
-  font-size:4mm;
-  font-weight:900;
-  text-transform:uppercase;
-  color:#183746;
-}
-.quote-section-title::before{
-  content:"";
-  width:4mm;
-  height:4mm;
-  border-radius:1mm;
-  background:#C58A22;
-  flex:0 0 auto;
-}
-.quote-customer{
-  margin:0;
-  padding:3mm 2mm;
-  background:#fff;
-  border:0;
-  border-radius:0;
-  font-size:3.4mm;
-  line-height:1.8;
-  color:#263f4b;
-}
-.quote-customer-grid{
-  display:grid;
-  grid-template-columns:1.6fr 1fr;
-  column-gap:8mm;
-  row-gap:1mm;
-}
-.quote-field{min-width:0}
-.quote-field strong{color:#183746;font-weight:800}
-.quote-field-value{color:#333}
-.quote-payment{
-  margin-top:2mm;
-  padding:3mm 2mm;
-  display:flex;
-  align-items:center;
-  gap:5mm;
-  border-top:1px solid #d9dee1;
-  border-bottom:1px solid #d9dee1;
-  font-size:3.3mm;
-}
-.quote-payment-title{font-weight:900;color:#183746;margin-right:2mm}
-.quote-payment-option{display:inline-flex;align-items:center;gap:2mm;color:#344954}
-.quote-check{width:4mm;height:4mm;border:1.3px solid #183746;border-radius:.8mm;display:inline-block;box-sizing:border-box}
-.quote-payment-selected{display:none}
-.quote-detail{margin-top:3mm}
-.quote-table{width:100%;min-width:0;border-collapse:collapse;table-layout:fixed}
-.quote-table th{background:#183746;color:#fff;padding:3mm 2mm;border:1px solid #183746;font-size:3.1mm;font-weight:800;text-transform:uppercase}
-.quote-table td{padding:2.5mm 2mm;border:1px solid #d7dde0;font-size:3.1mm;color:#263f4b;vertical-align:middle}
-.quote-table tbody tr:nth-child(even){background:#f4f6f7}
-.quote-table th:nth-child(1),.quote-table td:nth-child(1){width:31%}
-.quote-table th:nth-child(2),.quote-table td:nth-child(2){width:12%}
-.quote-table th:nth-child(3),.quote-table td:nth-child(3){width:11%;text-align:center}
-.quote-table th:nth-child(4),.quote-table td:nth-child(4){width:10%;text-align:center}
-.quote-table th:nth-child(5),.quote-table td:nth-child(5){width:16%;text-align:right}
-.quote-table th:nth-child(6),.quote-table td:nth-child(6){width:20%;text-align:right}
-.quote-table small{color:#6b7280;font-size:2.8mm}
-.quote-unidades-caja{display:block;color:#777;font-size:2.7mm;line-height:1.25;margin-top:1mm}
-.money{text-align:right;white-space:nowrap}
-.quote-total{display:flex;justify-content:flex-end;align-items:center;gap:5mm;margin-top:4mm;font-size:5mm;font-weight:900;color:#183746}
-.quote-total-value{min-width:45mm;padding:3mm 4mm;text-align:right;border:2px solid #183746;border-radius:2mm;background:#f2f5f6;color:#BE000F}
-.quote-footer-line{height:2px;background:#BE000F;margin-top:5mm;margin-bottom:3mm}
-.quote-foot{margin:0;padding:0;border:0;font-size:3mm;line-height:1.5;color:#59666c;display:grid;grid-template-columns:1fr 1.5fr;gap:8mm;align-items:center}
-.quote-thanks{font-size:4mm;font-weight:800;color:#183746}
-.quote-thanks span{color:#C58A22}
-.quote-legal{text-align:right}
-.quote-legal strong{color:#183746}
-.historical-actions{display:flex;gap:10px;margin-bottom:15px}
-.badge{display:inline-block;font-size:11px;padding:4px 7px;border-radius:10px;background:#eee;color:#555}.badge-zocalo{background:#e5e7eb;color:#555}
-.modal-productos{width:min(760px,100%)}
-
-/* =====================================================
-   MENÚ DE HERRAMIENTAS — NUEVO
-   No modifica la lógica existente del presupuesto.
-   ===================================================== */
-.quick-tools{
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-  margin-bottom:16px;
-}
-.quick-tool{
-  border:1px solid #d7dbe0;
-  background:#fff;
-  color:#333;
-  border-radius:10px;
-  padding:11px 15px;
-  min-height:44px;
-  font-weight:800;
-  transition:.15s;
-}
-.quick-tool:hover{
-  border-color:var(--rojo);
-  color:var(--rojo);
-  background:#fff7f7;
-}
-.quick-tool-primary{
-  background:var(--rojo);
-  color:#fff;
-  border-color:var(--rojo);
-}
-.quick-tool-primary:hover{
-  background:var(--rojo2);
-  color:#fff;
+  position:sticky;
+  top:0;
+  z-index:20;
 }
 
-/* =====================================================
-   MODAL CATÁLOGO INFORMATIVO — NUEVO
-   ===================================================== */
-.modal-catalogo-info{
-  width:min(980px,100%);
-  max-height:92vh;
-}
-.catalogo-info-grid{
-  display:grid;
-  grid-template-columns:minmax(300px, .9fr) minmax(360px,1.1fr);
-  gap:16px;
-}
-.catalogo-info-lista{
-  display:flex;
-  flex-direction:column;
-  gap:7px;
-  max-height:65vh;
-  overflow:auto;
-  padding-right:3px;
-}
-.catalogo-info-item{
-  width:100%;
-  text-align:left;
-  background:#fff;
-  border:1px solid #d9dce1;
-  border-radius:10px;
-  padding:11px 13px;
-  display:flex;
-  flex-direction:column;
-  gap:3px;
-  transition:.15s;
-}
-.catalogo-info-item:hover,
-.catalogo-info-item.active{
-  border-color:var(--rojo);
-  background:#fff7f7;
-}
-.catalogo-info-item strong{font-size:14px}
-.catalogo-info-item span{font-size:12px;color:#666}
-.catalogo-info-detail{
-  background:#f7f7f7;
-  border-radius:12px;
-  padding:17px;
-  min-height:280px;
-  line-height:1.55;
-}
-.catalogo-info-detail.empty-detail{
+.header-inner{
+  max-width:1050px;
+  margin:auto;
   display:flex;
   align-items:center;
-  justify-content:center;
-  text-align:center;
-  color:#777;
+  justify-content:space-between;
+  gap:15px
 }
-.catalogo-detail-title{
-  font-size:19px;
-  font-weight:900;
-  margin-bottom:4px;
-  color:#222;
+
+header img{
+  width:150px;
+  height:auto;
+  display:block
 }
-.catalogo-detail-subtitle{
-  color:#666;
+
+.user-pill{
   font-size:13px;
-  margin-bottom:15px;
-}
-.catalogo-detail-section{
-  background:#fff;
-  border:1px solid #e1e3e6;
-  border-radius:10px;
-  padding:12px;
-  margin-top:10px;
-}
-.catalogo-detail-row{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-}
-.catalogo-detail-label{
-  display:block;
-  color:#777;
-  font-size:11px;
-  text-transform:uppercase;
-  font-weight:800;
-  margin-bottom:2px;
-}
-.catalogo-detail-value{
-  font-size:14px;
-  font-weight:700;
-}
-.catalogo-precios{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:10px;
-  margin-top:10px;
-}
-.catalogo-precio-box{
-  background:#fff;
-  border:1px solid #e1e3e6;
-  border-radius:10px;
-  padding:12px;
-}
-.catalogo-precio-box strong{
-  display:block;
-  font-size:18px;
-  margin-top:2px;
-}
-.catalogo-precio-box.oferta{
-  border-color:#e5b75c;
-  background:#fffaf0;
-}
-.catalogo-colores{
-  display:flex;
-  flex-wrap:wrap;
-  gap:6px;
-  margin-top:5px;
-}
-.catalogo-color{
-  display:inline-block;
-  padding:5px 8px;
-  border-radius:12px;
-  background:#eef0f2;
   color:#555;
-  font-size:12px;
+  background:#f7f7f7;
+  border:1px solid #ddd;
+  border-radius:20px;
+  padding:8px 12px
 }
-.catalogo-info-search{margin-bottom:12px}
-.catalogo-info-count{font-size:12px;color:#777;margin:7px 0 0}
 
-@media(max-width:700px){
-  .catalogo-info-grid{grid-template-columns:1fr}
-  .catalogo-info-lista{max-height:34vh}
-  .catalogo-info-detail{min-height:220px}
+.wrap{
+  max-width:1050px;
+  margin:24px auto;
+  padding:0 15px 50px
 }
-@media(max-width:560px){
-  .quick-tools{flex-direction:column}
-  .quick-tool{width:100%}
-  .modal-catalogo-info{max-height:94vh;padding:15px}
-  .catalogo-detail-row{grid-template-columns:1fr}
-  .catalogo-precios{grid-template-columns:1fr}
-}
-.catalogo-lista{margin-top:12px;display:flex;flex-direction:column;gap:7px;max-height:52vh;overflow:auto;padding-right:3px}
-.catalogo-item{width:100%;text-align:left;background:#fff;border:1px solid #d9dce1;border-radius:10px;padding:11px 13px;display:flex;flex-direction:column;gap:3px;transition:.15s}
-.catalogo-item:hover{border-color:var(--rojo);background:#fff7f7}
-.catalogo-item strong{font-size:14px}
-.catalogo-item span{font-size:12px;color:#666}
-.loading-catalogo{margin-top:70px;text-align:center}
-.catalog-spinner{width:32px;height:32px;margin:20px auto;border:4px solid #e5e7eb;border-top-color:var(--rojo);border-radius:50%;animation:spin .8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
 
-/* =====================================================
-   CATÁLOGO INFORMATIVO — ESTÉTICA CONSULTA-CATALOGO
-   ===================================================== */
-.modal-catalogo-info{
-  width:min(1120px,100%);
-  max-width:1120px;
-  padding:18px;
+.card{
+  background:#fff;
+  border:1px solid #e2e2e2;
+  border-radius:14px;
+  padding:20px;
+  margin-bottom:16px;
+  box-shadow:0 3px 14px rgba(0,0,0,.05)
 }
-.catalogo-info-search{margin-bottom:14px}
-.catalogo-info-search input{padding-left:14px;font-size:15px}
-.catalogo-info-count{margin-top:7px;color:#777;font-size:12px}
-.catalogo-info-grid{
+
+.login-card{
+  max-width:430px;
+  margin:70px auto
+}
+
+.logo-login{
+  width:190px;
+  display:block;
+  margin:0 auto 20px
+}
+
+h1{
+  font-size:24px;
+  margin:0 0 5px
+}
+
+h2{
+  font-size:20px;
+  margin:0
+}
+
+.subtitle{
+  color:var(--muted);
+  font-size:14px;
+  margin-bottom:24px
+}
+
+label{
+  display:block;
+  font-weight:700;
+  font-size:13px;
+  margin:0 0 6px
+}
+
+input,select{
+  width:100%;
+  padding:12px;
+  border:1px solid #cfd2d7;
+  border-radius:9px;
+  background:#fff;
+  outline:none
+}
+
+input:focus,select:focus{
+  border-color:var(--rojo);
+  box-shadow:0 0 0 3px rgba(190,0,15,.10)
+}
+
+.btn{
+  border:0;
+  border-radius:9px;
+  padding:12px 16px;
+  font-weight:800;
+  min-height:44px
+}
+
+.btn-primary{
+  background:var(--rojo);
+  color:#fff
+}
+
+.btn-primary:hover{background:var(--rojo2)}
+
+.btn-large{
+  width:100%;
+  margin-top:16px
+}
+
+.status{
+  margin-top:14px;
+  padding:11px;
+  border-radius:9px;
+  font-size:14px;
+  display:none
+}
+
+.status.error{
+  display:block;
+  background:#fff0f1;
+  color:#9d0010;
+  border:1px solid #f2b7bd
+}
+
+.status.ok{
+  display:block;
+  background:#edf8f0;
+  color:var(--verde);
+  border:1px solid #b9dfc2
+}
+
+.loading{
+  text-align:center;
+  padding:35px;
+  color:#666
+}
+
+.catalog-header{
+  text-align:center;
+  margin-bottom:22px
+}
+
+.catalog-header h1{
+  color:var(--azul);
+  font-size:28px;
+  font-weight:900;
+  letter-spacing:.2px
+}
+
+.catalog-header .subtitle{
+  margin:6px 0 0
+}
+
+.search-label{
+  color:var(--azul);
+  font-size:14px;
+  margin-bottom:7px
+}
+
+.search-box{
+  position:relative
+}
+
+.search-box input{
+  padding-left:42px;
+  font-size:15px;
+}
+
+.search-icon{
+  position:absolute;
+  left:14px;
+  top:50%;
+  transform:translateY(-50%);
+  color:#777;
+  pointer-events:none;
+  font-size:18px
+}
+
+.resultados-titulo{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin-top:18px;
+  margin-bottom:8px;
+  color:var(--azul);
+  font-weight:800;
+  font-size:13px
+}
+
+.resultados-count{
+  color:#777;
+  font-weight:400
+}
+
+/* =========================================================
+   ÁREA PRINCIPAL DE CONSULTA
+   PC:
+     izquierda = buscador/resultados
+     derecha  = información + precios/detalles
+   CELULAR:
+     arriba = buscador/resultados
+     abajo  = información + precios/detalles
+   ========================================================= */
+
+.consulta-grid{
   display:grid;
-  grid-template-columns:minmax(330px,.82fr) minmax(0,1.18fr);
+  grid-template-columns:minmax(330px, .82fr) minmax(0, 1.18fr);
   gap:16px;
-  align-items:stretch;
+  align-items:stretch
 }
-.catalogo-info-lista{
+
+.consulta-panel{
+  background:#fff;
+  border:1px solid #e2e2e2;
+  border-radius:14px;
+  padding:18px;
+  box-shadow:0 3px 14px rgba(0,0,0,.05)
+}
+
+.consulta-panel-izq{
+  min-width:0
+}
+
+.detalle-columna{
+  min-width:0;
+  display:grid;
+  grid-template-rows:auto auto;
+  gap:16px
+}
+
+.detalle-modulo{
+  background:#fff;
+  border:1px solid #e2e2e2;
+  border-radius:14px;
+  padding:18px;
+  box-shadow:0 3px 14px rgba(0,0,0,.05);
+  min-width:0
+}
+
+.modulo-titulo{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:15px;
+  margin-bottom:14px
+}
+
+.modulo-titulo-texto{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  color:var(--azul);
+  font-size:18px;
+  font-weight:900
+}
+
+.modulo-titulo-icono{
+  font-size:21px;
+  line-height:1
+}
+
+.resultados-titulo{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin-top:15px;
+  margin-bottom:8px;
+  color:var(--azul);
+  font-weight:800;
+  font-size:13px
+}
+
+.resultados-count{
+  color:#777;
+  font-weight:400
+}
+
+/* 4 filas visibles */
+.catalogo-lista{
   display:flex;
   flex-direction:column;
   gap:5px;
-  height:430px;
+  height:250px;
   overflow-y:auto;
   overflow-x:hidden;
   padding:1px 4px 1px 1px;
   border:1px solid var(--gris2);
   border-radius:10px;
-  background:#fafafa;
+  background:#fafafa
 }
-.catalogo-info-item{
+
+.catalogo-item{
   flex:0 0 57px;
   width:100%;
   text-align:left;
@@ -445,1440 +343,1552 @@ th{font-size:12px;text-transform:uppercase;color:#666;background:#fafafa}
   align-items:center;
   justify-content:space-between;
   gap:12px;
-  transition:.15s;
-  color:var(--texto)
+  transition:.15s
 }
-.catalogo-info-item:hover,.catalogo-info-item:focus,.catalogo-info-item.active{
+
+.catalogo-item:hover,
+.catalogo-item:focus{
   border-color:var(--rojo);
   background:#fff7f7;
   outline:none
 }
-.catalogo-info-item strong{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.catalogo-info-item span{display:block;margin-top:3px;font-size:12px;color:#666;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.catalogo-info-detail{
-  background:#fff;
-  border:1px solid #e2e2e2;
-  border-radius:14px;
-  padding:18px;
-  min-width:0;
-  box-shadow:0 3px 14px rgba(0,0,0,.05);
-  min-height:430px;
+
+.catalogo-item-main{
+  min-width:0
 }
-.empty-detail{display:flex;align-items:center;justify-content:center;text-align:center;color:#777}
-.catalogo-detail-title{color:var(--azul,#183746);font-size:26px;font-weight:900;line-height:1.12;overflow-wrap:anywhere;margin-bottom:5px}
-.catalogo-detail-subtitle{font-size:12px;color:#777;margin-bottom:15px}
-.catalogo-detail-section{border-top:1px solid #e1e4e7;padding-top:12px;margin-top:12px}
-.catalogo-detail-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.catalogo-detail-label{display:block;color:#68727c;font-size:10px;font-weight:800;text-transform:uppercase;margin-bottom:5px;line-height:1.15}
-.catalogo-detail-value{display:block;color:#183746;font-size:15px;font-weight:900;line-height:1.25;overflow-wrap:anywhere}
-.catalogo-precios{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-top:15px}
-.catalogo-precio-box{min-width:0;border:1px solid #e0e3e6;border-radius:9px;padding:10px;background:#fff;text-align:center;border-top:3px solid #d9dee1}
-.catalogo-precio-box strong{display:block;color:#183746;font-size:15px;line-height:1.2;overflow-wrap:anywhere}
-.catalogo-precio-box.tarjeta{background:#f3f7fb;border-color:#cbdceb}
-.catalogo-precio-box.tarjeta .catalogo-detail-label,.catalogo-precio-box.tarjeta strong{color:#245a7a}
-.catalogo-precio-box.oferta{background:#edf8f0;border-color:#b9dfc2}
-.catalogo-precio-box.oferta .catalogo-detail-label,.catalogo-precio-box.oferta strong{color:var(--verde)}
-.catalogo-colores{display:flex;flex-wrap:wrap;gap:5px}
-.catalogo-color{display:inline-block;background:#f3f4f6;border:1px solid #dfe2e5;border-radius:15px;padding:4px 8px;font-size:11px;color:#444}
-.catalogo-info-nota{margin-top:10px;color:#777;font-size:11px;line-height:1.4}
-@media(max-width:850px){.modal-catalogo-info{width:min(760px,100%)}.catalogo-info-grid{grid-template-columns:1fr}.catalogo-info-lista{height:250px}.catalogo-info-detail{min-height:0}}
+
+.catalogo-item strong{
+  display:block;
+  font-size:14px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis
+}
+
+.catalogo-item span{
+  display:block;
+  margin-top:3px;
+  font-size:12px;
+  color:#666;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis
+}
+
+.catalogo-item-id{
+  display:none!important
+}
+
+.empty{
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  color:#777;
+  padding:20px
+}
+
+/* =========================================================
+   MÓDULO SUPERIOR — INFORMAÇÃO DO PRODUTO
+   ========================================================= */
+
+.produto-cabecalho{
+  min-width:0
+}
+
+.produto-cabecalho-linha{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  margin-bottom:12px
+}
+
+.produto-cabecalho-titulo{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  color:var(--azul);
+  font-size:18px;
+  font-weight:900
+}
+
+.produto-tipo{
+  flex:0 0 auto;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:115px;
+  padding:7px 13px;
+  border-radius:20px;
+  background:#fff0f1;
+  border:1px solid #f2b7bd;
+  color:var(--rojo);
+  font-size:11px;
+  font-weight:900;
+  text-transform:uppercase
+}
+
+.producto-nombre{
+  color:var(--azul);
+  font-size:26px;
+  font-weight:900;
+  line-height:1.12;
+  overflow-wrap:anywhere;
+  word-break:break-word;
+  margin-bottom:8px
+}
+
+.producto-dato{
+  font-size:14px;
+  color:#666;
+  line-height:1.4
+}
+
+.producto-dato strong{
+  color:#183746
+}
+
+.color-lista{
+  display:flex;
+  flex-wrap:wrap;
+  gap:5px;
+  margin-top:5px
+}
+
+.color-tag{
+  display:inline-block;
+  background:#f3f4f6;
+  border:1px solid #dfe2e5;
+  border-radius:15px;
+  padding:4px 8px;
+  font-size:11px;
+  color:#444
+}
+
+/* =========================================================
+   MÓDULO INFERIOR — PRECIOS Y DETALLES
+   ========================================================= */
+
+.precios-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:9px;
+  margin-top:4px
+}
+
+.dato{
+  min-width:0;
+  border:1px solid #e0e3e6;
+  border-radius:9px;
+  padding:10px;
+  background:#fafafa;
+  text-align:center
+}
+
+.dato-label{
+  display:block;
+  color:#68727c;
+  font-size:10px;
+  font-weight:800;
+  text-transform:uppercase;
+  margin-bottom:5px;
+  line-height:1.15
+}
+
+.dato-valor{
+  display:block;
+  color:#183746;
+  font-size:15px;
+  font-weight:900;
+  line-height:1.2;
+  overflow-wrap:anywhere
+}
+
+.dato-precio{
+  background:#fff;
+  border-top:3px solid #d9dee1
+}
+
+.dato-precio.oferta{
+  background:#edf8f0;
+  border-color:#b9dfc2
+}
+
+.dato-precio.oferta .dato-label,
+.dato-precio.oferta .dato-valor{
+  color:var(--verde)
+}
+
+.dato-precio.tarjeta{
+  background:#f3f7fb;
+  border-color:#cbdceb
+}
+
+.dato-precio.tarjeta .dato-label,
+.dato-precio.tarjeta .dato-valor{
+  color:#245a7a
+}
+
+.caja-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:0;
+  margin-top:10px;
+  padding:10px;
+  background:#f7f8f9;
+  border:1px solid #e1e4e7;
+  border-radius:9px
+}
+
+.caja-dato{
+  min-width:0;
+  padding:0 10px;
+  border-right:1px solid #dfe2e5;
+  text-align:center
+}
+
+.caja-dato:first-child{
+  padding-left:2px
+}
+
+.caja-dato:last-child{
+  border-right:0;
+  padding-right:2px
+}
+
+.caja-dato .dato-label{
+  margin-bottom:3px
+}
+
+.caja-dato .dato-valor{
+  font-size:14px
+}
+
+.nota{
+  margin-top:9px;
+  color:#777;
+  font-size:11px;
+  line-height:1.4
+}
+
+@media(max-width:850px){
+
+  .consulta-grid{
+    grid-template-columns:1fr
+  }
+
+  .detalle-columna{
+    grid-template-rows:auto auto
+  }
+
+}
+
 @media(max-width:560px){
-  .modal-catalogo-info{padding:15px}
-  .catalogo-detail-title{font-size:22px}
-  .catalogo-precios{grid-template-columns:1fr}
-  .catalogo-detail-row{grid-template-columns:1fr}
+
+  .consulta-panel,
+  .detalle-modulo{
+    padding:15px
+  }
+
+  .producto-cabecero{
+    font-size:22px
+  }
+
+  .producto-cabecero-linha{
+    gap:8px
+  }
+
+  .producto-nombre{
+    font-size:22px
+  }
+
+  .precios-grid{
+    grid-template-columns:1fr
+  }
+
+  .caja-grid{
+    grid-template-columns:1fr;
+    gap:8px
+  }
+
+  .caja-dato{
+    padding:0 0 8px;
+    border-right:0;
+    border-bottom:1px solid #dfe2e5
+  }
+
+  .caja-dato:last-child{
+    padding-bottom:0;
+    border-bottom:0
+  }
+
+  .produto-tipo{
+    min-width:auto;
+    padding:6px 9px
+  }
+
+}
+
+.oculto{display:none!important}
+
+.spinner{
+  width:30px;
+  height:30px;
+  margin:18px auto;
+  border:4px solid #e5e7eb;
+  border-top-color:var(--rojo);
+  border-radius:50%;
+  animation:spin .8s linear infinite
+}
+
+@keyframes spin{
+  to{transform:rotate(360deg)}
 }
 
 @media(min-width:1000px){
   .wrap{max-width:1180px}
   .header-inner{max-width:1180px}
-  .grid{grid-template-columns:repeat(3,1fr)}
-  .modal-productos{width:min(820px,100%)}
-  .catalogo-lista{max-height:58vh}
 }
-@media(max-width:800px){.grid{grid-template-columns:1fr 1fr}}
+
 @media(max-width:560px){
   header{position:relative}
-  .header-inner{align-items:flex-start}
+  .header-inner{
+    align-items:flex-start
+  }
   header img{width:125px}
   .user-pill{font-size:11px}
   .wrap{margin:12px auto}
-  .card{padding:15px;border-radius:11px}
-  .grid{grid-template-columns:1fr}
-  .titlebar{align-items:stretch;flex-direction:column}
-  .add-btn{width:100%}
-  .actions{flex-direction:column}
-  .actions button{width:100%}
-  .quote-head{grid-template-columns:1fr;gap:5mm}
-  .quote-presentation{border-left:0;border-top:2px solid #BE000F;padding:4mm 0 0;align-items:flex-start;text-align:left}
-  .quote-meta{text-align:left}
-  .quote-customer-grid{grid-template-columns:1fr}
-  .quote-payment{flex-wrap:wrap}
-  .quote-payment-selected{margin-left:0;width:100%}
-  .quote-foot{grid-template-columns:1fr}
-  .quote-legal{text-align:left}
-}
-@media print{
-  @page{size:A4;margin:0}
-  html,body{width:210mm;min-height:297mm;margin:0;padding:0;background:#fff}
-  body{-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  header,.no-print{display:none!important}
-  .wrap{width:210mm;max-width:none;margin:0;padding:0}
-  .card{border:0;box-shadow:none;padding:0;margin:0}
-  .quote-preview{width:210mm;min-height:297mm;margin:0;padding:8mm;box-sizing:border-box;border:0}
-  .quote-head,.quote-customer,.quote-payment,.quote-detail,.quote-total,.quote-foot{page-break-inside:avoid}
-  .quote-table{page-break-inside:auto}
-  .quote-table tr{page-break-inside:avoid;page-break-after:auto}
+  .card{
+    padding:15px;
+    border-radius:11px
+  }
+  .login-card{
+    margin:35px auto
+  }
+  .catalog-header h1{
+    font-size:23px
+  }
+  .catalogo-lista{
+    height:250px
+  }
+  .detalle-grid{
+    grid-template-columns:1fr
+  }
 }
 </style>
 </head>
+
 <body>
 
 <div id="app"></div>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycby_3DebaIbZZW2qZ7ShkePBD40Bzo8wGyaHAw8w0omsKahF6CpuUEEPaG2ox3fGkAqk0w/exec";
-const LOGO_URL = "https://raw.githubusercontent.com/Jdequelli85/qr-corralon/main/logo.png";
 
-/*
- * CARGA OPTIMIZADA DEL CATÁLOGO
- * ------------------------------
- * El HTML sigue siendo autocontenido.
- * El catálogo se guarda localmente para evitar volver a descargarlo
- * completo cada vez que se recarga la página.
- */
-const CATALOGO_CACHE_KEY = "gt_catalogo_cache_v1";
-const CATALOGO_CACHE_MAX_AGE = 24 * 60 * 60 * 1000; // 24 horas
+const API_URL =
+  "https://script.google.com/macros/s/AKfycby_3DebaIbZZW2qZ7ShkePBD40Bzo8wGyaHAw8w0omsKahF6CpuUEEPaG2ox3fGkAqk0w/exec";
 
+const LOGO_URL =
+  "https://raw.githubusercontent.com/Jdequelli85/qr-corralon/main/logo.png";
 
-let token = sessionStorage.getItem("gt_token") || "";
-let vendedor = sessionStorage.getItem("gt_usuario") || "";
-let productos = [];
+let token = "";
+let vendedor = "";
 let catalogoProductos = [];
 let catalogoOpciones = [];
 let productoActual = null;
-let verNumero = new URLSearchParams(location.search).get("ver") || "";
 
 const $ = id => document.getElementById(id);
-const esc = s => String(s ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
-const fmt = n => Number(n || 0).toLocaleString("es-AR",{minimumFractionDigits:2,maximumFractionDigits:2});
-const fmt0 = n => Number(n || 0).toLocaleString("es-AR",{maximumFractionDigits:0});
+
+const esc = s =>
+  String(s ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;");
+
+const numero = n =>
+  Number(n || 0).toLocaleString("es-AR",{
+    minimumFractionDigits:2,
+    maximumFractionDigits:2
+  });
+
+const numero0 = n =>
+  Number(n || 0).toLocaleString("es-AR",{
+    maximumFractionDigits:0
+  });
+
 
 function categoriaProducto(p){
-  const id=String(p?.["ID"]||"").trim().toUpperCase();
+
+  const id =
+    String(p?.["ID"] || "")
+      .trim()
+      .toUpperCase();
+
   if(id.startsWith("CRRL-")) return "CRRL";
   if(id.startsWith("CER-")) return "CER";
   if(id.startsWith("POR-")) return "POR";
   if(id.startsWith("REV-")) return "REV";
   if(id.startsWith("PSO-")) return "PSO";
+
   return "OTRO";
 }
 
-function esMaterialCorralon(p){ return categoriaProducto(p)==="CRRL"; }
 
-function sonidoQR(){
-  try{
-    const AudioCtx = window.AudioContext || window.webkitAudioContext;
-    if(!AudioCtx)return;
-    const ctx = new AudioCtx();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
+function nombreCategoria(categoria){
 
-    osc.type = "sine";
-    osc.frequency.value = 880;
+  const nombres = {
+    CRRL:"Material de corralón",
+    CER:"Cerámico",
+    POR:"Porcelanato",
+    REV:"Revestimiento",
+    PSO:"Piso",
+    OTRO:"Producto"
+  };
 
-    gain.gain.setValueAtTime(0.0001, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.16, ctx.currentTime + 0.01);
-    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.13);
-
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-
-    osc.start();
-    osc.stop(ctx.currentTime + 0.14);
-    osc.onended = () => ctx.close();
-  }catch(e){}
+  return nombres[categoria] || "Producto";
 }
 
-function nuevoPresupuesto(){
-  productos = [];
-  productoActual = null;
-  verNumero = "";
-  renderApp();
-}
 
 function jsonp(params, timeoutMs=20000){
+
   return new Promise((resolve,reject)=>{
-    const callback = "gtcb_" + Date.now() + "_" + Math.floor(Math.random()*100000);
-    const script = document.createElement("script");
-    const q = new URLSearchParams({...params,callback,_ts:Date.now()});
-    let timer = setTimeout(()=>{cleanup();reject(new Error("Tiempo de espera agotado."));},timeoutMs);
+
+    const callback =
+      "gtconsulta_" +
+      Date.now() +
+      "_" +
+      Math.floor(Math.random()*100000);
+
+    const script =
+      document.createElement("script");
+
+    const q =
+      new URLSearchParams({
+        ...params,
+        callback,
+        _ts:Date.now()
+      });
+
+    let timer =
+      setTimeout(()=>{
+
+        cleanup();
+
+        reject(
+          new Error(
+            "Tiempo de espera agotado."
+          )
+        );
+
+      },timeoutMs);
+
     let terminado = false;
 
     function cleanup(){
+
       if(terminado)return;
+
       terminado=true;
+
       clearTimeout(timer);
+
       delete window[callback];
+
       script.remove();
+
     }
 
-    window[callback] = data => {cleanup();resolve(data)};
-    script.onerror = ()=>{cleanup();reject(new Error("No se pudo conectar con el servidor."))};
-    script.src = API_URL + "?" + q.toString();
+    window[callback] = data => {
+
+      cleanup();
+
+      resolve(data);
+
+    };
+
+    script.onerror = ()=>{
+
+      cleanup();
+
+      reject(
+        new Error(
+          "No se pudo conectar con el servidor."
+        )
+      );
+
+    };
+
+    script.src =
+      API_URL + "?" + q.toString();
+
     document.body.appendChild(script);
+
   });
 }
 
-function guardarCatalogoCache(){
-  try{
-    localStorage.setItem(CATALOGO_CACHE_KEY, JSON.stringify({
-      fecha: Date.now(),
-      productos: catalogoProductos
-    }));
-  }catch(e){
-    // Si el almacenamiento local está lleno/bloqueado,
-    // la aplicación continúa funcionando normalmente.
-  }
-}
 
-function cargarCatalogoDesdeCache(){
-  try{
-    const raw = localStorage.getItem(CATALOGO_CACHE_KEY);
-    if(!raw)return false;
-
-    const cache = JSON.parse(raw);
-    if(!cache || !Array.isArray(cache.productos) || !cache.productos.length){
-      localStorage.removeItem(CATALOGO_CACHE_KEY);
-      return false;
-    }
-
-    const antiguedad = Date.now() - Number(cache.fecha || 0);
-    if(antiguedad > CATALOGO_CACHE_MAX_AGE){
-      localStorage.removeItem(CATALOGO_CACHE_KEY);
-      return false;
-    }
-
-    construirCatalogo(cache.productos);
-    return !!catalogoOpciones.length;
-  }catch(e){
-    try{localStorage.removeItem(CATALOGO_CACHE_KEY)}catch(_e){}
-    return false;
-  }
-}
-
-function construirCatalogo(productos){
-  catalogoProductos = Array.isArray(productos) ? productos : [];
-  catalogoOpciones = [];
-
-  /*
-   * CATÁLOGO PC
-   * -------------------------
-   * Una sola opción por:
-   * PRODUCTO + MEDIDA
-   *
-   * Los colores NO se duplican.
-   * Se seleccionan posteriormente
-   * en la ventana de configuración.
-   */
-
-  const claves = new Set();
-
-  catalogoProductos.forEach(p => {
-
-    const categoria = categoriaProducto(p);
-
-    if(categoria === "OTRO") return;
-
-    const producto = String(p["Producto"] || "").trim();
-    const medida = String(p["Medida"] || "").trim();
-
-    /*
-     * CRRL:
-     * No tiene color ni medida como
-     * característica del producto.
-     */
-    if(categoria === "CRRL"){
-      const clave = `CRRL|${producto.toUpperCase()}`;
-
-      if(claves.has(clave)) return;
-
-      claves.add(clave);
-
-      catalogoOpciones.push({
-        ...p,
-        _colorSeleccionado: ""
-      });
-
-      return;
-    }
-
-    /*
-     * CER / POR / REV / PSO
-     *
-     * Una sola opción por Producto + Medida.
-     */
-    const clave =
-      `${categoria}|${producto.toUpperCase()}|${medida.toUpperCase()}`;
-
-    if(claves.has(clave)) return;
-
-    claves.add(clave);
-
-    catalogoOpciones.push({
-      ...p,
-      _colorSeleccionado: ""
-    });
-  });
-
-  if(!catalogoOpciones.length) {
-    throw new Error("El catálogo no contiene productos disponibles.");
-  }
-}
-
-async function actualizarCatalogoServidor(){
-  const r = await jsonp({accion:"catalogo",token});
-
-  if(!r?.ok) {
-    throw new Error(r?.error || "No se pudo cargar el catálogo de productos.");
-  }
-
-  const productosNuevos = Array.isArray(r.productos)
-    ? r.productos
-    : (Array.isArray(r.catalogo) ? r.catalogo : []);
-
-  construirCatalogo(productosNuevos);
-  guardarCatalogoCache();
-  return true;
-}
-
-async function cargarCatalogo({usarCache=true,esperarServidor=true}={}){
-  /*
-   * PRIMERA ETAPA:
-   * si ya tenemos catálogo local, lo mostramos inmediatamente.
-   */
-  if(usarCache && cargarCatalogoDesdeCache()){
-    /*
-     * SEGUNDA ETAPA:
-     * actualizar en segundo plano. No bloqueamos la interfaz.
-     */
-    actualizarCatalogoServidor().catch(err=>{
-      console.warn("No se pudo actualizar el catálogo en segundo plano:", err.message);
-    });
-    return true;
-  }
-
-  /*
-   * Primera carga o caché inexistente:
-   * aquí sí necesitamos esperar al servidor.
-   */
-  if(esperarServidor){
-    await actualizarCatalogoServidor();
-    return true;
-  }
-
-  return false;
-}
-
-function mostrarCargaCatalogo(){
-  $("app").innerHTML = `
-    <main class="wrap">
-      <section class="card login-card loading-catalogo">
-        <img class="logo-login" src="${LOGO_URL}" alt="G&T S.R.L.">
-        <h1>Cargando productos...</h1>
-        <div class="subtitle">Preparando el catálogo para esta sesión.</div>
-        <div class="catalog-spinner" aria-label="Cargando"></div>
-      </section>
-    </main>`;
-}
+/* =========================================================
+   LOGIN — VISUAL BASADO EN ppto.gytsrl.com
+   ========================================================= */
 
 function mostrarLogin(mensaje=""){
-  document.title="G&T S.R.L. — Presupuesto Digital";
+
+  document.title =
+    "G&T S.R.L. — Consulta de Productos";
+
   $("app").innerHTML = `
+
     <main class="wrap">
+
       <section class="card login-card">
-        <img class="logo-login" src="${LOGO_URL}" alt="G&T S.R.L.">
-        <h1>Presupuesto Digital</h1>
-        <div class="subtitle">Acceso para personal autorizado</div>
+
+        <img
+          class="logo-login"
+          src="${LOGO_URL}"
+          alt="G&T S.R.L."
+        >
+
+        <h1>Consulta de Productos</h1>
+
+        <div class="subtitle">
+          Acceso para personal autorizado
+        </div>
+
         <form id="loginForm">
+
           <label>Vendedor</label>
+
           <select id="loginUsuario" required>
-            <option value="">Seleccioná tu nombre</option>
+
+            <option value="">
+              Seleccioná tu nombre
+            </option>
+
             <option value="Agustin">Agustin</option>
             <option value="Gaston">Gaston</option>
             <option value="Tomito">Tomito</option>
             <option value="Julio">Julio</option>
+
           </select>
+
           <div style="height:12px"></div>
+
           <label>PIN</label>
-          <input id="loginPin" type="password" inputmode="numeric" autocomplete="off" required>
-          <button class="btn btn-primary btn-large" id="loginBtn">INGRESAR</button>
-          <div id="loginStatus" class="status ${mensaje?'error':''}">${esc(mensaje)}</div>
+
+          <input
+            id="loginPin"
+            type="password"
+            inputmode="numeric"
+            autocomplete="off"
+            required
+          >
+
+          <button
+            class="btn btn-primary btn-large"
+            id="loginBtn"
+          >
+            INGRESAR
+          </button>
+
+          <div
+            id="loginStatus"
+            class="status ${mensaje ? "error" : ""}"
+          >
+            ${esc(mensaje)}
+          </div>
+
         </form>
-        <div style="margin-top:22px;text-align:center;color:#888;font-size:12px">G&T S.R.L. · Presupuesto Digital</div>
+
+        <div
+          style="
+            margin-top:22px;
+            text-align:center;
+            color:#888;
+            font-size:12px
+          "
+        >
+          G&T S.R.L. · Consulta de Productos
+        </div>
+
       </section>
-    </main>`;
-  $("loginForm").onsubmit=async e=>{
+
+    </main>
+  `;
+
+
+  $("loginForm").onsubmit = async e => {
+
     e.preventDefault();
-    const btn=$("loginBtn"), st=$("loginStatus");
-    btn.disabled=true; btn.textContent="VERIFICANDO...";
-    st.className="status"; st.textContent="";
+
+    const btn = $("loginBtn");
+    const st = $("loginStatus");
+
+    btn.disabled = true;
+    btn.textContent = "VERIFICANDO...";
+
+    st.className = "status";
+    st.textContent = "";
+
     try{
-      const r=await jsonp({accion:"login",usuario:$("loginUsuario").value,pin:$("loginPin").value});
-      if(!r || !r.ok) throw new Error(r?.error || "Usuario o PIN incorrecto.");
-      token=r.token; vendedor=r.usuario;
-      sessionStorage.setItem("gt_token",token);
-      sessionStorage.setItem("gt_usuario",vendedor);
-      mostrarCargaCatalogo();
-      await cargarCatalogo({usarCache:true,esperarServidor:true});
-      renderApp();
-    }catch(err){
-      st.className="status error"; st.textContent=err.message;
-      btn.disabled=false; btn.textContent="INGRESAR";
-    }
-  };
-}
 
-function header(){
-  return `<header><div class="header-inner">
-    <img src="${LOGO_URL}" alt="G&T S.R.L.">
-    <div class="user-pill">Vendedor: <strong>${esc(vendedor)}</strong></div>
-  </div></header>`;
-}
-
-async function renderApp(){
-  if(!token){mostrarLogin();return;}
-  if(verNumero){renderLoadingHistorico();cargarHistorico(verNumero);return;}
-  if(!catalogoOpciones.length){
-    try{
-      /*
-       * Primero intenta el catálogo local. Si existe,
-       * la pantalla se construye inmediatamente y la
-       * actualización al servidor continúa en segundo plano.
-       */
-      const teniaCache = cargarCatalogoDesdeCache();
-
-      if(!teniaCache){
-        mostrarCargaCatalogo();
-        await actualizarCatalogoServidor();
-      }else{
-        actualizarCatalogoServidor().catch(err=>{
-          console.warn("No se pudo actualizar el catálogo en segundo plano:", err.message);
+      const r =
+        await jsonp({
+          accion:"login",
+          usuario:$("loginUsuario").value,
+          pin:$("loginPin").value
         });
+
+
+      if(!r || !r.ok){
+
+        throw new Error(
+          r?.error ||
+          "Usuario o PIN incorrecto."
+        );
+
       }
-    }catch(e){
-      mostrarLogin("No se pudo cargar el catálogo: " + e.message);
-      return;
-    }
-  }
-  document.title="G&T S.R.L. — Presupuesto Digital";
-  $("app").innerHTML = header()+`
-  <main class="wrap">
-    <section class="card">
-      <h1>Presupuesto Digital</h1>
-      <div class="subtitle">Nuevo presupuesto · el número se asigna al generar</div>
-      <div class="grid">
-        <div><label>Cliente *</label><input id="cliente" placeholder="Nombre y apellido / Razón social"></div>
-        <div><label>DNI / CUIT</label><input id="dni"></div>
-        <div><label>Teléfono</label><input id="telefono"></div>
-        <div><label>Email</label><input id="email" type="email"></div>
-        <div><label>Dirección</label><input id="direccion"></div>
-        <div><label>Forma de pago</label>
-          <select id="forma"><option value="Contado">Contado</option><option value="Tarjeta">Tarjeta</option><option value="Otro">Otro</option></select>
-        </div>
-      </div>
-    </section>
 
-    <!-- =====================================================
-         HERRAMIENTAS — NUEVO
-         ===================================================== -->
-    <div class="quick-tools no-print">
-      <button class="quick-tool quick-tool-primary" id="openCatalogoInfo">📋 CATÁLOGO</button>
-      <button class="quick-tool" type="button" disabled title="Disponible próximamente">🕘 HISTÓRICO</button>
-    </div>
 
-    <section class="card">
-      <div class="titlebar">
-        <h2>Productos</h2>
-        <button class="btn btn-primary add-btn" id="add">＋ AGREGAR PRODUCTO</button>
-      </div>
-      <div id="empty" class="empty">Todavía no se agregaron productos.</div>
-<div class="table-wrap"><table id="table" hidden>
-  <thead>
-    <tr>
-      <th>Producto</th>
-      <th>Medida</th>
-      <th>Cantidad</th>
-      <th>Cajas</th>
-      <th>P. UNIT.</th>
-      <th>Subtotal</th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody id="rows"></tbody>
-</table></div>
-      <div class="total-box"><small>Total presupuesto</small>$ <span id="total">0,00</span></div>
-      <div class="actions">
-        <button class="btn btn-secondary" id="cancel">CANCELAR</button>
-        <button class="btn btn-primary" id="generate">GENERAR PRESUPUESTO</button>
-      </div>
-      <div id="appStatus" class="status"></div>
-    </section>
-  </main>
+      token = r.token;
+      vendedor = r.usuario;
 
-  <div class="modal-backdrop" id="modal">
-    <div class="modal modal-productos">
-      <div class="modal-head"><h3>Agregar producto</h3><button class="close" id="close">×</button></div>
-      <div id="catalogArea">
-        <p class="scan-note">Seleccioná un producto del catálogo.</p>
-        <input id="buscarProducto" type="search" placeholder="🔎 Buscar por producto o medida..." autocomplete="off">
-        <div id="catalogoLista" class="catalogo-lista"></div>
-        <div id="catalogoError" class="status"></div>
-      </div>
-      <div id="calcArea" hidden>
-        <div id="productInfo" class="product-info"></div>
-        <div id="m2Area">
-          <label>Metros cuadrados necesarios *</label>
-          <input id="m2" type="number" min="0.01" step="0.01" placeholder="Ej.: 28">
-          <label class="checkbox"><input id="zocalo" type="checkbox"> Con zócalo (+10%)</label>
-        </div>
-        <div id="cantidadArea" hidden>
-          <label>Cantidad *</label>
-          <input id="cantidad" type="number" min="1" step="1" placeholder="Ej.: 10">
-        </div>
-        <div id="calcInfo" class="calc-info"></div>
-        <button class="btn btn-primary btn-large" id="confirm">AGREGAR AL PRESUPUESTO</button>
-      </div>
-    </div>
-  </div>
 
-  <!-- =====================================================
-       MODAL CATÁLOGO INFORMATIVO — NUEVO
-       Estética basada en consulta-v7.html.
-       ===================================================== -->
-  <div class="modal-backdrop" id="modalCatalogoInfo">
-    <div class="modal modal-catalogo-info">
-      <div class="modal-head">
-        <div>
-          <h3 style="margin:0;color:#183746;font-size:20px">Consulta de Productos</h3>
-          <div style="font-size:12px;color:#777;margin-top:3px">Buscá un producto para consultar sus precios y características.</div>
-        </div>
-        <button class="close" id="closeCatalogoInfo" type="button">×</button>
-      </div>
+      await cargarCatalogo();
 
-      <div class="catalogo-info-search">
-        <label style="color:#183746;font-size:14px;margin-bottom:7px">🔎 BUSCAR PRODUCTO</label>
-        <input id="buscarCatalogoInfo" type="search" placeholder="Nombre, medida, color o código..." autocomplete="off">
-        <div class="catalogo-info-count"><span>Resultados:</span> <strong id="catalogoInfoCount">0 productos</strong></div>
-      </div>
 
-      <div class="catalogo-info-grid">
-        <section>
-          <div id="catalogoInfoLista" class="catalogo-info-lista"></div>
-        </section>
-        <section id="catalogoInfoDetalle" class="catalogo-info-detail empty-detail">
-          Seleccioná un producto para ver sus características, precios y datos de presentación.
-        </section>
-      </div>
-    </div>
-  </div>`;
-  $("forma").onchange=recalcularPreciosPorFormaPago;
-  $("add").onclick=abrirModal;
-  $("close").onclick=cerrarModal;
-  $("buscarProducto").oninput=renderCatalogo;
+      renderConsulta();
 
-  // ==================================================
-  // CATÁLOGO INFORMATIVO — NUEVO
-  // ==================================================
-  $("openCatalogoInfo").onclick=abrirCatalogoInformativo;
-  $("closeCatalogoInfo").onclick=cerrarCatalogoInformativo;
-  $("buscarCatalogoInfo").oninput=renderCatalogoInformativo;
-  $("catalogoInfoLista").addEventListener("click",e=>{
-    const item=e.target.closest("[data-info-catalogo-index]");
-    if(!item)return;
-    seleccionarCatalogoInformativo(Number(item.dataset.infoCatalogoIndex));
-  });
-  $("cancel").onclick=()=>{if(confirm("¿Cancelar este presupuesto?")){productos=[];limpiarFormulario();renderProductos()}};
-  $("generate").onclick=guardarPresupuesto;
-  $("m2").oninput=calcularActual;
-  $("zocalo").onchange=calcularActual;
-  $("cantidad").oninput=calcularActual;
-  renderProductos();
-}
+    }catch(err){
 
+      st.className = "status error";
+      st.textContent = err.message;
 
-/* =====================================================
-   CATÁLOGO INFORMATIVO — NUEVO
-   -----------------------------------------------------
-   Utiliza catalogoProductos/catalogoOpciones ya cargados.
-   No llama nuevamente al login ni modifica el flujo de
-   presupuestos.
-   ===================================================== */
-function abrirCatalogoInformativo(){
-  const modal=$("modalCatalogoInfo");
-  if(!modal)return;
-  modal.classList.add("open");
-  $("buscarCatalogoInfo").value="";
-  renderCatalogoInformativo();
-  setTimeout(()=>$('buscarCatalogoInfo')?.focus(),50);
-}
+      btn.disabled = false;
+      btn.textContent = "INGRESAR";
 
-function cerrarCatalogoInformativo(){
-  $("modalCatalogoInfo")?.classList.remove("open");
-}
-
-function opcionesCatalogoInformativo(){
-  return catalogoOpciones.filter(p=>categoriaProducto(p)!=="OTRO");
-}
-
-function buscarTextoCatalogoInformativo(p){
-  return [p?.["ID"],p?.["Producto"],p?.["Medida"],p?.["Color"]]
-    .map(v=>String(v||""))
-    .join(" ")
-    .toLocaleLowerCase("es-AR");
-}
-
-function obtenerColoresProducto(p){
-  const id=String(p?.["ID"]||"").trim();
-  const producto=String(p?.["Producto"]||"").trim().toLocaleLowerCase("es-AR");
-  const medida=String(p?.["Medida"]||"").trim().toLocaleLowerCase("es-AR");
-  const filas=catalogoProductos.filter(x=>{
-    const xid=String(x?.["ID"]||"").trim();
-    const xprod=String(x?.["Producto"]||"").trim().toLocaleLowerCase("es-AR");
-    const xmed=String(x?.["Medida"]||"").trim().toLocaleLowerCase("es-AR");
-    return xid===id || (xprod===producto && xmed===medida);
-  });
-  const colores=[];
-  filas.forEach(x=>{
-    String(x?.["Color"]||"").split(/\s*-\s*/).map(c=>c.trim()).filter(Boolean).forEach(c=>{
-      if(!colores.some(ex=>ex.toLocaleLowerCase("es-AR")===c.toLocaleLowerCase("es-AR"))) colores.push(c);
-    });
-  });
-  return colores;
-}
-
-function esPastinaCatalogo(p){
-  const categoria=categoriaProducto(p);
-  const medida=String(p?.["Medida"]||"").trim();
-  const id=String(p?.["ID"]||"").trim().toUpperCase();
-  return categoria==="PSO" && (!medida || id==="PSO-PTNA-1K" || id==="PSO-PTNA-5K");
-}
-
-function seleccionarCatalogoInformativo(indice){
-  const p=catalogoOpciones[indice];
-  if(!p)return;
-
-  document.querySelectorAll("#catalogoInfoLista .catalogo-info-item").forEach(el=>{
-    el.classList.toggle("active",Number(el.dataset.infoCatalogoIndex)===indice);
-  });
-
-  const detalle=$("catalogoInfoDetalle");
-  if(!detalle)return;
-
-  const categoria=categoriaProducto(p);
-  const cr=categoria==="CRRL";
-  const pastina=esPastinaCatalogo(p);
-  const colores=obtenerColoresProducto(p);
-  const precioContado=Number(p["Precio Contado"]||0);
-  const precioTarjeta=Number(p["Precio Tarjeta"]||0);
-  const oferta=Number(p["OFERTA"]||0);
-  const tieneOferta=Number.isFinite(oferta)&&oferta>0;
-  const cajaM2=Number(p["Caja m²"]||0);
-  const kgCaja=Number(p["Kg/Caja"]||0);
-  const unidadesCaja=unidadesPorCaja(p);
-  const precioCajaContado=(precioContado>0&&cajaM2>0)?precioContado*cajaM2:0;
-  const precioCajaTarjeta=(precioTarjeta>0&&cajaM2>0)?precioTarjeta*cajaM2:0;
-
-  detalle.className="catalogo-info-detail";
-
-  let html=`
-    <div class="catalogo-detail-title">${esc(p["Producto"]||"")}</div>
-    <div class="catalogo-detail-subtitle">Código: ${esc(p["ID"]||"—")}</div>
-
-    <div class="catalogo-detail-section">
-      <div class="catalogo-detail-row">
-        <div>
-          <span class="catalogo-detail-label">Categoría</span>
-          <span class="catalogo-detail-value">${esc(pastina?"PASTINA":categoria)}</span>
-        </div>
-        <div>
-          <span class="catalogo-detail-label">Medida</span>
-          <span class="catalogo-detail-value">${esc(pastina?"—":(p["Medida"]||"—"))}</span>
-        </div>
-      </div>
-    </div>`;
-
-  if(cr){
-    html+=`<div class="catalogo-detail-section">
-      <span class="catalogo-detail-label">Presentación</span>
-      <span class="catalogo-detail-value">Venta por unidad</span>
-    </div>`;
-  }else if(pastina){
-    html+=`<div class="catalogo-detail-section">
-      <div class="catalogo-detail-row">
-        <div><span class="catalogo-detail-label">Superficie aproximada</span><span class="catalogo-detail-value">${cajaM2>0?fmt(cajaM2)+" m²":"—"}</span></div>
-        <div><span class="catalogo-detail-label">Peso</span><span class="catalogo-detail-value">${kgCaja>0?fmt0(kgCaja)+" kg/caja":"—"}</span></div>
-      </div>
-      <div class="catalogo-info-nota">El rendimiento es aproximado y puede variar según el tamaño de la junta.</div>
-    </div>`;
-  }else{
-    html+=`<div class="catalogo-detail-section">
-      <div class="catalogo-detail-row">
-        <div><span class="catalogo-detail-label">m² por caja</span><span class="catalogo-detail-value">${cajaM2>0?fmt(cajaM2)+" m²":"—"}</span></div>
-        <div><span class="catalogo-detail-label">Kg por caja</span><span class="catalogo-detail-value">${kgCaja>0?fmt0(kgCaja)+" kg":"—"}</span></div>
-      </div>
-      ${unidadesCaja?`<div style="margin-top:9px"><span class="catalogo-detail-label">Unidades por caja</span><span class="catalogo-detail-value">${fmt0(unidadesCaja)} unidades</span></div>`:""}
-    </div>`;
-  }
-
-  /* =========================
-     PRECIOS — PASTINA
-     ========================= */
-  if(pastina){
-    html+=`<div class="catalogo-precios">
-      ${precioCajaContado>0?`<div class="catalogo-precio-box"><span class="catalogo-detail-label">Precio por caja (contado)</span><strong>$ ${fmt(precioCajaContado)}</strong></div>`:""}
-      ${precioCajaTarjeta>0?`<div class="catalogo-precio-box tarjeta"><span class="catalogo-detail-label">Precio por caja (tarjeta)</span><strong>$ ${fmt(precioCajaTarjeta)}</strong></div>`:""}
-      ${cajaM2>0?`<div class="catalogo-precio-box"><span class="catalogo-detail-label">m² por caja</span><strong>${fmt(cajaM2)} m²</strong></div>`:""}
-    </div>`;
-  }else{
-    html+=`<div class="catalogo-precios">
-      ${precioContado>0?`<div class="catalogo-precio-box"><span class="catalogo-detail-label">Precio contado</span><strong>$ ${fmt(precioContado)} ${cr?"/ unidad":"/ m²"}</strong></div>`:""}
-      ${tieneOferta?`<div class="catalogo-precio-box oferta"><span class="catalogo-detail-label">Precio oferta</span><strong>$ ${fmt(oferta)} ${cr?"/ unidad":"/ m²"}</strong></div>`:""}
-      ${precioTarjeta>0?`<div class="catalogo-precio-box tarjeta"><span class="catalogo-detail-label">Precio tarjeta</span><strong>$ ${fmt(precioTarjeta)} ${cr?"/ unidad":"/ m²"}</strong></div>`:""}
-    </div>`;
-
-    if(cajaM2>0&&precioContado>0){
-      html+=`<div class="catalogo-detail-section"><div class="catalogo-detail-row"><div><span class="catalogo-detail-label">Precio por caja</span><span class="catalogo-detail-value">$ ${fmt(precioContado*cajaM2)}</span></div><div><span class="catalogo-detail-label">m² por caja</span><span class="catalogo-detail-value">${fmt(cajaM2)} m²</span></div></div></div>`;
-    }
-  }
-
-  if(colores.length){
-    html+=`<div class="catalogo-detail-section"><span class="catalogo-detail-label">Colores disponibles</span><div class="catalogo-colores">${colores.map(c=>`<span class="catalogo-color">${esc(c)}</span>`).join("")}</div></div>`;
-  }
-
-  detalle.innerHTML=html;
-}
-
-function renderCatalogoInformativo(){
-  const lista=$("catalogoInfoLista");
-  if(!lista)return;
-  const q=String($("buscarCatalogoInfo")?.value||"").trim().toLocaleLowerCase("es-AR");
-  const opciones=opcionesCatalogoInformativo();
-  const resultados=opciones.filter(p=>!q||buscarTextoCatalogoInformativo(p).includes(q));
-
-  $("catalogoInfoCount").textContent=`${resultados.length} producto${resultados.length===1?"":"s"}`;
-
-  if(!resultados.length){
-    lista.innerHTML='<div class="empty">No se encontraron productos.</div>';
-    $("catalogoInfoDetalle").className="catalogo-info-detail empty-detail";
-    $("catalogoInfoDetalle").textContent="No hay resultados para la búsqueda.";
-    return;
-  }
-
-  lista.innerHTML=resultados.map(p=>{
-    const idx=catalogoOpciones.indexOf(p);
-    const categoria=categoriaProducto(p);
-    const medida=esPastinaCatalogo(p)?"Pastina":(categoria==="CRRL"?"Material de corralón":(p["Medida"]||"Sin medida"));
-    return `<button type="button" class="catalogo-info-item" data-info-catalogo-index="${idx}"><div><strong>${esc(p["Producto"]||"")}</strong><span>${esc(medida)}</span></div></button>`;
-  }).join("");
-
-  seleccionarCatalogoInformativo(catalogoOpciones.indexOf(resultados[0]));
-}
-
-function limpiarFormulario(){
-  ["cliente","dni","telefono","email","direccion"].forEach(id=>{if($(id))$(id).value=""});
-  if($("forma"))$("forma").value="Contado";
-}
-
-function abrirModal(){
-  productoActual = null;
-  $("modal").classList.add("open");
-  $("catalogArea").hidden=false;
-  $("calcArea").hidden=true;
-  $("catalogoError").className="status";
-  $("catalogoError").textContent="";
-  $("buscarProducto").value="";
-  renderCatalogo();
-  setTimeout(()=>$("buscarProducto")?.focus(),50);
-}
-
-function cerrarModal(){
-  $("modal")?.classList.remove("open");
-  productoActual=null;
-}
-
-function textoOpcionCatalogo(p){
-  const producto = String(p["Producto"] || "").trim();
-  const medida = String(p["Medida"] || "").trim();
-
-  if(categoriaProducto(p) === "CRRL"){
-    return producto;
-  }
-
-  return medida
-    ? `${producto} (${medida})`
-    : producto;
-}
-
-function renderCatalogo(){
-  const lista=$("catalogoLista");
-  if(!lista)return;
-  const q=String($("buscarProducto")?.value||"").trim().toLocaleLowerCase("es-AR");
-  const resultados=catalogoOpciones.filter(p=>{
-    if(!q)return true;
-    return textoOpcionCatalogo(p).toLocaleLowerCase("es-AR").includes(q);
-  });
-
-  if(!resultados.length){
-    lista.innerHTML='<div class="empty">No se encontraron productos.</div>';
-    return;
-  }
-
-  lista.innerHTML=resultados.map((p,i)=>`
-    <button type="button" class="catalogo-item" data-catalogo-index="${catalogoOpciones.indexOf(p)}">
-      <strong>${esc(p["Producto"]||"")}</strong>
-      <span>${esc(p["Medida"] || "")}</span>
-    </button>`).join("");
-}
-
-function seleccionarProductoCatalogo(indice){
-  const p=catalogoOpciones[indice];
-  if(!p)return;
-  productoActual={...p};
-  $("catalogArea").hidden=true;
-  $("calcArea").hidden=false;
-  mostrarProducto();
-}
-
-function mostrarProducto(){
-  const p=productoActual;
-  const crrl=esMaterialCorralon(p);
-
-  const oferta=Number(p["OFERTA"]||0);
-  const tieneOferta=Number.isFinite(oferta)&&oferta>0;
-
-  const precioContado=Number(p["Precio Contado"]||0);
-  const precioTarjeta=Number(p["Precio Tarjeta"]||0);
-  const forma=$("forma")?.value||"Contado";
-
-  const precio=
-    forma==="Tarjeta"&&precioTarjeta>0
-      ? precioTarjeta
-      : (tieneOferta?oferta:precioContado);
-
-  /* =========================
-     MATERIAL DE CORRALÓN
-     ========================= */
-  if(crrl){
-    $("productInfo").innerHTML=`
-      <strong>${esc(p["Producto"])}</strong><br>
-      <strong>${tieneOferta?"🔥 OFERTA":"Precio"}: $ ${fmt(precio)} /unidad</strong>`;
-
-    $("m2Area").hidden=true;
-    $("cantidadArea").hidden=false;
-
-    $("cantidad").value="";
-    $("calcInfo").textContent="";
-    $("calcArea").hidden=false;
-
-    $("cantidad").focus();
-    return;
-  }
-
-  /* =========================
-     CERÁMICOS / PORCELANATOS /
-     REVESTIMIENTOS / PISOS
-     ========================= */
-
-  const coloresRaw=String(p["Color"]||"").trim();
-
-  const colores=coloresRaw
-    .split(/\s*-\s*/)
-    .map(c=>c.trim())
-    .filter(Boolean);
-
-  let selectorColor="";
-
-  if(colores.length>1){
-    selectorColor=`
-      <br>
-      <label>Color *</label>
-      <select id="colorSelect">
-        <option value="">Seleccioná un color</option>
-        ${colores.map(c=>`
-          <option value="${esc(c)}">${esc(c)}</option>
-        `).join("")}
-      </select>
-    `;
-  }
-
-  $("productInfo").innerHTML=`
-    <strong>${esc(p["Producto"])}</strong><br>
-    ${esc(p["Medida"]||"")}
-    ${selectorColor}
-    <br>
-    <strong>${tieneOferta?"🔥 OFERTA":"Precio"}: $ ${fmt(precio)} /m²</strong><br>
-    Caja: ${fmt(p["Caja m²"])} m² · ${fmt0(p["Kg/Caja"]||0)} kg/caja`;
-
-  $("m2Area").hidden=false;
-  $("cantidadArea").hidden=true;
-
-  $("m2").value="";
-  $("zocalo").checked=false;
-  $("calcInfo").textContent="";
-  $("calcArea").hidden=false;
-
-  if(colores.length===1){
-    productoActual._colorSeleccionado=colores[0];
-  }else{
-    productoActual._colorSeleccionado="";
-  }
-
-  $("colorSelect")?.addEventListener("change",function(){
-    productoActual._colorSeleccionado=this.value;
-  });
-
-  $("m2").focus();
-  calcularActual();
-}
-  
-function unidadesPorCaja(p){
-  const medida = String(p?.["Medida"] || "").trim().toLowerCase();
-  const cajaM2 = Number(p?.["Caja m²"] || 0);
-  if(!medida || !Number.isFinite(cajaM2) || cajaM2 <= 0) return null;
-
-  const partes = medida.split("x").map(v => Number(String(v).trim().replace(",", ".")));
-  if(partes.length !== 2 || !Number.isFinite(partes[0]) || !Number.isFinite(partes[1]) || partes[0] <= 0 || partes[1] <= 0) return null;
-
-  const areaPieza = (partes[0] / 100) * (partes[1] / 100);
-  const unidades = Math.round(cajaM2 / areaPieza);
-  return unidades > 0 ? unidades : null;
-}
-
-function precioSegunFormaPago(p, forma){
-  const id=String(p?.id||p?.["ID"]||"").trim();
-  const catalogo=catalogoProductos.find(x=>String(x?.["ID"]||"").trim()===id) || p;
-
-  const oferta=Number(catalogo?.["OFERTA"]||0);
-  const tieneOferta=Number.isFinite(oferta)&&oferta>0;
-  const precioContado=Number(catalogo?.["Precio Contado"]||0);
-  const precioTarjeta=Number(catalogo?.["Precio Tarjeta"]||0);
-
-  /*
-   * FORMA DE PAGO
-   * -------------------------
-   * Contado  -> Precio Contado / Oferta
-   * Tarjeta  -> Precio Tarjeta
-   * Otro     -> Por ahora mismo criterio que Contado
-   *
-   * FUTURO:
-   * En "Otro" se podrá aplicar un porcentaje
-   * adicional, por ejemplo para operaciones con cheque.
-   * Ejemplo:
-   * const porcentajeOtro = 5;
-   * precio = precioContado * (1 + porcentajeOtro / 100);
-   */
-
-  if(forma==="Tarjeta" && precioTarjeta>0){
-    return {
-      precio:precioTarjeta,
-      tieneOferta:false,
-      oferta
-    };
-  }
-
-  return {
-    precio:tieneOferta ? oferta : precioContado,
-    tieneOferta,
-    oferta
-  };
-}
-
-function recalcularPreciosPorFormaPago(){
-  if(!productos.length)return;
-
-  const forma=$("forma")?.value||"Contado";
-
-  productos.forEach(p=>{
-    const datosPrecio=precioSegunFormaPago(p,forma);
-    const precio=datosPrecio.precio;
-
-    p.precioM2=precio;
-    p.tieneOferta=datosPrecio.tieneOferta;
-    p.oferta=datosPrecio.oferta;
-
-    if(String(p.unidad||"")==="Unidades"){
-      p.precioCaja=precio;
-      p.subtotal=Number(p.cantidad||0)*precio;
-    }else{
-      p.precioCaja=precio*Number(p.cajaM2||0);
-      p.subtotal=Number(p.m2Reales||0)*precio;
-    }
-  });
-
-  renderProductos();
-}
-
-function calcularActual(){
-  if(!productoActual)return null;
-  const crrl=esMaterialCorralon(productoActual);
-  const oferta=Number(productoActual["OFERTA"]||0);
-  const tieneOferta=Number.isFinite(oferta)&&oferta>0;
-  const forma=$("forma").value||"Contado";
-  const precioTarjeta=Number(productoActual["Precio Tarjeta"]||0);
-  const precio=(forma==="Tarjeta"&&precioTarjeta>0)?precioTarjeta:(tieneOferta?oferta:Number(productoActual["Precio Contado"]||0));
-
-  if(crrl){
-    const cantidad=Number($("cantidad")?.value||0);
-    if(cantidad<=0){$("calcInfo").textContent="";return null}
-    const subtotal=cantidad*precio;
-    $("calcInfo").textContent=`${cantidad} unidades · Subtotal: $ ${fmt(subtotal)}`;
-    return {unidad:"Unidades",cantidad, m2Solicitados:0,conZocalo:false,porcentajeAdicional:0,m2Calculados:0,cajas:0,m2Reales:0,precioM2:precio,precioCaja:precio,subtotal,tieneOferta,oferta};
-  }
-
-  const m2=Number($("m2").value||0);if(m2<=0){$("calcInfo").textContent="";return null}
-  const conZ=$("zocalo").checked, extra=conZ?10:0, m2Calc=m2*(1+extra/100);
-  const caja=Number(productoActual["Caja m²"]||0);
-  const cajas=Math.ceil(m2Calc/caja), reales=cajas*caja;
-  const subtotal=reales*precio;
-  $("calcInfo").textContent=`${conZ?"Con zócalo (+10%) · ":""}${cajas} cajas · ${fmt(reales)} m² reales · Subtotal: $ ${fmt(subtotal)}`;
-  return {unidad:"m²",cantidad:m2,m2Solicitados:m2,conZocalo:conZ,porcentajeAdicional:extra,m2Calculados:m2Calc,cajas,m2Reales:reales,precioM2:precio,precioCaja:precio*caja,subtotal,tieneOferta,oferta};
-}
-
-function renderProductos(){
-  if(!$("rows"))return;
-
-  $("rows").innerHTML="";
-  let total=0;
-
-  productos.forEach((p,i)=>{
-    total+=Number(p.subtotal||0);
-
-    const esCRRL = String(p.id||"").toUpperCase().startsWith("CRRL-");
-
-    let cantidadHTML="";
-
-    if(esCRRL){
-
-      cantidadHTML=`
-        <strong>${fmt0(p.cantidad||0)} unidades</strong>
-      `;
-
-    }else{
-
-      const m2Solicitados=Number(p.m2Solicitados||0);
-      const m2Calculados=Number(p.m2Reales||0);
-      const m2Zocalo=p.conZocalo
-        ? Math.max(0,m2Calculados-m2Solicitados)
-        : 0;
-
-      cantidadHTML=`
-        <strong>${fmt(m2Solicitados)} m²</strong>
-        ${p.conZocalo && m2Zocalo>0
-          ? `<br><small>+ ${fmt(m2Zocalo)} m² zócalo</small>`
-          : ""
-        }
-      `;
     }
 
-    // En pastinas se muestra el precio de la caja, sin modificar
-    // el cálculo interno por m² ni el subtotal.
-    const idProducto = String(p.id||"").trim().toUpperCase();
-    const esPastina =
-      idProducto==="PSO-PTNA-1K" ||
-      idProducto==="PSO-PTNA-5K";
-
-    const precioUnitario = esPastina
-      ? Number(p.precioCaja||p.precioM2||0)
-      : Number(p.precioM2||0);
-
-    const tr=document.createElement("tr");
-
-    tr.innerHTML=`
-      <td>
-        <strong>${esc(p.producto)}</strong>
-        ${p.color ? `<br><small>${esc(p.color)}</small>` : ""}
-        ${p.tieneOferta ? ' <span class="badge">OFERTA</span>' : ""}
-        ${p.conZocalo
-          ? ' <span class="badge">INCLUIDO ZÓCALO</span>'
-          : ""
-        }
-      </td>
-
-      <td>${esc(p.medida||"—")}${p.unidadesPorCaja ? `<span class="quote-unidades-caja">${fmt0(p.unidadesPorCaja)} un./caja</span>` : ""}</td>
-
-      <td>${cantidadHTML}</td>
-
-      <td>${esCRRL ? "—" : p.cajas}</td>
-
-      <td class="money">$ ${fmt(precioUnitario)}</td>
-
-      <td class="money">$ ${fmt(p.subtotal)}</td>
-
-      <td>
-        <button class="btn btn-danger" data-remove="${i}" title="Eliminar">🗑</button>
-      </td>
-    `;
-
-    $("rows").appendChild(tr);
-  });
-
-  $("total").textContent=fmt(total);
-  $("empty").hidden=productos.length>0;
-  $("table").hidden=productos.length===0;
-}
-  
-$("cantidad")?.addEventListener("input",calcularActual);
-
-$("app").addEventListener("click",e=>{
-  const item=e.target.closest("[data-catalogo-index]");
-  if(item){
-    seleccionarProductoCatalogo(Number(item.dataset.catalogoIndex));
-    return;
-  }
-  const btn=e.target.closest("[data-remove]");
-  if(btn){
-    productos.splice(Number(btn.dataset.remove),1);
-    renderProductos();
-    return;
-  }
-
-  if(e.target.id==="confirm"){
-    const c=calcularActual();
-
-    if(!c){
-      return alert(
-        esMaterialCorralon(productoActual)
-          ? "Ingresá la cantidad de unidades."
-          : "Ingresá los metros cuadrados."
-      );
-    }
-
-    const p=productoActual;
-
-const colorSeleccionado = $("colorSelect")?.value || p._colorSeleccionado || p["Color"] || "";
-
-productos.push({
-  id:p["ID"],
-  producto:p["Producto"],
-  medida:p["Medida"]||"",
-  cajaM2:Number(p["Caja m²"]||0),
-  unidadesPorCaja:unidadesPorCaja(p),
-  color:colorSeleccionado,
-  ...c
-});
-
-    cerrarModal();
-    renderProductos();
-  }
-});
-
-async function guardarPresupuesto(){
-
-  if(!productos.length){
-    return alert("Agregá al menos un producto.");
-  }
-
-  const cliente=$("cliente").value.trim();
-
-  if(!cliente){
-    return alert("Ingresá el cliente.");
-  }
-
-  const total=productos.reduce(
-    (s,p)=>s+Number(p.subtotal||0),
-    0
-  );
-
-  const datos={
-    cliente,
-    dniCuit:$("dni").value.trim(),
-    telefono:$("telefono").value.trim(),
-    email:$("email").value.trim(),
-    direccion:$("direccion").value.trim(),
-    formaPago:$("forma").value,
-    subtotal:total,
-    descuento:0,
-    total,
-    observaciones:"",
-    productos
   };
 
-  const btn=$("generate");
-  const st=$("appStatus");
+}
 
-  btn.disabled=true;
-  btn.textContent="RESERVANDO NÚMERO...";
-  st.className="status";
-  st.textContent="";
 
-  try{
+/* =========================================================
+   CARGA COMPLETA DEL CATÁLOGO
+   ========================================================= */
 
-    // ==================================================
-    // PASO 1 — RESERVAR NÚMERO
-    // ==================================================
+async function cargarCatalogo(){
 
-    const rNumero=await jsonp({
-      accion:"nuevoNumero",
+  mostrarCarga();
+
+  const r =
+    await jsonp({
+      accion:"catalogo",
       token
     });
 
-    if(!rNumero?.ok){
-      throw new Error(
-        rNumero?.error ||
-        "No se pudo reservar el número de presupuesto."
-      );
+
+  if(!r?.ok){
+
+    throw new Error(
+      r?.error ||
+      "No se pudo cargar el catálogo."
+    );
+
+  }
+
+
+  catalogoProductos =
+    Array.isArray(r.productos)
+      ? r.productos
+      : (
+          Array.isArray(r.catalogo)
+            ? r.catalogo
+            : []
+        );
+
+
+  construirCatalogo(catalogoProductos);
+
+}
+
+
+function construirCatalogo(productos){
+
+  catalogoOpciones = [];
+
+  const claves = new Set();
+
+
+  productos.forEach(p=>{
+
+    const categoria =
+      categoriaProducto(p);
+
+    if(categoria === "OTRO"){
+
+      /*
+       * En esta primera versión
+       * también permitimos OTRO.
+       */
+
     }
 
-    const numero=rNumero.numero;
 
-    // ==================================================
-    // POR AHORA:
-    // mostramos el presupuesto inmediatamente.
-    //
-    // EL GUARDADO TODAVÍA NO SE MODIFICA.
-    // ==================================================
+    const producto =
+      String(p["Producto"] || "").trim();
 
-// MOSTRAR EL PRESUPUESTO INMEDIATAMENTE
-mostrarPresupuestoGuardado(numero, datos);
+    const medida =
+      String(p["Medida"] || "").trim();
 
-// GUARDAR EN SEGUNDO PLANO
-jsonp({
-  accion: "guardar",
-  token,
-  numero: numero,
-  datos: JSON.stringify(datos)
-})
-.then(rGuardado => {
 
-  if (!rGuardado?.ok) {
-    console.error(
-      "No se pudo guardar el presupuesto:",
-      rGuardado?.error || "Error desconocido"
+    /*
+     * Igual que el catálogo actual:
+     * una opción por Producto + Medida.
+     * Los colores no duplican el resultado.
+     */
+
+    const clave =
+      `${categoria}|${producto.toUpperCase()}|${medida.toUpperCase()}`;
+
+
+    if(claves.has(clave))return;
+
+    claves.add(clave);
+
+
+    catalogoOpciones.push({
+      ...p
+    });
+
+  });
+
+
+  if(!catalogoOpciones.length){
+
+    throw new Error(
+      "El catálogo no contiene productos."
     );
+
+  }
+
+}
+
+
+function mostrarCarga(){
+
+  $("app").innerHTML = `
+
+    <main class="wrap">
+
+      <section class="card loading">
+
+        <img
+          class="logo-login"
+          src="${LOGO_URL}"
+          alt="G&T S.R.L."
+        >
+
+        <h1>Cargando productos...</h1>
+
+        <div class="subtitle">
+          Preparando el catálogo.
+        </div>
+
+        <div class="spinner"></div>
+
+      </section>
+
+    </main>
+  `;
+
+}
+
+
+/* =========================================================
+   INTERFAZ DE CONSULTA
+   ========================================================= */
+
+function renderConsulta(){
+
+  document.title =
+    "G&T S.R.L. — Consulta de Productos";
+
+
+  $("app").innerHTML = `
+
+    <header>
+
+      <div class="header-inner">
+
+        <img
+          src="${LOGO_URL}"
+          alt="G&T S.R.L."
+        >
+
+        <div class="user-pill">
+          Vendedor:
+          <strong>${esc(vendedor)}</strong>
+        </div>
+
+      </div>
+
+    </header>
+
+
+    <main class="wrap">
+
+      <div class="catalog-header">
+
+        <h1>Consulta de Productos</h1>
+
+        <div class="subtitle">
+          Buscá un producto para consultar sus precios y características.
+        </div>
+
+      </div>
+
+
+      <div class="consulta-grid">
+
+        <!-- =========================
+             MÓDULO IZQUIERDO
+             ========================= -->
+
+        <section class="consulta-panel consulta-panel-izq">
+
+          <label
+            class="search-label"
+            for="buscarProducto"
+          >
+            🔎 BUSCAR PRODUCTO
+          </label>
+
+
+          <div class="search-box">
+
+            <span class="search-icon">⌕</span>
+
+            <input
+              id="buscarProducto"
+              type="search"
+              placeholder="Nombre, medida..."
+              autocomplete="off"
+            >
+
+          </div>
+
+
+          <div class="resultados-titulo">
+
+            <span>Resultados</span>
+
+            <span
+              id="resultadosCount"
+              class="resultados-count"
+            ></span>
+
+          </div>
+
+
+          <div
+            id="catalogoLista"
+            class="catalogo-lista"
+          ></div>
+
+        </section>
+
+
+        <!-- =========================
+             COLUMNA DERECHA
+             ========================= -->
+
+        <div class="detalle-columna">
+
+          <!-- MÓDULO SUPERIOR -->
+          <section class="detalle-modulo">
+
+            <div class="producto-cabecero-linha">
+
+              <div class="producto-cabecero-titulo">
+                <span class="modulo-titulo-icono">📦</span>
+                <span>Información del Producto</span>
+              </div>
+
+              <div
+                id="detalleTipo"
+                class="producto-tipo"
+              >
+                PRODUCTO
+              </div>
+
+            </div>
+
+
+            <div
+              id="detalleProductoSuperior"
+              class="producto-cabecera"
+            >
+              <div class="detalle-placeholder">
+                Seleccioná un producto para ver
+                sus características.
+              </div>
+            </div>
+
+          </section>
+
+
+          <!-- MÓDULO INFERIOR -->
+          <section class="detalle-modulo">
+
+            <div class="modulo-titulo">
+
+              <div class="modulo-titulo-texto">
+                <span class="modulo-titulo-icono">🏷️</span>
+                <span>Precios y Detalles</span>
+              </div>
+
+            </div>
+
+
+            <div
+              id="detalleProductoInferior"
+            >
+              <div class="detalle-placeholder">
+                Seleccioná un producto para consultar
+                precios y datos de caja.
+              </div>
+            </div>
+
+          </section>
+
+        </div>
+
+      </div>
+
+    </main>
+  `;
+
+
+  $("buscarProducto").addEventListener(
+    "input",
+    renderCatalogo
+  );
+
+
+  renderCatalogo();
+
+}
+
+
+/* =========================================================
+   TEXTO DE RESULTADO
+   ========================================================= */
+
+function textoOpcionCatalogo(p){
+
+  const producto =
+    String(p["Producto"] || "").trim();
+
+  const medida =
+    String(p["Medida"] || "").trim();
+
+  const id =
+    String(p["ID"] || "").trim();
+
+
+  if(medida){
+
+    return `${producto} ${medida} ${id}`;
+
+  }
+
+  return `${producto} ${id}`;
+
+}
+
+
+/* =========================================================
+   BUSCADOR
+   ========================================================= */
+
+function renderCatalogo(){
+
+  const lista =
+    $("catalogoLista");
+
+  if(!lista)return;
+
+
+  const q =
+    String(
+      $("buscarProducto")?.value || ""
+    )
+    .trim()
+    .toLocaleLowerCase("es-AR");
+
+
+  const resultados =
+    catalogoOpciones.filter(p=>{
+
+      if(!q)return true;
+
+      return textoOpcionCatalogo(p)
+        .toLocaleLowerCase("es-AR")
+        .includes(q);
+
+    });
+
+
+  $("resultadosCount").textContent =
+    resultados.length +
+    (
+      resultados.length === 1
+        ? " producto"
+        : " productos"
+    );
+
+
+  if(!resultados.length){
+
+    lista.innerHTML = `
+      <div class="empty">
+        No se encontraron productos.
+      </div>
+    `;
+
     return;
-  }
-
-  console.log(
-    "Presupuesto guardado correctamente:",
-    rGuardado.numero
-  );
-
-})
-.catch(error => {
-
-  console.error(
-    "Error al guardar el presupuesto:",
-    error
-  );
-
-});
-    
-  }catch(e){
-
-    st.className="status error";
-    st.textContent=e.message;
-
-  }finally{
-
-    btn.disabled=false;
-    btn.textContent="GENERAR PRESUPUESTO";
 
   }
+
+
+  lista.innerHTML =
+    resultados.map((p,i)=>{
+
+      const indice =
+        catalogoOpciones.indexOf(p);
+
+      const medida =
+        String(p["Medida"] || "").trim();
+
+      return `
+
+        <button
+          type="button"
+          class="catalogo-item"
+          data-index="${indice}"
+        >
+
+          <div class="catalogo-item-main">
+
+            <strong>
+              ${esc(p["Producto"] || "")}
+            </strong>
+
+            <span>
+              ${esc(medida || "Sin medida")}
+            </span>
+
+          </div>
+
+         </button>
+
+      `;
+
+    }).join("");
+
+
+  lista
+    .querySelectorAll("[data-index]")
+    .forEach(item=>{
+
+      item.addEventListener(
+        "click",
+        ()=>{
+
+          seleccionarProducto(
+            Number(item.dataset.index)
+          );
+
+        }
+      );
+
+    });
+
 }
 
-function mostrarPresupuestoGuardado(numero,datos){
-  verNumero="";
-  document.title = "G&T S.R.L. - " + numero.replace("e-Ptto - ", "ePpto ");
-  const fecha=new Date().toLocaleDateString("es-AR");
-  $("app").innerHTML=header()+`<main class="wrap">
-    <div class="historical-actions no-print">
-      <button class="btn btn-primary" id="printQuote">🖨 IMPRIMIR / GUARDAR PDF</button>
-      <button class="btn btn-secondary" id="newQuote">NUEVO PRESUPUESTO</button>
-    </div>
-    ${quoteHtml(numero,fecha,datos)}
-  </main>`;
-  $("printQuote").onclick=()=>window.print();
-  $("newQuote").onclick=nuevoPresupuesto;
+
+function seleccionarProducto(indice){
+
+  const p =
+    catalogoOpciones[indice];
+
+  if(!p)return;
+
+  productoActual = p;
+
+  mostrarProducto(p);
+
 }
 
-function quoteHtml(numero,fecha,d){
-const rows=d.productos.map(p=>{
 
-  const cr=String(p.unidad||"")==="Unidades";
+/* =========================================================
+   DETALLE DEL PRODUCTO
+   ========================================================= */
 
-  // ==================================================
-  // PRECIO UNITARIO MOSTRADO EN EL PRESUPUESTO
-  // Excepción exclusiva para las pastinas:
-  // PSO-PTNA-1K → precio por bolsa de 1 Kg
-  // PSO-PTNA-5K → precio por bolsa de 5 Kg
-  // ==================================================
+function mostrarProducto(p){
 
-  const idProducto=String(p.id||"").trim().toUpperCase();
+  const superior =
+    $("detalleProductoSuperior");
 
-  const esPastina=
-    idProducto==="PSO-PTNA-1K" ||
-    idProducto==="PSO-PTNA-5K";
+  const inferior =
+    $("detalleProductoInferior");
 
-  const precioUnitarioMostrar=
+  const tipo =
+    $("detalleTipo");
+
+
+  const categoria =
+    categoriaProducto(p);
+
+
+  const producto =
+    String(p["Producto"] || "").trim();
+
+  const medida =
+    String(p["Medida"] || "").trim();
+
+  const colorRaw =
+    String(p["Color"] || "").trim();
+
+  const precioContado =
+    Number(p["Precio Contado"] || 0);
+
+  const precioTarjeta =
+    Number(p["Precio Tarjeta"] || 0);
+
+  const oferta =
+    Number(p["OFERTA"] || 0);
+
+  const tieneOferta =
+    Number.isFinite(oferta) &&
+    oferta > 0;
+
+  const cajaM2 =
+    Number(p["Caja m²"] || 0);
+
+  /*
+   * Para PASTINA, Precio Contado y Precio Tarjeta
+   * vienen expresados por m².
+   *
+   * El precio final de la caja se obtiene:
+   * precio por m² × m² por caja.
+   */
+  const precioCajaContado =
+    (precioContado > 0 && cajaM2 > 0)
+      ? precioContado * cajaM2
+      : 0;
+
+  const precioCajaTarjeta =
+    (precioTarjeta > 0 && cajaM2 > 0)
+      ? precioTarjeta * cajaM2
+      : 0;
+
+  const kgCaja =
+    Number(p["Kg/Caja"] || 0);
+
+
+  /*
+   * PASTINA:
+   * En el catálogo actual se identifica como PSO
+   * y sin medida.
+   *
+   * Para pastina los precios se muestran directamente
+   * como precio por caja. No se multiplican por m².
+   */
+
+  const esPastina =
+    categoria === "PSO" &&
+    !medida;
+
+
+  /* =========================
+     MÓDULO SUPERIOR
+     ========================= */
+
+  tipo.textContent =
     esPastina
-      ? Number(p.precioCaja||p.precioM2||0)
-      : Number(p.precioM2||0);
+      ? "PASTINA"
+      : nombreCategoria(categoria);
 
-  return cr
-    ? `<tr>
-        <td>
-          <strong>${esc(p.producto)}</strong>
-          ${p.tieneOferta?' <small>OFERTA</small>':''}
-        </td>
-        <td>—</td>
-        <td>${fmt0(p.cantidad||0)} unidades</td>
-        <td>—</td>
-        <td class="money">$ ${fmt(precioUnitarioMostrar)}</td>
-        <td class="money">$ ${fmt(p.subtotal)}</td>
-      </tr>`
 
-    : `<tr>
-        <td>
-          <strong>${esc(p.producto)}</strong>
-          ${p.color?`<br><small>${esc(p.color)}</small>`:""}
-          ${p.conZocalo?`<br><small>Incl. Zócalo</small>`:""}
-          ${p.tieneOferta?`<br><small>OFERTA</small>`:""}
-        </td>
-        <td>${esc(p.medida||"—")}${p.unidadesPorCaja ? `<span class="quote-unidades-caja">${fmt0(p.unidadesPorCaja)} un./caja</span>` : ""}</td>
-        <td>${fmt(p.m2Solicitados)} m²</td>
-        <td>${p.cajas}</td>
-        <td class="money">$ ${fmt(precioUnitarioMostrar)}</td>
-        <td class="money">$ ${fmt(p.subtotal)}</td>
-      </tr>`;
+  const colores =
+    colorRaw
+      .split(/\s*-\s*/)
+      .map(c=>c.trim())
+      .filter(Boolean);
 
-}).join("");
 
-  const formaPago=String(d.formaPago||"Contado").trim();
+  let superiorHtml = `
 
-  const check = valor =>
-    formaPago.toLocaleLowerCase("es-AR")===valor.toLocaleLowerCase("es-AR")
-      ? "☑"
-      : "☐";
+    <div class="producto-nombre">
+      ${esc(producto)}
+    </div>
 
-  return `<section class="quote-preview" id="quote">
+  `;
 
-    <div class="quote-head">
 
-      <div class="quote-company">
-        <img class="quote-logo" src="${LOGO_URL}" alt="G&T S.R.L.">
-        <div class="quote-company-data">
-          <div><strong>WhatsApp:</strong> 299 - 5207382</div>
-          <div><strong>Dirección:</strong> Conquistadores del Desierto 3400</div>
-          <div><strong>Parque Industrial de Neuquén</strong></div>
-          <div><strong>IVA RESPONSABLE INSCRIPTO</strong></div>
-        </div>
+  if(medida){
+
+    superiorHtml += `
+      <div class="producto-dato">
+        Medida:
+        <strong>${esc(medida)}</strong>
       </div>
+    `;
 
-      <div class="quote-presentation">
-        <div class="quote-title">PRESUPUESTO</div>
-        <div class="quote-number">${esc(numero)}</div>
-        <div class="quote-meta">
-          <div><strong>Fecha:</strong> ${esc(fecha)}</div>
-          <div><strong>Vendedor:</strong> ${esc(vendedor)}</div>
-        </div>
-      </div>
-
-    </div>
-
-    <div class="quote-section">
-      <div class="quote-section-line"></div>
-      <div class="quote-section-title">Datos del Cliente</div>
-
-      <div class="quote-customer">
-        <div class="quote-customer-grid">
-          <div class="quote-field">
-            <strong>Nombre:</strong> <span class="quote-field-value">${esc(d.cliente||"—")}</span>
-          </div>
-          <div class="quote-field">
-            <strong>DNI / CUIT:</strong> <span class="quote-field-value">${esc(d.dniCuit||"—")}</span>
-          </div>
-          <div class="quote-field">
-            <strong>Teléfono:</strong> <span class="quote-field-value">${esc(d.telefono||"—")}</span>
-          </div>
-          <div class="quote-field">
-            <strong>Dirección:</strong> <span class="quote-field-value">${esc(d.direccion||"—")}</span>
-          </div>
-          <div class="quote-field" style="grid-column:1/-1">
-            <strong>E-Mail:</strong> <span class="quote-field-value">${esc(d.email||"—")}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="quote-payment">
-      <div class="quote-payment-title">Condición de Venta:</div>
-      <div class="quote-payment-option"><span>${check("Contado")}</span> Contado</div>
-      <div class="quote-payment-option"><span>${check("Tarjeta")}</span> Tarjeta</div>
-      <div class="quote-payment-option"><span>${check("Otro")}</span> Otro</div>
-      <div class="quote-payment-selected">Seleccionada: ${esc(formaPago)}</div>
-    </div>
-
-    <div class="quote-detail">
-      <div class="quote-section-line"></div>
-      <div class="quote-section-title">Detalle del Presupuesto</div>
-
-      <table class="quote-table">
-        <thead>
-          <tr><th>Producto</th><th>Medida</th><th>Cantidad</th><th>Cajas</th><th>Precio Unit.</th><th>Importe</th></tr>
-        </thead>
-        <tbody>${rows}</tbody>
-      </table>
-    </div>
-
-    <div class="quote-total">
-      <div>TOTAL</div>
-      <div class="quote-total-value">$ ${fmt(d.total)}</div>
-    </div>
-
-    <div class="quote-footer-line"></div>
-
-    <div class="quote-foot">
-      <div class="quote-thanks">
-        ¡Gracias por confiar en nosotros!<br>
-        <span>G&T S.R.L.</span>
-      </div>
-      <div class="quote-legal">
-        <div><strong>Validez: 15 días.</strong> Los precios y condiciones indicados corresponden al momento de emisión del presupuesto.</div>
-        <div><strong>Documento no válido como factura.</strong></div>
-      </div>
-    </div>
-
-  </section>`;
-}
-
-function renderLoadingHistorico(){
-  $("app").innerHTML=header()+`<main class="wrap"><section class="card loading">Cargando presupuesto ${esc(verNumero)}...</section></main>`;
-}
-
-async function cargarHistorico(numero){
-  try{
-    const r=await jsonp({accion:"presupuesto",numero,token});
-    if(!r?.ok)throw new Error(r?.error||"No se pudo cargar el presupuesto.");
-    const p=r.presupuesto;
-    const productosHistoricos=(r.productos||[]).map(x=>({
-      producto:x["Producto"]||"",color:x["Color"]||"",medida:x["Medida"]||"",
-      unidad:x["Unidad"]||"",cantidad:Number(x["Cantidad"]||0),
-      m2Solicitados:Number(x["m² solicitados"]||x["m² Solicitados"]||x["m2 Solicitados"]||0),
-      cajas:Number(x["Cajas"]||0),precioM2:Number(x["Precio/m²"]||0),subtotal:Number(x["Subtotal"]||0),
-      conZocalo:String(x["Con zócalo"]||"")==="Sí",tieneOferta:Number(x["Oferta"]||0)>0
-    }));
-    const datos={cliente:p["Cliente"]||"",dniCuit:p["DNI/CUIT"]||"",telefono:p["Teléfono"]||"",email:p["Email"]||"",direccion:p["Dirección"]||"",formaPago:p["Forma de pago"]||"",total:Number(p["Total"]||0),productos:productosHistoricos};
-    const fecha=p["Fecha"]?new Date(p["Fecha"]).toLocaleDateString("es-AR"):new Date().toLocaleDateString("es-AR");
-    $("app").innerHTML=header()+`<main class="wrap"><div class="historical-actions no-print"><button class="btn btn-primary" id="printQuote">🖨 IMPRIMIR / GUARDAR PDF</button><button class="btn btn-secondary" id="newQuote">NUEVO PRESUPUESTO</button></div>${quoteHtml(numero,fecha,datos)}</main>`;
-    $("printQuote").onclick=()=>window.print();$("newQuote").onclick=nuevoPresupuesto;
-  }catch(e){
-    $("app").innerHTML=header()+`<main class="wrap"><section class="card"><div class="status error" style="display:block">${esc(e.message)}</div><div class="actions no-print"><button class="btn btn-secondary" id="back">VOLVER</button></div></section></main>`;
-    $("back").onclick=()=>{verNumero="";renderApp()};
   }
+
+
+  if(colores.length){
+
+    superiorHtml += `
+
+      <div class="producto-dato">
+
+        Color:
+
+        <div class="color-lista">
+
+          ${colores.map(c=>`
+            <span class="color-tag">
+              ${esc(c)}
+            </span>
+          `).join("")}
+
+        </div>
+
+      </div>
+
+    `;
+
+  }
+
+
+  superior.innerHTML =
+    superiorHtml;
+
+
+  /* =========================
+     MÓDULO INFERIOR
+     ========================= */
+
+  let inferiorHtml = "";
+
+
+  /* =====================================================
+     PASTINA
+     ===================================================== */
+
+  if(esPastina){
+
+    inferiorHtml += `
+
+      <div class="precios-grid">
+
+        ${
+          precioCajaContado > 0
+            ? `
+              <div class="dato dato-precio">
+
+                <span class="dato-label">
+                  Precio por caja
+                  (contado)
+                </span>
+
+                <span class="dato-valor">
+                  $ ${numero(precioCajaContado)}
+                </span>
+
+              </div>
+            `
+            : ""
+        }
+
+
+        ${
+          precioCajaTarjeta > 0
+            ? `
+              <div class="dato dato-precio tarjeta">
+
+                <span class="dato-label">
+                  Precio por caja
+                  (tarjeta)
+                </span>
+
+                <span class="dato-valor">
+                  $ ${numero(precioCajaTarjeta)}
+                </span>
+
+              </div>
+            `
+            : ""
+        }
+
+
+        ${
+          cajaM2 > 0
+            ? `
+              <div class="dato">
+
+                <span class="dato-label">
+                  m² por caja
+                </span>
+
+                <span class="dato-valor">
+                  ${numero(cajaM2)} m²
+                </span>
+
+              </div>
+            `
+            : ""
+        }
+
+      </div>
+
+    `;
+
+
+    /*
+     * En pastina no mostramos:
+     * - Precio contado /m²
+     * - Precio oferta
+     * - Precio tarjeta /m²
+     * - Cantidad por caja
+     * - Precio por caja calculado
+     */
+
+
+    if(kgCaja > 0){
+
+      inferiorHtml += `
+        <div class="nota">
+          ${numero(kgCaja)} kg por caja.
+        </div>
+      `;
+
+    }
+
+
+  /*
+   * =====================================================
+   * RESTO DE PRODUCTOS
+   * =====================================================
+   */
+
+  }else{
+
+    inferiorHtml +=
+      `<div class="precios-grid">`;
+
+
+    if(precioContado > 0){
+
+      inferiorHtml += `
+        <div class="dato dato-precio">
+
+          <span class="dato-label">
+            Precio contado
+          </span>
+
+          <span class="dato-valor">
+            $ ${numero(precioContado)}
+            ${categoria === "CRRL" ? "/ unidad" : "/ m²"}
+          </span>
+
+        </div>
+      `;
+
+    }
+
+
+    if(tieneOferta){
+
+      inferiorHtml += `
+        <div class="dato dato-precio oferta">
+
+          <span class="dato-label">
+            Precio oferta
+          </span>
+
+          <span class="dato-valor">
+            $ ${numero(oferta)}
+            ${categoria === "CRRL" ? "/ unidad" : "/ m²"}
+          </span>
+
+        </div>
+      `;
+
+    }
+
+
+    if(precioTarjeta > 0){
+
+      inferiorHtml += `
+        <div class="dato dato-precio tarjeta">
+
+          <span class="dato-label">
+            Precio tarjeta
+          </span>
+
+          <span class="dato-valor">
+            $ ${numero(precioTarjeta)}
+            ${categoria === "CRRL" ? "/ unidad" : "/ m²"}
+          </span>
+
+        </div>
+      `;
+
+    }
+
+
+    inferiorHtml += `</div>`;
+
+
+    /* =========================
+       DATOS DE CAJA
+       ========================= */
+
+    const datosCaja = [];
+
+
+    if(cajaM2 > 0){
+
+      datosCaja.push({
+        label:"m² por caja",
+        valor:`${numero(cajaM2)} m²`
+      });
+
+    }
+
+
+    if(medida && cajaM2 > 0){
+
+      const partes =
+        medida
+          .toLowerCase()
+          .split("x")
+          .map(v =>
+            Number(
+              String(v)
+                .trim()
+                .replace(",", ".")
+            )
+          );
+
+
+      if(
+        partes.length === 2 &&
+        Number.isFinite(partes[0]) &&
+        Number.isFinite(partes[1]) &&
+        partes[0] > 0 &&
+        partes[1] > 0
+      ){
+
+        const areaPieza =
+          (partes[0] / 100) *
+          (partes[1] / 100);
+
+        const unidades =
+          Math.round(
+            cajaM2 / areaPieza
+          );
+
+
+        if(unidades > 0){
+
+          datosCaja.push({
+            label:"Cantidad por caja",
+            valor:`${numero0(unidades)} unidades`
+          });
+
+        }
+
+      }
+
+    }
+
+
+    /*
+     * Para el resto de productos mantenemos
+     * el cálculo visual que ya tenía la versión anterior.
+     */
+
+    if(cajaM2 > 0 && precioContado > 0){
+
+      datosCaja.unshift({
+        label:"Precio por caja",
+        valor:`$ ${numero(precioContado * cajaM2)}`
+      });
+
+    }
+
+
+    if(datosCaja.length){
+
+      inferiorHtml += `
+        <div class="caja-grid">
+
+          ${datosCaja.map(d=>`
+
+            <div class="caja-dato">
+
+              <span class="dato-label">
+                ${esc(d.label)}
+              </span>
+
+              <span class="dato-valor">
+                ${esc(d.valor)}
+              </span>
+
+            </div>
+
+          `).join("")}
+
+        </div>
+      `;
+
+    }
+
+
+    if(kgCaja > 0){
+
+      inferiorHtml += `
+        <div class="nota">
+          ${numero(kgCaja)} kg por caja.
+        </div>
+      `;
+
+    }
+
+  }
+
+
+  inferior.innerHTML =
+    inferiorHtml;
+
 }
 
-if(token) renderApp(); else mostrarLogin();
+
+/* =========================================================
+   INICIO
+   ========================================================= */
+
+mostrarLogin();
+
 </script>
+
 </body>
 </html>
