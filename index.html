@@ -403,6 +403,92 @@ th{font-size:12px;text-transform:uppercase;color:#666;background:#fafafa}
 .loading-catalogo{margin-top:70px;text-align:center}
 .catalog-spinner{width:32px;height:32px;margin:20px auto;border:4px solid #e5e7eb;border-top-color:var(--rojo);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
+
+/* =====================================================
+   CATÁLOGO INFORMATIVO — ESTÉTICA CONSULTA-CATALOGO
+   ===================================================== */
+.modal-catalogo-info{
+  width:min(1120px,100%);
+  max-width:1120px;
+  padding:18px;
+}
+.catalogo-info-search{margin-bottom:14px}
+.catalogo-info-search input{padding-left:14px;font-size:15px}
+.catalogo-info-count{margin-top:7px;color:#777;font-size:12px}
+.catalogo-info-grid{
+  display:grid;
+  grid-template-columns:minmax(330px,.82fr) minmax(0,1.18fr);
+  gap:16px;
+  align-items:stretch;
+}
+.catalogo-info-lista{
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+  height:430px;
+  overflow-y:auto;
+  overflow-x:hidden;
+  padding:1px 4px 1px 1px;
+  border:1px solid var(--gris2);
+  border-radius:10px;
+  background:#fafafa;
+}
+.catalogo-info-item{
+  flex:0 0 57px;
+  width:100%;
+  text-align:left;
+  background:#fff;
+  border:1px solid #d9dce1;
+  border-radius:8px;
+  padding:8px 11px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  transition:.15s;
+  color:var(--texto)
+}
+.catalogo-info-item:hover,.catalogo-info-item:focus,.catalogo-info-item.active{
+  border-color:var(--rojo);
+  background:#fff7f7;
+  outline:none
+}
+.catalogo-info-item strong{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.catalogo-info-item span{display:block;margin-top:3px;font-size:12px;color:#666;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.catalogo-info-detail{
+  background:#fff;
+  border:1px solid #e2e2e2;
+  border-radius:14px;
+  padding:18px;
+  min-width:0;
+  box-shadow:0 3px 14px rgba(0,0,0,.05);
+  min-height:430px;
+}
+.empty-detail{display:flex;align-items:center;justify-content:center;text-align:center;color:#777}
+.catalogo-detail-title{color:var(--azul,#183746);font-size:26px;font-weight:900;line-height:1.12;overflow-wrap:anywhere;margin-bottom:5px}
+.catalogo-detail-subtitle{font-size:12px;color:#777;margin-bottom:15px}
+.catalogo-detail-section{border-top:1px solid #e1e4e7;padding-top:12px;margin-top:12px}
+.catalogo-detail-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.catalogo-detail-label{display:block;color:#68727c;font-size:10px;font-weight:800;text-transform:uppercase;margin-bottom:5px;line-height:1.15}
+.catalogo-detail-value{display:block;color:#183746;font-size:15px;font-weight:900;line-height:1.25;overflow-wrap:anywhere}
+.catalogo-precios{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-top:15px}
+.catalogo-precio-box{min-width:0;border:1px solid #e0e3e6;border-radius:9px;padding:10px;background:#fff;text-align:center;border-top:3px solid #d9dee1}
+.catalogo-precio-box strong{display:block;color:#183746;font-size:15px;line-height:1.2;overflow-wrap:anywhere}
+.catalogo-precio-box.tarjeta{background:#f3f7fb;border-color:#cbdceb}
+.catalogo-precio-box.tarjeta .catalogo-detail-label,.catalogo-precio-box.tarjeta strong{color:#245a7a}
+.catalogo-precio-box.oferta{background:#edf8f0;border-color:#b9dfc2}
+.catalogo-precio-box.oferta .catalogo-detail-label,.catalogo-precio-box.oferta strong{color:var(--verde)}
+.catalogo-colores{display:flex;flex-wrap:wrap;gap:5px}
+.catalogo-color{display:inline-block;background:#f3f4f6;border:1px solid #dfe2e5;border-radius:15px;padding:4px 8px;font-size:11px;color:#444}
+.catalogo-info-nota{margin-top:10px;color:#777;font-size:11px;line-height:1.4}
+@media(max-width:850px){.modal-catalogo-info{width:min(760px,100%)}.catalogo-info-grid{grid-template-columns:1fr}.catalogo-info-lista{height:250px}.catalogo-info-detail{min-height:0}}
+@media(max-width:560px){
+  .modal-catalogo-info{padding:15px}
+  .catalogo-detail-title{font-size:22px}
+  .catalogo-precios{grid-template-columns:1fr}
+  .catalogo-detail-row{grid-template-columns:1fr}
+}
+
 @media(min-width:1000px){
   .wrap{max-width:1180px}
   .header-inner{max-width:1180px}
@@ -868,32 +954,31 @@ async function renderApp(){
 
   <!-- =====================================================
        MODAL CATÁLOGO INFORMATIVO — NUEVO
-       Reutiliza el catálogo ya cargado por PPTO.
-       No realiza un segundo login ni cambia el modal
-       existente de "Agregar producto".
+       Estética basada en consulta-v7.html.
        ===================================================== -->
   <div class="modal-backdrop" id="modalCatalogoInfo">
     <div class="modal modal-catalogo-info">
       <div class="modal-head">
         <div>
-          <h3 style="margin:0">Catálogo de productos</h3>
-          <div style="font-size:12px;color:#777;margin-top:3px">Consulta de productos y precios</div>
+          <h3 style="margin:0;color:#183746;font-size:20px">Consulta de Productos</h3>
+          <div style="font-size:12px;color:#777;margin-top:3px">Buscá un producto para consultar sus precios y características.</div>
         </div>
         <button class="close" id="closeCatalogoInfo" type="button">×</button>
       </div>
 
       <div class="catalogo-info-search">
-        <input id="buscarCatalogoInfo" type="search" placeholder="🔎 Buscar por producto, medida, color o código..." autocomplete="off">
-        <div id="catalogoInfoCount" class="catalogo-info-count"></div>
+        <label style="color:#183746;font-size:14px;margin-bottom:7px">🔎 BUSCAR PRODUCTO</label>
+        <input id="buscarCatalogoInfo" type="search" placeholder="Nombre, medida, color o código..." autocomplete="off">
+        <div class="catalogo-info-count"><span>Resultados:</span> <strong id="catalogoInfoCount">0 productos</strong></div>
       </div>
 
       <div class="catalogo-info-grid">
-        <div>
+        <section>
           <div id="catalogoInfoLista" class="catalogo-info-lista"></div>
-        </div>
-        <div id="catalogoInfoDetalle" class="catalogo-info-detail empty-detail">
-          Seleccioná un producto para ver sus detalles.
-        </div>
+        </section>
+        <section id="catalogoInfoDetalle" class="catalogo-info-detail empty-detail">
+          Seleccioná un producto para ver sus características, precios y datos de presentación.
+        </section>
       </div>
     </div>
   </div>`;
@@ -932,12 +1017,10 @@ async function renderApp(){
 function abrirCatalogoInformativo(){
   const modal=$("modalCatalogoInfo");
   if(!modal)return;
-
   modal.classList.add("open");
   $("buscarCatalogoInfo").value="";
   renderCatalogoInformativo();
-
-  setTimeout(()=>$("buscarCatalogoInfo")?.focus(),50);
+  setTimeout(()=>$('buscarCatalogoInfo')?.focus(),50);
 }
 
 function cerrarCatalogoInformativo(){
@@ -945,78 +1028,40 @@ function cerrarCatalogoInformativo(){
 }
 
 function opcionesCatalogoInformativo(){
-  // catalogoOpciones ya representa una sola línea por Producto + Medida.
-  // Para los detalles de color se consulta catalogoProductos.
   return catalogoOpciones.filter(p=>categoriaProducto(p)!=="OTRO");
 }
 
 function buscarTextoCatalogoInformativo(p){
-  return [
-    p?.["ID"],
-    p?.["Producto"],
-    p?.["Medida"],
-    p?.["Color"]
-  ].map(v=>String(v||"")).join(" ").toLocaleLowerCase("es-AR");
-}
-
-function renderCatalogoInformativo(){
-  const lista=$("catalogoInfoLista");
-  if(!lista)return;
-
-  const q=String($("buscarCatalogoInfo")?.value||"").trim().toLocaleLowerCase("es-AR");
-  const opciones=opcionesCatalogoInformativo();
-  const resultados=opciones.filter(p=>!q || buscarTextoCatalogoInformativo(p).includes(q));
-
-  $("catalogoInfoCount").textContent=
-    `${resultados.length} producto${resultados.length===1?"":"s"}`;
-
-  if(!resultados.length){
-    lista.innerHTML='<div class="empty">No se encontraron productos.</div>';
-    $("catalogoInfoDetalle").className="catalogo-info-detail empty-detail";
-    $("catalogoInfoDetalle").textContent="No hay resultados para la búsqueda.";
-    return;
-  }
-
-  lista.innerHTML=resultados.map(p=>{
-    const idx=catalogoOpciones.indexOf(p);
-    const categoria=categoriaProducto(p);
-    const medida=categoria==="CRRL" ? "Material de corralón" : (p["Medida"]||"Sin medida");
-    return `
-      <button type="button" class="catalogo-info-item" data-info-catalogo-index="${idx}">
-        <strong>${esc(p["Producto"]||"")}</strong>
-        <span>${esc(medida)}</span>
-      </button>`;
-  }).join("");
-
-  // Seleccionar automáticamente el primero solamente si no hay uno ya mostrado.
-  seleccionarCatalogoInformativo(catalogoOpciones.indexOf(resultados[0]));
+  return [p?.["ID"],p?.["Producto"],p?.["Medida"],p?.["Color"]]
+    .map(v=>String(v||""))
+    .join(" ")
+    .toLocaleLowerCase("es-AR");
 }
 
 function obtenerColoresProducto(p){
   const id=String(p?.["ID"]||"").trim();
   const producto=String(p?.["Producto"]||"").trim().toLocaleLowerCase("es-AR");
   const medida=String(p?.["Medida"]||"").trim().toLocaleLowerCase("es-AR");
-
   const filas=catalogoProductos.filter(x=>{
     const xid=String(x?.["ID"]||"").trim();
     const xprod=String(x?.["Producto"]||"").trim().toLocaleLowerCase("es-AR");
     const xmed=String(x?.["Medida"]||"").trim().toLocaleLowerCase("es-AR");
     return xid===id || (xprod===producto && xmed===medida);
   });
-
   const colores=[];
   filas.forEach(x=>{
-    String(x?.["Color"]||"")
-      .split(/\s*-\s*/)
-      .map(c=>c.trim())
-      .filter(Boolean)
-      .forEach(c=>{
-        if(!colores.some(ex=>ex.toLocaleLowerCase("es-AR")===c.toLocaleLowerCase("es-AR"))){
-          colores.push(c);
-        }
-      });
+    String(x?.["Color"]||"").split(/\s*-\s*/).map(c=>c.trim()).filter(Boolean).forEach(c=>{
+      if(!colores.some(ex=>ex.toLocaleLowerCase("es-AR")===c.toLocaleLowerCase("es-AR"))) colores.push(c);
+    });
   });
   return colores;
+}
+
+function esPastinaCatalogo(p){
+  const categoria=categoriaProducto(p);
+  const medida=String(p?.["Medida"]||"").trim();
+  const id=String(p?.["ID"]||"").trim().toUpperCase();
+  return categoria==="PSO" && (!medida || id==="PSO-PTNA-1K" || id==="PSO-PTNA-5K");
 }
 
 function seleccionarCatalogoInformativo(indice){
@@ -1031,7 +1076,8 @@ function seleccionarCatalogoInformativo(indice){
   if(!detalle)return;
 
   const categoria=categoriaProducto(p);
-  const cr= categoria==="CRRL";
+  const cr=categoria==="CRRL";
+  const pastina=esPastinaCatalogo(p);
   const colores=obtenerColoresProducto(p);
   const precioContado=Number(p["Precio Contado"]||0);
   const precioTarjeta=Number(p["Precio Tarjeta"]||0);
@@ -1040,9 +1086,12 @@ function seleccionarCatalogoInformativo(indice){
   const cajaM2=Number(p["Caja m²"]||0);
   const kgCaja=Number(p["Kg/Caja"]||0);
   const unidadesCaja=unidadesPorCaja(p);
+  const precioCajaContado=(precioContado>0&&cajaM2>0)?precioContado*cajaM2:0;
+  const precioCajaTarjeta=(precioTarjeta>0&&cajaM2>0)?precioTarjeta*cajaM2:0;
 
   detalle.className="catalogo-info-detail";
-  detalle.innerHTML=`
+
+  let html=`
     <div class="catalogo-detail-title">${esc(p["Producto"]||"")}</div>
     <div class="catalogo-detail-subtitle">Código: ${esc(p["ID"]||"—")}</div>
 
@@ -1050,55 +1099,90 @@ function seleccionarCatalogoInformativo(indice){
       <div class="catalogo-detail-row">
         <div>
           <span class="catalogo-detail-label">Categoría</span>
-          <span class="catalogo-detail-value">${esc(categoria)}</span>
+          <span class="catalogo-detail-value">${esc(pastina?"PASTINA":categoria)}</span>
         </div>
         <div>
           <span class="catalogo-detail-label">Medida</span>
-          <span class="catalogo-detail-value">${esc(p["Medida"]||"—")}</span>
+          <span class="catalogo-detail-value">${esc(pastina?"—":(p["Medida"]||"—"))}</span>
         </div>
       </div>
-    </div>
+    </div>`;
 
-    ${!cr ? `
-      <div class="catalogo-detail-section">
-        <div class="catalogo-detail-row">
-          <div>
-            <span class="catalogo-detail-label">m² por caja</span>
-            <span class="catalogo-detail-value">${fmt(cajaM2)} m²</span>
-          </div>
-          <div>
-            <span class="catalogo-detail-label">Kg por caja</span>
-            <span class="catalogo-detail-value">${kgCaja>0?fmt0(kgCaja):"—"} kg</span>
-          </div>
-        </div>
-        ${unidadesCaja ? `<div style="margin-top:9px"><span class="catalogo-detail-label">Unidades por caja</span><span class="catalogo-detail-value">${fmt0(unidadesCaja)} unidades</span></div>` : ""}
-      </div>` : ""}
-
-    <div class="catalogo-precios">
-      <div class="catalogo-precio-box">
-        <span class="catalogo-detail-label">Precio contado</span>
-        <strong>$ ${fmt(precioContado)}</strong>
+  if(cr){
+    html+=`<div class="catalogo-detail-section">
+      <span class="catalogo-detail-label">Presentación</span>
+      <span class="catalogo-detail-value">Venta por unidad</span>
+    </div>`;
+  }else if(pastina){
+    html+=`<div class="catalogo-detail-section">
+      <div class="catalogo-detail-row">
+        <div><span class="catalogo-detail-label">Superficie aproximada</span><span class="catalogo-detail-value">${cajaM2>0?fmt(cajaM2)+" m²":"—"}</span></div>
+        <div><span class="catalogo-detail-label">Peso</span><span class="catalogo-detail-value">${kgCaja>0?fmt0(kgCaja)+" kg/caja":"—"}</span></div>
       </div>
-      <div class="catalogo-precio-box">
-        <span class="catalogo-detail-label">Precio tarjeta</span>
-        <strong>$ ${fmt(precioTarjeta)}</strong>
+      <div class="catalogo-info-nota">El rendimiento es aproximado y puede variar según el tamaño de la junta.</div>
+    </div>`;
+  }else{
+    html+=`<div class="catalogo-detail-section">
+      <div class="catalogo-detail-row">
+        <div><span class="catalogo-detail-label">m² por caja</span><span class="catalogo-detail-value">${cajaM2>0?fmt(cajaM2)+" m²":"—"}</span></div>
+        <div><span class="catalogo-detail-label">Kg por caja</span><span class="catalogo-detail-value">${kgCaja>0?fmt0(kgCaja)+" kg":"—"}</span></div>
       </div>
-    </div>
+      ${unidadesCaja?`<div style="margin-top:9px"><span class="catalogo-detail-label">Unidades por caja</span><span class="catalogo-detail-value">${fmt0(unidadesCaja)} unidades</span></div>`:""}
+    </div>`;
+  }
 
-    ${tieneOferta ? `
-      <div class="catalogo-precio-box oferta" style="margin-top:10px">
-        <span class="catalogo-detail-label">Precio de oferta</span>
-        <strong>$ ${fmt(oferta)}</strong>
-      </div>` : ""}
+  /* =========================
+     PRECIOS — PASTINA
+     ========================= */
+  if(pastina){
+    html+=`<div class="catalogo-precios">
+      ${precioCajaContado>0?`<div class="catalogo-precio-box"><span class="catalogo-detail-label">Precio por caja (contado)</span><strong>$ ${fmt(precioCajaContado)}</strong></div>`:""}
+      ${precioCajaTarjeta>0?`<div class="catalogo-precio-box tarjeta"><span class="catalogo-detail-label">Precio por caja (tarjeta)</span><strong>$ ${fmt(precioCajaTarjeta)}</strong></div>`:""}
+      ${cajaM2>0?`<div class="catalogo-precio-box"><span class="catalogo-detail-label">m² por caja</span><strong>${fmt(cajaM2)} m²</strong></div>`:""}
+    </div>`;
+  }else{
+    html+=`<div class="catalogo-precios">
+      ${precioContado>0?`<div class="catalogo-precio-box"><span class="catalogo-detail-label">Precio contado</span><strong>$ ${fmt(precioContado)} ${cr?"/ unidad":"/ m²"}</strong></div>`:""}
+      ${tieneOferta?`<div class="catalogo-precio-box oferta"><span class="catalogo-detail-label">Precio oferta</span><strong>$ ${fmt(oferta)} ${cr?"/ unidad":"/ m²"}</strong></div>`:""}
+      ${precioTarjeta>0?`<div class="catalogo-precio-box tarjeta"><span class="catalogo-detail-label">Precio tarjeta</span><strong>$ ${fmt(precioTarjeta)} ${cr?"/ unidad":"/ m²"}</strong></div>`:""}
+    </div>`;
 
-    ${colores.length ? `
-      <div class="catalogo-detail-section">
-        <span class="catalogo-detail-label">Colores disponibles</span>
-        <div class="catalogo-colores">
-          ${colores.map(c=>`<span class="catalogo-color">${esc(c)}</span>`).join("")}
-        </div>
-      </div>` : ""}
-  `;
+    if(cajaM2>0&&precioContado>0){
+      html+=`<div class="catalogo-detail-section"><div class="catalogo-detail-row"><div><span class="catalogo-detail-label">Precio por caja</span><span class="catalogo-detail-value">$ ${fmt(precioContado*cajaM2)}</span></div><div><span class="catalogo-detail-label">m² por caja</span><span class="catalogo-detail-value">${fmt(cajaM2)} m²</span></div></div></div>`;
+    }
+  }
+
+  if(colores.length){
+    html+=`<div class="catalogo-detail-section"><span class="catalogo-detail-label">Colores disponibles</span><div class="catalogo-colores">${colores.map(c=>`<span class="catalogo-color">${esc(c)}</span>`).join("")}</div></div>`;
+  }
+
+  detalle.innerHTML=html;
+}
+
+function renderCatalogoInformativo(){
+  const lista=$("catalogoInfoLista");
+  if(!lista)return;
+  const q=String($("buscarCatalogoInfo")?.value||"").trim().toLocaleLowerCase("es-AR");
+  const opciones=opcionesCatalogoInformativo();
+  const resultados=opciones.filter(p=>!q||buscarTextoCatalogoInformativo(p).includes(q));
+
+  $("catalogoInfoCount").textContent=`${resultados.length} producto${resultados.length===1?"":"s"}`;
+
+  if(!resultados.length){
+    lista.innerHTML='<div class="empty">No se encontraron productos.</div>';
+    $("catalogoInfoDetalle").className="catalogo-info-detail empty-detail";
+    $("catalogoInfoDetalle").textContent="No hay resultados para la búsqueda.";
+    return;
+  }
+
+  lista.innerHTML=resultados.map(p=>{
+    const idx=catalogoOpciones.indexOf(p);
+    const categoria=categoriaProducto(p);
+    const medida=esPastinaCatalogo(p)?"Pastina":(categoria==="CRRL"?"Material de corralón":(p["Medida"]||"Sin medida"));
+    return `<button type="button" class="catalogo-info-item" data-info-catalogo-index="${idx}"><div><strong>${esc(p["Producto"]||"")}</strong><span>${esc(medida)}</span></div></button>`;
+  }).join("");
+
+  seleccionarCatalogoInformativo(catalogoOpciones.indexOf(resultados[0]));
 }
 
 function limpiarFormulario(){
