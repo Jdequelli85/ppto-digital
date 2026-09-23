@@ -1123,6 +1123,12 @@ function mostrarProducto(){
   const p=productoActual;
   const crrl=esMaterialCorralon(p);
 
+  // La fecha de entrega solo corresponde a productos ENV-.
+  // Siempre la ocultamos al abrir un producto y la mostramos
+  // únicamente en el bloque específico de ENV.
+  $("fechaEntregaArea").hidden=true;
+  $("fechaEntrega").value="";
+
   const oferta=Number(p["OFERTA"]||0);
   const tieneOferta=Number.isFinite(oferta)&&oferta>0;
 
