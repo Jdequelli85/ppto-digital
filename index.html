@@ -221,6 +221,180 @@ th{font-size:12px;text-transform:uppercase;color:#666;background:#fafafa}
 .historical-actions{display:flex;gap:10px;margin-bottom:15px}
 .badge{display:inline-block;font-size:11px;padding:4px 7px;border-radius:10px;background:#eee;color:#555}.badge-zocalo{background:#e5e7eb;color:#555}
 .modal-productos{width:min(760px,100%)}
+
+/* =====================================================
+   MENÚ DE HERRAMIENTAS — NUEVO
+   No modifica la lógica existente del presupuesto.
+   ===================================================== */
+.quick-tools{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-bottom:16px;
+}
+.quick-tool{
+  border:1px solid #d7dbe0;
+  background:#fff;
+  color:#333;
+  border-radius:10px;
+  padding:11px 15px;
+  min-height:44px;
+  font-weight:800;
+  transition:.15s;
+}
+.quick-tool:hover{
+  border-color:var(--rojo);
+  color:var(--rojo);
+  background:#fff7f7;
+}
+.quick-tool-primary{
+  background:var(--rojo);
+  color:#fff;
+  border-color:var(--rojo);
+}
+.quick-tool-primary:hover{
+  background:var(--rojo2);
+  color:#fff;
+}
+
+/* =====================================================
+   MODAL CATÁLOGO INFORMATIVO — NUEVO
+   ===================================================== */
+.modal-catalogo-info{
+  width:min(980px,100%);
+  max-height:92vh;
+}
+.catalogo-info-grid{
+  display:grid;
+  grid-template-columns:minmax(300px, .9fr) minmax(360px,1.1fr);
+  gap:16px;
+}
+.catalogo-info-lista{
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+  max-height:65vh;
+  overflow:auto;
+  padding-right:3px;
+}
+.catalogo-info-item{
+  width:100%;
+  text-align:left;
+  background:#fff;
+  border:1px solid #d9dce1;
+  border-radius:10px;
+  padding:11px 13px;
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+  transition:.15s;
+}
+.catalogo-info-item:hover,
+.catalogo-info-item.active{
+  border-color:var(--rojo);
+  background:#fff7f7;
+}
+.catalogo-info-item strong{font-size:14px}
+.catalogo-info-item span{font-size:12px;color:#666}
+.catalogo-info-detail{
+  background:#f7f7f7;
+  border-radius:12px;
+  padding:17px;
+  min-height:280px;
+  line-height:1.55;
+}
+.catalogo-info-detail.empty-detail{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  color:#777;
+}
+.catalogo-detail-title{
+  font-size:19px;
+  font-weight:900;
+  margin-bottom:4px;
+  color:#222;
+}
+.catalogo-detail-subtitle{
+  color:#666;
+  font-size:13px;
+  margin-bottom:15px;
+}
+.catalogo-detail-section{
+  background:#fff;
+  border:1px solid #e1e3e6;
+  border-radius:10px;
+  padding:12px;
+  margin-top:10px;
+}
+.catalogo-detail-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+.catalogo-detail-label{
+  display:block;
+  color:#777;
+  font-size:11px;
+  text-transform:uppercase;
+  font-weight:800;
+  margin-bottom:2px;
+}
+.catalogo-detail-value{
+  font-size:14px;
+  font-weight:700;
+}
+.catalogo-precios{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+  margin-top:10px;
+}
+.catalogo-precio-box{
+  background:#fff;
+  border:1px solid #e1e3e6;
+  border-radius:10px;
+  padding:12px;
+}
+.catalogo-precio-box strong{
+  display:block;
+  font-size:18px;
+  margin-top:2px;
+}
+.catalogo-precio-box.oferta{
+  border-color:#e5b75c;
+  background:#fffaf0;
+}
+.catalogo-colores{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-top:5px;
+}
+.catalogo-color{
+  display:inline-block;
+  padding:5px 8px;
+  border-radius:12px;
+  background:#eef0f2;
+  color:#555;
+  font-size:12px;
+}
+.catalogo-info-search{margin-bottom:12px}
+.catalogo-info-count{font-size:12px;color:#777;margin:7px 0 0}
+
+@media(max-width:700px){
+  .catalogo-info-grid{grid-template-columns:1fr}
+  .catalogo-info-lista{max-height:34vh}
+  .catalogo-info-detail{min-height:220px}
+}
+@media(max-width:560px){
+  .quick-tools{flex-direction:column}
+  .quick-tool{width:100%}
+  .modal-catalogo-info{max-height:94vh;padding:15px}
+  .catalogo-detail-row{grid-template-columns:1fr}
+  .catalogo-precios{grid-template-columns:1fr}
+}
 .catalogo-lista{margin-top:12px;display:flex;flex-direction:column;gap:7px;max-height:52vh;overflow:auto;padding-right:3px}
 .catalogo-item{width:100%;text-align:left;background:#fff;border:1px solid #d9dce1;border-radius:10px;padding:11px 13px;display:flex;flex-direction:column;gap:3px;transition:.15s}
 .catalogo-item:hover{border-color:var(--rojo);background:#fff7f7}
@@ -629,6 +803,14 @@ async function renderApp(){
       </div>
     </section>
 
+    <!-- =====================================================
+         HERRAMIENTAS — NUEVO
+         ===================================================== -->
+    <div class="quick-tools no-print">
+      <button class="quick-tool quick-tool-primary" id="openCatalogoInfo">📋 CATÁLOGO</button>
+      <button class="quick-tool" type="button" disabled title="Disponible próximamente">🕘 HISTÓRICO</button>
+    </div>
+
     <section class="card">
       <div class="titlebar">
         <h2>Productos</h2>
@@ -682,17 +864,241 @@ async function renderApp(){
         <button class="btn btn-primary btn-large" id="confirm">AGREGAR AL PRESUPUESTO</button>
       </div>
     </div>
+  </div>
+
+  <!-- =====================================================
+       MODAL CATÁLOGO INFORMATIVO — NUEVO
+       Reutiliza el catálogo ya cargado por PPTO.
+       No realiza un segundo login ni cambia el modal
+       existente de "Agregar producto".
+       ===================================================== -->
+  <div class="modal-backdrop" id="modalCatalogoInfo">
+    <div class="modal modal-catalogo-info">
+      <div class="modal-head">
+        <div>
+          <h3 style="margin:0">Catálogo de productos</h3>
+          <div style="font-size:12px;color:#777;margin-top:3px">Consulta de productos y precios</div>
+        </div>
+        <button class="close" id="closeCatalogoInfo" type="button">×</button>
+      </div>
+
+      <div class="catalogo-info-search">
+        <input id="buscarCatalogoInfo" type="search" placeholder="🔎 Buscar por producto, medida, color o código..." autocomplete="off">
+        <div id="catalogoInfoCount" class="catalogo-info-count"></div>
+      </div>
+
+      <div class="catalogo-info-grid">
+        <div>
+          <div id="catalogoInfoLista" class="catalogo-info-lista"></div>
+        </div>
+        <div id="catalogoInfoDetalle" class="catalogo-info-detail empty-detail">
+          Seleccioná un producto para ver sus detalles.
+        </div>
+      </div>
+    </div>
   </div>`;
   $("forma").onchange=recalcularPreciosPorFormaPago;
   $("add").onclick=abrirModal;
   $("close").onclick=cerrarModal;
   $("buscarProducto").oninput=renderCatalogo;
+
+  // ==================================================
+  // CATÁLOGO INFORMATIVO — NUEVO
+  // ==================================================
+  $("openCatalogoInfo").onclick=abrirCatalogoInformativo;
+  $("closeCatalogoInfo").onclick=cerrarCatalogoInformativo;
+  $("buscarCatalogoInfo").oninput=renderCatalogoInformativo;
+  $("catalogoInfoLista").addEventListener("click",e=>{
+    const item=e.target.closest("[data-info-catalogo-index]");
+    if(!item)return;
+    seleccionarCatalogoInformativo(Number(item.dataset.infoCatalogoIndex));
+  });
   $("cancel").onclick=()=>{if(confirm("¿Cancelar este presupuesto?")){productos=[];limpiarFormulario();renderProductos()}};
   $("generate").onclick=guardarPresupuesto;
   $("m2").oninput=calcularActual;
   $("zocalo").onchange=calcularActual;
   $("cantidad").oninput=calcularActual;
   renderProductos();
+}
+
+
+/* =====================================================
+   CATÁLOGO INFORMATIVO — NUEVO
+   -----------------------------------------------------
+   Utiliza catalogoProductos/catalogoOpciones ya cargados.
+   No llama nuevamente al login ni modifica el flujo de
+   presupuestos.
+   ===================================================== */
+function abrirCatalogoInformativo(){
+  const modal=$("modalCatalogoInfo");
+  if(!modal)return;
+
+  modal.classList.add("open");
+  $("buscarCatalogoInfo").value="";
+  renderCatalogoInformativo();
+
+  setTimeout(()=>$("buscarCatalogoInfo")?.focus(),50);
+}
+
+function cerrarCatalogoInformativo(){
+  $("modalCatalogoInfo")?.classList.remove("open");
+}
+
+function opcionesCatalogoInformativo(){
+  // catalogoOpciones ya representa una sola línea por Producto + Medida.
+  // Para los detalles de color se consulta catalogoProductos.
+  return catalogoOpciones.filter(p=>categoriaProducto(p)!=="OTRO");
+}
+
+function buscarTextoCatalogoInformativo(p){
+  return [
+    p?.["ID"],
+    p?.["Producto"],
+    p?.["Medida"],
+    p?.["Color"]
+  ].map(v=>String(v||"")).join(" ").toLocaleLowerCase("es-AR");
+}
+
+function renderCatalogoInformativo(){
+  const lista=$("catalogoInfoLista");
+  if(!lista)return;
+
+  const q=String($("buscarCatalogoInfo")?.value||"").trim().toLocaleLowerCase("es-AR");
+  const opciones=opcionesCatalogoInformativo();
+  const resultados=opciones.filter(p=>!q || buscarTextoCatalogoInformativo(p).includes(q));
+
+  $("catalogoInfoCount").textContent=
+    `${resultados.length} producto${resultados.length===1?"":"s"}`;
+
+  if(!resultados.length){
+    lista.innerHTML='<div class="empty">No se encontraron productos.</div>';
+    $("catalogoInfoDetalle").className="catalogo-info-detail empty-detail";
+    $("catalogoInfoDetalle").textContent="No hay resultados para la búsqueda.";
+    return;
+  }
+
+  lista.innerHTML=resultados.map(p=>{
+    const idx=catalogoOpciones.indexOf(p);
+    const categoria=categoriaProducto(p);
+    const medida=categoria==="CRRL" ? "Material de corralón" : (p["Medida"]||"Sin medida");
+    return `
+      <button type="button" class="catalogo-info-item" data-info-catalogo-index="${idx}">
+        <strong>${esc(p["Producto"]||"")}</strong>
+        <span>${esc(medida)}</span>
+      </button>`;
+  }).join("");
+
+  // Seleccionar automáticamente el primero solamente si no hay uno ya mostrado.
+  seleccionarCatalogoInformativo(catalogoOpciones.indexOf(resultados[0]));
+}
+
+function obtenerColoresProducto(p){
+  const id=String(p?.["ID"]||"").trim();
+  const producto=String(p?.["Producto"]||"").trim().toLocaleLowerCase("es-AR");
+  const medida=String(p?.["Medida"]||"").trim().toLocaleLowerCase("es-AR");
+
+  const filas=catalogoProductos.filter(x=>{
+    const xid=String(x?.["ID"]||"").trim();
+    const xprod=String(x?.["Producto"]||"").trim().toLocaleLowerCase("es-AR");
+    const xmed=String(x?.["Medida"]||"").trim().toLocaleLowerCase("es-AR");
+    return xid===id || (xprod===producto && xmed===medida);
+  });
+
+  const colores=[];
+  filas.forEach(x=>{
+    String(x?.["Color"]||"")
+      .split(/\s*-\s*/)
+      .map(c=>c.trim())
+      .filter(Boolean)
+      .forEach(c=>{
+        if(!colores.some(ex=>ex.toLocaleLowerCase("es-AR")===c.toLocaleLowerCase("es-AR"))){
+          colores.push(c);
+        }
+      });
+  });
+  return colores;
+}
+
+function seleccionarCatalogoInformativo(indice){
+  const p=catalogoOpciones[indice];
+  if(!p)return;
+
+  document.querySelectorAll("#catalogoInfoLista .catalogo-info-item").forEach(el=>{
+    el.classList.toggle("active",Number(el.dataset.infoCatalogoIndex)===indice);
+  });
+
+  const detalle=$("catalogoInfoDetalle");
+  if(!detalle)return;
+
+  const categoria=categoriaProducto(p);
+  const cr= categoria==="CRRL";
+  const colores=obtenerColoresProducto(p);
+  const precioContado=Number(p["Precio Contado"]||0);
+  const precioTarjeta=Number(p["Precio Tarjeta"]||0);
+  const oferta=Number(p["OFERTA"]||0);
+  const tieneOferta=Number.isFinite(oferta)&&oferta>0;
+  const cajaM2=Number(p["Caja m²"]||0);
+  const kgCaja=Number(p["Kg/Caja"]||0);
+  const unidadesCaja=unidadesPorCaja(p);
+
+  detalle.className="catalogo-info-detail";
+  detalle.innerHTML=`
+    <div class="catalogo-detail-title">${esc(p["Producto"]||"")}</div>
+    <div class="catalogo-detail-subtitle">Código: ${esc(p["ID"]||"—")}</div>
+
+    <div class="catalogo-detail-section">
+      <div class="catalogo-detail-row">
+        <div>
+          <span class="catalogo-detail-label">Categoría</span>
+          <span class="catalogo-detail-value">${esc(categoria)}</span>
+        </div>
+        <div>
+          <span class="catalogo-detail-label">Medida</span>
+          <span class="catalogo-detail-value">${esc(p["Medida"]||"—")}</span>
+        </div>
+      </div>
+    </div>
+
+    ${!cr ? `
+      <div class="catalogo-detail-section">
+        <div class="catalogo-detail-row">
+          <div>
+            <span class="catalogo-detail-label">m² por caja</span>
+            <span class="catalogo-detail-value">${fmt(cajaM2)} m²</span>
+          </div>
+          <div>
+            <span class="catalogo-detail-label">Kg por caja</span>
+            <span class="catalogo-detail-value">${kgCaja>0?fmt0(kgCaja):"—"} kg</span>
+          </div>
+        </div>
+        ${unidadesCaja ? `<div style="margin-top:9px"><span class="catalogo-detail-label">Unidades por caja</span><span class="catalogo-detail-value">${fmt0(unidadesCaja)} unidades</span></div>` : ""}
+      </div>` : ""}
+
+    <div class="catalogo-precios">
+      <div class="catalogo-precio-box">
+        <span class="catalogo-detail-label">Precio contado</span>
+        <strong>$ ${fmt(precioContado)}</strong>
+      </div>
+      <div class="catalogo-precio-box">
+        <span class="catalogo-detail-label">Precio tarjeta</span>
+        <strong>$ ${fmt(precioTarjeta)}</strong>
+      </div>
+    </div>
+
+    ${tieneOferta ? `
+      <div class="catalogo-precio-box oferta" style="margin-top:10px">
+        <span class="catalogo-detail-label">Precio de oferta</span>
+        <strong>$ ${fmt(oferta)}</strong>
+      </div>` : ""}
+
+    ${colores.length ? `
+      <div class="catalogo-detail-section">
+        <span class="catalogo-detail-label">Colores disponibles</span>
+        <div class="catalogo-colores">
+          ${colores.map(c=>`<span class="catalogo-color">${esc(c)}</span>`).join("")}
+        </div>
+      </div>` : ""}
+  `;
 }
 
 function limpiarFormulario(){
