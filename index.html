@@ -84,6 +84,8 @@ th{font-size:12px;text-transform:uppercase;color:#666;background:#fafafa}
 .scan-note{font-size:13px;color:#666;text-align:center}
 .product-info{background:#f7f7f7;border-radius:10px;padding:14px;margin-bottom:15px;line-height:1.55}
 .calc-info{margin-top:10px;color:#555;font-size:13px;line-height:1.5}
+#fechaEntregaArea{margin-top:12px;padding:12px;border:1px solid #e5e7eb;border-radius:10px;background:#fafafa}
+#fechaEntregaArea input{margin-top:4px}
 .checkbox{display:flex;align-items:center;gap:8px;margin:13px 0;font-weight:700}
 .checkbox input{width:auto}
 .loading{text-align:center;padding:35px;color:#666}
@@ -465,6 +467,7 @@ function categoriaProducto(p){
   if(id.startsWith("POR-")) return "POR";
   if(id.startsWith("REV-")) return "REV";
   if(id.startsWith("PSO-")) return "PSO";
+  if(id.startsWith("ENV-")) return "ENV";
   return "OTRO";
 }
 
@@ -586,6 +589,26 @@ function construirCatalogo(productos){
 
     const producto = String(p["Producto"] || "").trim();
     const medida = String(p["Medida"] || "").trim();
+
+    /*
+     * ENV:
+     * El nombre de la zona es la característica principal.
+     * No utiliza medida ni color.
+     */
+    if(categoria === "ENV"){
+      const clave = `ENV|${String(p["ID"] || "").trim().toUpperCase()}`;
+
+      if(claves.has(clave)) return;
+
+      claves.add(clave);
+
+      catalogoOpciones.push({
+        ...p,
+        _colorSeleccionado: ""
+      });
+
+      return;
+    }
 
     /*
      * CRRL:
@@ -887,6 +910,11 @@ async function renderApp(){
           <label>Cantidad *</label>
           <input id="cantidad" type="number" min="1" step="1" placeholder="Ej.: 10">
         </div>
+        <div id="fechaEntregaArea" hidden>
+          <label>Fecha de entrega *</label>
+          <input id="fechaEntrega" type="date">
+          <div class="calc-info">Seleccioná la fecha prevista para la entrega.</div>
+        </div>
         <div id="calcInfo" class="calc-info"></div>
         <button class="btn btn-primary btn-large" id="confirm">AGREGAR AL PRESUPUESTO</button>
       </div>
@@ -904,6 +932,7 @@ async function renderApp(){
   $("m2").oninput=calcularActual;
   $("zocalo").onchange=calcularActual;
   $("cantidad").oninput=calcularActual;
+  $("fechaEntrega").onchange=calcularActual;
   renderProductos();
 }
 
@@ -948,7 +977,7 @@ function consultaV7Categoria(p){
 }
 
 function consultaV7NombreCategoria(c){
-  return ({CRRL:"Material de corralón",CER:"Cerámico",POR:"Porcelanato",REV:"Revestimiento",PSO:"Piso",OTRO:"Producto"})[c]||"Producto";
+  return ({CRRL:"Material de corralón",CER:"Cerámico",POR:"Porcelanato",REV:"Revestimiento",PSO:"Piso",ENV:"Envío",OTRO:"Producto"})[c]||"Producto";
 }
 
 function consultaV7Texto(p){
@@ -1008,9 +1037,10 @@ function mostrarConsultaV7Producto(p){
     if(kgCaja>0)h+=`<div class="consulta-v7-note">${fmt(kgCaja)} kg por caja.</div>`;
   }else{
     h+=`<div class="consulta-v7-prices">`;
-    if(precioContado>0)h+=`<div class="consulta-v7-dato consulta-v7-price"><span class="consulta-v7-label">Precio contado</span><span class="consulta-v7-value">$ ${fmt(precioContado)} ${categoria==="CRRL"?"/ unidad":"/ m²"}</span></div>`;
-    if(tieneOferta)h+=`<div class="consulta-v7-dato consulta-v7-price consulta-v7-offer"><span class="consulta-v7-label">Precio oferta</span><span class="consulta-v7-value">$ ${fmt(oferta)} ${categoria==="CRRL"?"/ unidad":"/ m²"}</span></div>`;
-    if(precioTarjeta>0)h+=`<div class="consulta-v7-dato consulta-v7-price consulta-v7-card"><span class="consulta-v7-label">Precio tarjeta</span><span class="consulta-v7-value">$ ${fmt(precioTarjeta)} ${categoria==="CRRL"?"/ unidad":"/ m²"}</span></div>`;
+    const sufijoPrecio=categoria==="ENV"?"/ flete":(categoria==="CRRL"?"/ unidad":"/ m²");
+    if(precioContado>0)h+=`<div class="consulta-v7-dato consulta-v7-price"><span class="consulta-v7-label">Precio contado</span><span class="consulta-v7-value">$ ${fmt(precioContado)} ${sufijoPrecio}</span></div>`;
+    if(tieneOferta)h+=`<div class="consulta-v7-dato consulta-v7-price consulta-v7-offer"><span class="consulta-v7-label">Precio oferta</span><span class="consulta-v7-value">$ ${fmt(oferta)} ${sufijoPrecio}</span></div>`;
+    if(precioTarjeta>0)h+=`<div class="consulta-v7-dato consulta-v7-price consulta-v7-card"><span class="consulta-v7-label">Precio tarjeta</span><span class="consulta-v7-value">$ ${fmt(precioTarjeta)} ${sufijoPrecio}</span></div>`;
     h+=`</div>`;
     const datos=[];
     if(cajaM2>0)datos.push({label:"m² por caja",valor:`${fmt(cajaM2)} m²`});
@@ -1104,6 +1134,25 @@ function mostrarProducto(){
     forma==="Tarjeta"&&precioTarjeta>0
       ? precioTarjeta
       : (tieneOferta?oferta:precioContado);
+
+  /* =========================
+     ENVÍO / FLETE
+     ========================= */
+  const esENV = categoriaProducto(p) === "ENV";
+
+  if(esENV){
+    $("productInfo").innerHTML=`
+      <strong>${esc(p["Producto"])}</strong><br>
+      <strong>${tieneOferta?"🔥 OFERTA":"Precio"}: $ ${fmt(precio)} /flete`;
+    $("m2Area").hidden=true;
+    $("cantidadArea").hidden=true;
+    $("fechaEntregaArea").hidden=false;
+    $("fechaEntrega").value="";
+    $("calcInfo").textContent="Servicio de entrega · Cantidad: 1 flete";
+    $("calcArea").hidden=false;
+    $("fechaEntrega").focus();
+    return;
+  }
 
   /* =========================
      MATERIAL DE CORRALÓN
@@ -1246,9 +1295,9 @@ function recalcularPreciosPorFormaPago(){
     p.tieneOferta=datosPrecio.tieneOferta;
     p.oferta=datosPrecio.oferta;
 
-    if(String(p.unidad||"")==="Unidades"){
+    if(String(p.unidad||"")==="Unidades" || String(p.unidad||"")==="Flete"){
       p.precioCaja=precio;
-      p.subtotal=Number(p.cantidad||0)*precio;
+      p.subtotal=Number(p.cantidad||1)*precio;
     }else{
       p.precioCaja=precio*Number(p.cajaM2||0);
       p.subtotal=Number(p.m2Reales||0)*precio;
@@ -1267,6 +1316,34 @@ function calcularActual(){
   const precioTarjeta=Number(productoActual["Precio Tarjeta"]||0);
   const precio=(forma==="Tarjeta"&&precioTarjeta>0)?precioTarjeta:(tieneOferta?oferta:Number(productoActual["Precio Contado"]||0));
 
+  const esENV = categoriaProducto(productoActual) === "ENV";
+
+  if(esENV){
+    const fechaEntrega = String($("fechaEntrega")?.value || "").trim();
+    if(!fechaEntrega){
+      $("calcInfo").textContent="Seleccioná una fecha de entrega.";
+      return null;
+    }
+    const subtotal=precio;
+    $("calcInfo").textContent=`1 flete · Subtotal: $ ${fmt(subtotal)}`;
+    return {
+      unidad:"Flete",
+      cantidad:1,
+      m2Solicitados:0,
+      conZocalo:false,
+      porcentajeAdicional:0,
+      m2Calculados:0,
+      cajas:0,
+      m2Reales:0,
+      precioM2:precio,
+      precioCaja:precio,
+      subtotal,
+      tieneOferta,
+      oferta,
+      fechaEntrega
+    };
+  }
+
   if(crrl){
     const cantidad=Number($("cantidad")?.value||0);
     if(cantidad<=0){$("calcInfo").textContent="";return null}
@@ -1284,6 +1361,13 @@ function calcularActual(){
   return {unidad:"m²",cantidad:m2,m2Solicitados:m2,conZocalo:conZ,porcentajeAdicional:extra,m2Calculados:m2Calc,cajas,m2Reales:reales,precioM2:precio,precioCaja:precio*caja,subtotal,tieneOferta,oferta};
 }
 
+function formatearFechaCorta(fechaISO){
+  const s=String(fechaISO||"").trim();
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  const partes=s.split("-");
+  return `${partes[2]}/${partes[1]}/${partes[0]}`;
+}
+
 function renderProductos(){
   if(!$("rows"))return;
 
@@ -1294,10 +1378,13 @@ function renderProductos(){
     total+=Number(p.subtotal||0);
 
     const esCRRL = String(p.id||"").toUpperCase().startsWith("CRRL-");
+    const esENV = String(p.id||"").toUpperCase().startsWith("ENV-");
 
     let cantidadHTML="";
 
-    if(esCRRL){
+    if(esENV){
+      cantidadHTML=`<strong>1 flete</strong>${p.fechaEntrega ? `<br><small>Entrega: ${formatearFechaCorta(p.fechaEntrega)}</small>` : ""}`;
+    }else if(esCRRL){
 
       cantidadHTML=`
         <strong>${fmt0(p.cantidad||0)} unidades</strong>
@@ -1344,11 +1431,11 @@ function renderProductos(){
         }
       </td>
 
-      <td>${esc(p.medida||"—")}${p.unidadesPorCaja ? `<span class="quote-unidades-caja">${fmt0(p.unidadesPorCaja)} un./caja</span>` : ""}</td>
+      <td>${esENV ? "—" : `${esc(p.medida||"—")}${p.unidadesPorCaja ? `<span class="quote-unidades-caja">${fmt0(p.unidadesPorCaja)} un./caja</span>` : ""}`}</td>
 
       <td>${cantidadHTML}</td>
 
-      <td>${esCRRL ? "—" : p.cajas}</td>
+      <td>${esENV || esCRRL ? "—" : p.cajas}</td>
 
       <td class="money">$ ${fmt(precioUnitario)}</td>
 
@@ -1387,9 +1474,11 @@ $("app").addEventListener("click",e=>{
 
     if(!c){
       return alert(
-        esMaterialCorralon(productoActual)
-          ? "Ingresá la cantidad de unidades."
-          : "Ingresá los metros cuadrados."
+        categoriaProducto(productoActual)==="ENV"
+          ? "Seleccioná la fecha de entrega."
+          : (esMaterialCorralon(productoActual)
+              ? "Ingresá la cantidad de unidades."
+              : "Ingresá los metros cuadrados.")
       );
     }
 
@@ -1564,7 +1653,21 @@ const rows=d.productos.map(p=>{
       ? Number(p.precioCaja||p.precioM2||0)
       : Number(p.precioM2||0);
 
-  return cr
+  const esENV = String(p.unidad||"").toUpperCase()==="FLETE" || String(p.id||"").toUpperCase().startsWith("ENV-");
+
+  return esENV
+    ? `<tr>
+        <td>
+          <strong>${esc(p.producto)}</strong>
+        </td>
+        <td>—</td>
+        <td>Flete</td>
+        <td>—</td>
+        <td class="money">$ ${fmt(precioUnitarioMostrar)}</td>
+        <td class="money">$ ${fmt(p.subtotal)}</td>
+      </tr>`
+
+    : cr
     ? `<tr>
         <td>
           <strong>${esc(p.producto)}</strong>
@@ -1670,6 +1773,12 @@ const rows=d.productos.map(p=>{
       </table>
     </div>
 
+    ${d.productos.some(p => String(p.id||"").toUpperCase().startsWith("ENV-") || String(p.unidad||"").toUpperCase()==="FLETE")
+      ? `<div style="margin-top:3mm;font-size:3mm;line-height:1.45;color:#59666c">
+          <strong>Importante:</strong> La descarga se realizará en la puerta de acceso del domicilio, en un sector seguro y accesible para el vehículo. El servicio no contempla el ingreso del camión al interior de la propiedad.
+        </div>`
+      : ""}
+
     <div class="quote-total">
       <div>TOTAL</div>
       <div class="quote-total-value">$ ${fmt(d.total)}</div>
@@ -1701,8 +1810,10 @@ async function cargarHistorico(numero){
     if(!r?.ok)throw new Error(r?.error||"No se pudo cargar el presupuesto.");
     const p=r.presupuesto;
     const productosHistoricos=(r.productos||[]).map(x=>({
+      id:x["ID Producto"]||"",
       producto:x["Producto"]||"",color:x["Color"]||"",medida:x["Medida"]||"",
-      unidad:x["Unidad"]||"",cantidad:Number(x["Cantidad"]||0),
+      unidad:x["Unidad"]||"",cantidad:Number(x["Cantidad"]||x["Cantidad comercial"]||0),
+      fechaEntrega:x["Fecha entrega"]||"",
       m2Solicitados:Number(x["m² solicitados"]||x["m² Solicitados"]||x["m2 Solicitados"]||0),
       cajas:Number(x["Cajas"]||0),precioM2:Number(x["Precio/m²"]||0),subtotal:Number(x["Subtotal"]||0),
       conZocalo:String(x["Con zócalo"]||"")==="Sí",tieneOferta:Number(x["Oferta"]||0)>0
