@@ -456,6 +456,39 @@ th{font-size:12px;text-transform:uppercase;color:#666;background:#fafafa}
 .presupuesto-ver-close{border:0;background:#eee;border-radius:50%;width:34px;height:34px;font-size:22px;line-height:1}
 #presupuestoVerFrame{width:100%;height:100%;border:0;background:#f3f4f6;display:block}
 @media(max-width:700px){.presupuesto-ver-backdrop{padding:0}.presupuesto-ver-modal{border-radius:0}.presupuesto-ver-head{height:48px;flex-basis:48px;padding:0 10px 0 12px}.presupuesto-ver-head strong{font-size:14px}}
+
+@media print{
+  /* Cuando se imprime desde el visor histórico, imprimir solamente el presupuesto. */
+  body.imprimiendo-presupuesto #app{display:none!important}
+  body.imprimiendo-presupuesto .presupuesto-ver-backdrop{
+    display:block!important;
+    position:static!important;
+    inset:auto!important;
+    padding:0!important;
+    background:#fff!important;
+    overflow:visible!important;
+  }
+  body.imprimiendo-presupuesto .presupuesto-ver-modal{
+    width:210mm!important;
+    height:auto!important;
+    min-height:297mm!important;
+    max-height:none!important;
+    margin:0!important;
+    border-radius:0!important;
+    box-shadow:none!important;
+    overflow:visible!important;
+    display:block!important;
+  }
+  body.imprimiendo-presupuesto .presupuesto-ver-head{
+    display:none!important;
+  }
+  body.imprimiendo-presupuesto #presupuestoVerContenido{
+    width:210mm!important;
+    height:auto!important;
+    overflow:visible!important;
+    background:#fff!important;
+  }
+}
 </style>
 </head>
 <body>
@@ -1971,6 +2004,8 @@ function abrirPresupuestoEnVentana(numero){
   if(!backdrop || !contenido) return;
 
   cerrarGestion();
+  backdrop.dataset.numero = String(numero);
+  window._presupuestoNumeroActual = String(numero);
   backdrop.classList.add("open");
   contenido.innerHTML = `<div class="loading" style="padding:60px">Cargando presupuesto ${esc(numero)}...</div>`;
 
@@ -2044,13 +2079,46 @@ async function cargarPresupuestoEnModal(numero){
 function cerrarPresupuestoEnVentana(){
   const backdrop=$("presupuestoVerBackdrop");
   const contenido=$("presupuestoVerContenido");
-  if(backdrop) backdrop.classList.remove("open");
+  if(backdrop){
+    backdrop.classList.remove("open");
+    delete backdrop.dataset.numero;
+  }
+  window._presupuestoNumeroActual = "";
   if(contenido) contenido.innerHTML="";
 }
 
 function volverGestionDesdePresupuesto(){
   cerrarPresupuestoEnVentana();
   abrirGestion();
+}
+
+function imprimirPresupuestoDesdeVentana(){
+  const backdrop=$("presupuestoVerBackdrop");
+  if(!backdrop || !backdrop.classList.contains("open")) return;
+
+  const numero = String(
+    backdrop.dataset.numero ||
+    window._presupuestoNumeroActual ||
+    ""
+  ).trim();
+
+  const tituloAnterior = document.title;
+  const numeroLimpio = numero || "Presupuesto";
+
+  // El título del documento es el que Chrome suele tomar como nombre
+  // sugerido al elegir "Guardar como PDF".
+  document.title = `Presupuesto ${numeroLimpio}`;
+
+  document.body.classList.add("imprimiendo-presupuesto");
+
+  const limpiarImpresion = ()=>{
+    document.body.classList.remove("imprimiendo-presupuesto");
+    document.title = tituloAnterior;
+    window.removeEventListener("afterprint", limpiarImpresion);
+  };
+
+  window.addEventListener("afterprint", limpiarImpresion);
+  window.print();
 }
 
 window.addEventListener("message",function(event){
@@ -2083,6 +2151,7 @@ document.addEventListener("click",function(event){
   if(event.target.id==="openGestion") abrirGestion();
   if(event.target.id==="closeGestion" || event.target.id==="gestionBackdrop") cerrarGestion();
   if(event.target.id==="closePresupuestoVer") cerrarPresupuestoEnVentana();
+  if(event.target.id==="imprimirPresupuestoVer") imprimirPresupuestoDesdeVentana();
   if(event.target.id==="volverGestionPresupuesto") volverGestionDesdePresupuesto();
   if(event.target.id==="presupuestoVerBackdrop") cerrarPresupuestoEnVentana();
 });
@@ -2121,6 +2190,7 @@ if(token) renderApp(); else mostrarLogin();
       <div class="presupuesto-ver-head">
         <strong>👁 VER PRESUPUESTO</strong>
         <div class="presupuesto-ver-actions">
+          <button type="button" class="btn btn-secondary" id="imprimirPresupuestoVer">🖨 IMPRIMIR / GUARDAR PDF</button>
           <button type="button" class="btn btn-secondary" id="volverGestionPresupuesto">↩ VOLVER A GESTIÓN</button>
           <button type="button" class="presupuesto-ver-close" id="closePresupuestoVer" aria-label="Cerrar">×</button>
         </div>
