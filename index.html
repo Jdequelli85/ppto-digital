@@ -60,6 +60,10 @@ input:focus,select:focus{border-color:var(--rojo);box-shadow:0 0 0 3px rgba(190,
 .status.ok{display:block;background:#edf8f0;color:var(--verde);border:1px solid #b9dfc2}
 .titlebar{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:14px}
 .add-btn{white-space:nowrap}
+.productos-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.productos-toolbar-left{display:flex;align-items:center;gap:8px}
+.productos-toolbar-right{display:flex;align-items:center}
+@media(max-width:560px){.productos-toolbar{flex-wrap:wrap}.productos-toolbar-left,.productos-toolbar-right{width:100%}.productos-toolbar-right .add-btn{width:100%}}
 .empty{padding:28px;text-align:center;color:#777;border:1px dashed #ccc;border-radius:10px}
 .table-wrap{overflow:auto}
 table{width:100%;border-collapse:collapse;min-width:760px}
@@ -426,6 +430,32 @@ th{font-size:12px;text-transform:uppercase;color:#666;background:#fafafa}
   .quote-table tr{page-break-inside:avoid;page-break-after:auto}
 }
 
+
+/* =====================================================
+   PRUEBA 1 — GESTIÓN INTEGRADA
+   ===================================================== */
+.gestion-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.58);z-index:9000;display:none;padding:18px}
+.gestion-backdrop.open{display:flex;align-items:stretch;justify-content:center}
+.gestion-modal{width:min(1500px,100%);height:100%;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.35);display:flex;flex-direction:column}
+.gestion-modal-head{height:54px;flex:0 0 54px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid #ddd;background:#fff}
+.gestion-modal-head strong{font-size:17px}
+.gestion-close{border:0;background:transparent;font-size:30px;line-height:1;cursor:pointer;color:#555;padding:0 6px}
+#gestionFrame{width:100%;height:100%;border:0;background:#f3f4f6;display:block}
+@media(max-width:700px){.gestion-backdrop{padding:0}.gestion-modal{border-radius:0}.gestion-modal-head{height:48px;flex-basis:48px}}
+
+
+/* =========================================================
+   V11 — VISOR DE PRESUPUESTO DENTRO DE PPTO
+   ========================================================= */
+.presupuesto-ver-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.62);z-index:9500;display:none;padding:18px}
+.presupuesto-ver-backdrop.open{display:flex;align-items:stretch;justify-content:center}
+.presupuesto-ver-modal{width:min(1500px,100%);height:100%;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.38);display:flex;flex-direction:column}
+.presupuesto-ver-head{height:54px;flex:0 0 54px;display:flex;align-items:center;justify-content:space-between;padding:0 14px 0 18px;border-bottom:1px solid #ddd;background:#fff;gap:10px}
+.presupuesto-ver-head strong{font-size:17px}
+.presupuesto-ver-actions{display:flex;align-items:center;gap:8px}
+.presupuesto-ver-close{border:0;background:#eee;border-radius:50%;width:34px;height:34px;font-size:22px;line-height:1}
+#presupuestoVerFrame{width:100%;height:100%;border:0;background:#f3f4f6;display:block}
+@media(max-width:700px){.presupuesto-ver-backdrop{padding:0}.presupuesto-ver-modal{border-radius:0}.presupuesto-ver-head{height:48px;flex-basis:48px;padding:0 10px 0 12px}.presupuesto-ver-head strong{font-size:14px}}
 </style>
 </head>
 <body>
@@ -434,6 +464,21 @@ th{font-size:12px;text-transform:uppercase;color:#666;background:#fafafa}
 
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycby_3DebaIbZZW2qZ7ShkePBD40Bzo8wGyaHAw8w0omsKahF6CpuUEEPaG2ox3fGkAqk0w/exec";
+
+// PRUEBA 7: si Histórico devuelve PPTO con la sesión en el fragmento,
+// restauramos la sesión ANTES de renderizar la aplicación.
+(function restaurarSesionDesdeFragmento(){
+  try{
+    const hash = new URLSearchParams(location.hash.replace(/^#/, ""));
+    const t = hash.get("gt_session") || "";
+    const u = hash.get("gt_usuario") || "";
+    if(t){
+      sessionStorage.setItem("gt_token", t);
+      if(u) sessionStorage.setItem("gt_usuario", u);
+      history.replaceState(null, "", location.pathname + location.search);
+    }
+  }catch(e){}
+})();
 const LOGO_URL = "https://raw.githubusercontent.com/Jdequelli85/qr-corralon/main/logo.png";
 
 /*
@@ -447,13 +492,24 @@ const CATALOGO_CACHE_KEY = "gt_catalogo_cache_v1";
 const CATALOGO_CACHE_MAX_AGE = 24 * 60 * 60 * 1000; // 24 horas
 
 
-let token = sessionStorage.getItem("gt_token") || "";
-let vendedor = sessionStorage.getItem("gt_usuario") || "";
+const gtHashParams = new URLSearchParams(String(location.hash || "").replace(/^#/, ""));
+const gtHashToken = gtHashParams.get("gt_session") || "";
+const gtHashUsuario = gtHashParams.get("gt_usuario") || "";
+let token = sessionStorage.getItem("gt_token") || gtHashToken;
+let vendedor = sessionStorage.getItem("gt_usuario") || gtHashUsuario;
+if(gtHashToken){
+  try{ sessionStorage.setItem("gt_token", gtHashToken); }catch(e){}
+  if(gtHashUsuario){ try{ sessionStorage.setItem("gt_usuario", gtHashUsuario); }catch(e){} }
+  // El fragmento solo sirve para entregar la sesión al iframe.
+  // Lo quitamos de la barra de dirección del iframe una vez leído.
+  try{ history.replaceState(null, "", location.pathname + location.search); }catch(e){}
+}
 let productos = [];
 let catalogoProductos = [];
 let catalogoOpciones = [];
 let productoActual = null;
 let verNumero = new URLSearchParams(location.search).get("ver") || "";
+let gtViewer = new URLSearchParams(location.search).get("gt_viewer") === "1";
 
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
@@ -807,10 +863,12 @@ async function renderApp(){
     </section>
 
     <section class="card">
-      <div class="titlebar">
-        <h2>Productos</h2>
-        <div class="productos-actions">
+      <div class="titlebar productos-toolbar">
+        <div class="productos-toolbar-left">
           <button class="btn btn-secondary catalogo-consulta-btn" id="openConsultaCatalogo">📦 CATÁLOGO</button>
+          <button class="btn btn-secondary" id="openGestion">📋 GESTIÓN</button>
+        </div>
+        <div class="productos-toolbar-right">
           <button class="btn btn-primary add-btn" id="add">＋ AGREGAR PRODUCTO</button>
         </div>
       </div>
@@ -1826,7 +1884,14 @@ async function cargarHistorico(numero){
     }));
     const datos={cliente:p["Cliente"]||"",dniCuit:p["DNI/CUIT"]||"",telefono:p["Teléfono"]||"",email:p["Email"]||"",direccion:p["Dirección"]||"",formaPago:p["Forma de pago"]||"",total:Number(p["Total"]||0),productos:productosHistoricos};
     const fecha=p["Fecha"]?new Date(p["Fecha"]).toLocaleDateString("es-AR"):new Date().toLocaleDateString("es-AR");
-    $("app").innerHTML=header()+`<main class="wrap"><div class="historical-actions no-print"><button class="btn btn-primary" id="printQuote">🖨 IMPRIMIR / GUARDAR PDF</button><button class="btn btn-secondary" id="newQuote">NUEVO PRESUPUESTO</button></div>${quoteHtml(numero,fecha,datos)}</main>`;
+    $("app").innerHTML=header()+`<main class="wrap"><div class="historical-actions no-print"><button class="btn btn-secondary" id="returnGestion">↩ VOLVER A GESTIÓN</button><button class="btn btn-primary" id="printQuote">🖨 IMPRIMIR / GUARDAR PDF</button><button class="btn btn-secondary" id="newQuote">NUEVO PRESUPUESTO</button></div>${quoteHtml(numero,fecha,datos)}</main>`;
+    $("returnGestion").onclick=()=>{
+      if(gtViewer && window.parent !== window){
+        window.parent.postMessage({type:"GT_VIEWER_BACK_TO_GESTION"}, location.origin);
+      }else{
+        abrirGestion();
+      }
+    };
     $("printQuote").onclick=()=>window.print();$("newQuote").onclick=nuevoPresupuesto;
   }catch(e){
     $("app").innerHTML=header()+`<main class="wrap"><section class="card"><div class="status error" style="display:block">${esc(e.message)}</div><div class="actions no-print"><button class="btn btn-secondary" id="back">VOLVER</button></div></section></main>`;
@@ -1849,7 +1914,221 @@ document.addEventListener("keydown",e=>{
   }
 });
 
+const GESTION_URL = "https://historico.gytsrl.com/";
+const GESTION_ORIGIN = new URL(GESTION_URL).origin;
+
+function enviarSesionGestion(){
+  const frame=$("gestionFrame");
+  if(!frame || !frame.contentWindow || !token) return;
+  // Para esta prueba usamos '*' como destino.
+  // Gestión valida que el mensaje provenga realmente de PPTO
+  // (event.origin === https://ppto.gytsrl.com), por lo que no
+  // se expone la sesión a otro origen.
+  frame.contentWindow.postMessage({
+    type:"GT_GESTION_SESSION",
+    token:token,
+    usuario:vendedor
+  },"*");
+}
+
+function abrirGestion(){
+  if(!token){ mostrarLogin(); return; }
+
+  const frame=$("gestionFrame");
+  $("gestionBackdrop").classList.add("open");
+
+  // PRUEBA 4: además del postMessage, enviamos la sesión en el
+  // fragmento (#) de la URL. El fragmento NO se envía al servidor.
+  // Esto nos permite comprobar si el problema está exclusivamente
+  // en la comunicación postMessage entre ambos dominios.
+  const hash = "#gt_session=" + encodeURIComponent(token) +
+               "&gt_usuario=" + encodeURIComponent(vendedor);
+  const urlSesion = GESTION_URL + hash;
+
+  if(frame.dataset.listenerAttached!=="1"){
+    frame.addEventListener("load",function(){
+      enviarSesionGestion();
+      setTimeout(enviarSesionGestion,250);
+    });
+    frame.dataset.listenerAttached="1";
+  }
+
+  frame.src = urlSesion;
+
+  // También intentamos por postMessage como vía secundaria.
+  setTimeout(enviarSesionGestion,500);
+}
+
+function cerrarGestion(){
+  $("gestionBackdrop").classList.remove("open");
+}
+
+function abrirPresupuestoEnVentana(numero){
+  if(!numero || !token) return;
+
+  const backdrop=$("presupuestoVerBackdrop");
+  const contenido=$("presupuestoVerContenido");
+  if(!backdrop || !contenido) return;
+
+  cerrarGestion();
+  backdrop.classList.add("open");
+  contenido.innerHTML = `<div class="loading" style="padding:60px">Cargando presupuesto ${esc(numero)}...</div>`;
+
+  // V13: NO abrimos otro PPTO dentro de un iframe.
+  // El PPTO principal ya tiene la sesión válida, por lo que consulta
+  // directamente el presupuesto y lo renderiza dentro de este modal.
+  cargarPresupuestoEnModal(numero);
+}
+
+async function cargarPresupuestoEnModal(numero){
+  const contenido=$("presupuestoVerContenido");
+  if(!contenido) return;
+
+  try{
+    const r=await jsonp({accion:"presupuesto",numero,token});
+    if(!r?.ok) throw new Error(r?.error || "No se pudo cargar el presupuesto.");
+
+    const p=r.presupuesto || {};
+    const productosHistoricos=(r.productos||[]).map(x=>{
+      const id=String(x["ID Producto"]||x["ID"]||"").trim();
+      const idUpper=id.toUpperCase();
+      const cantidadComercialRaw=x["Cantidad comercial"];
+      const cantidadRaw=(cantidadComercialRaw!==undefined && cantidadComercialRaw!==null && String(cantidadComercialRaw).trim()!=="")
+        ? cantidadComercialRaw
+        : x["Cantidad"];
+      let unidad=String(x["Unidad"]||"").trim();
+      if(!unidad && idUpper.startsWith("ENV-")) unidad="Flete";
+      if(!unidad && idUpper.startsWith("CRRL-")) unidad="Unidades";
+      return {
+        id,
+        producto:x["Producto"]||"",
+        color:x["Color"]||"",
+        medida:x["Medida"]||"",
+        unidad,
+        cantidad:Number(cantidadRaw||0),
+        fechaEntrega:x["Fecha entrega"]||"",
+        m2Solicitados:Number(x["m² solicitados"]||x["m² Solicitados"]||x["m2 Solicitados"]||0),
+        cajas:Number(x["Cajas"]||0),
+        precioM2:Number(x["Precio/m²"]||0),
+        precioCaja:Number(x["Precio/caja"]||0),
+        subtotal:Number(x["Subtotal"]||0),
+        conZocalo:String(x["Con zócalo"]||"")==="Sí",
+        tieneOferta:Number(x["Oferta"]||0)>0
+      };
+    });
+
+    const datos={
+      cliente:p["Cliente"]||"",
+      dniCuit:p["DNI/CUIT"]||"",
+      telefono:p["Teléfono"]||"",
+      email:p["Email"]||"",
+      direccion:p["Dirección"]||"",
+      formaPago:p["Forma de pago"]||"",
+      total:Number(p["Total"]||0),
+      productos:productosHistoricos
+    };
+
+    const fecha=p["Fecha"]
+      ? new Date(p["Fecha"]).toLocaleDateString("es-AR")
+      : new Date().toLocaleDateString("es-AR");
+
+    contenido.innerHTML = quoteHtml(numero,fecha,datos);
+  }catch(e){
+    contenido.innerHTML = `
+      <section class="card" style="margin:20px">
+        <div class="status error" style="display:block">${esc(e.message)}</div>
+      </section>`;
+  }
+}
+
+function cerrarPresupuestoEnVentana(){
+  const backdrop=$("presupuestoVerBackdrop");
+  const contenido=$("presupuestoVerContenido");
+  if(backdrop) backdrop.classList.remove("open");
+  if(contenido) contenido.innerHTML="";
+}
+
+function volverGestionDesdePresupuesto(){
+  cerrarPresupuestoEnVentana();
+  abrirGestion();
+}
+
+window.addEventListener("message",function(event){
+  const frame=$("gestionFrame");
+
+  if(!frame || event.source!==frame.contentWindow) return;
+  // VER dentro de Gestión: abrimos el presupuesto en un iframe
+  // independiente. La página principal de PPTO queda intacta.
+  if(event.origin===GESTION_ORIGIN && event.data?.type==="GT_VER_PRESUPUESTO"){
+    const numero=String(event.data.numero||"").trim();
+    if(!numero || !token) return;
+    abrirPresupuestoEnVentana(numero);
+    return;
+  }
+
+  if(event.data?.type!=="GT_GESTION_READY") return;
+
+  // El Histórico nos avisa cuando ya está listo para recibir la sesión.
+  // En esta prueba respondemos con '*' para eliminar cualquier
+  // problema de destino-origin durante la carga/redirección.
+  if(!token) return;
+  frame.contentWindow.postMessage({
+    type:"GT_GESTION_SESSION",
+    token:token,
+    usuario:vendedor
+  },"*");
+});
+
+document.addEventListener("click",function(event){
+  if(event.target.id==="openGestion") abrirGestion();
+  if(event.target.id==="closeGestion" || event.target.id==="gestionBackdrop") cerrarGestion();
+  if(event.target.id==="closePresupuestoVer") cerrarPresupuestoEnVentana();
+  if(event.target.id==="volverGestionPresupuesto") volverGestionDesdePresupuesto();
+  if(event.target.id==="presupuestoVerBackdrop") cerrarPresupuestoEnVentana();
+});
+
+document.addEventListener("keydown",function(event){
+  if(event.key!=="Escape") return;
+  if($("presupuestoVerBackdrop")?.classList.contains("open")){
+    cerrarPresupuestoEnVentana();
+    return;
+  }
+  if($("gestionBackdrop")?.classList.contains("open")) cerrarGestion();
+});
+
+// V13: el presupuesto se renderiza directamente en el PPTO principal.
+// No existe un segundo iframe PPTO ni una segunda sesión.
+
+// INICIO DE LA APLICACIÓN
 if(token) renderApp(); else mostrarLogin();
 </script>
+
+
+  <!-- V11: Gestión integrada -->
+  <div class="gestion-backdrop" id="gestionBackdrop">
+    <div class="gestion-modal" role="dialog" aria-modal="true" aria-label="Gestión de presupuestos">
+      <div class="gestion-modal-head">
+        <strong>📋 GESTIÓN DE PRESUPUESTOS</strong>
+        <button type="button" class="gestion-close" id="closeGestion" aria-label="Cerrar">×</button>
+      </div>
+      <iframe id="gestionFrame" title="Gestión de presupuestos" src="about:blank"></iframe>
+    </div>
+  </div>
+
+  <!-- V11: visor de presupuesto integrado -->
+  <div class="presupuesto-ver-backdrop" id="presupuestoVerBackdrop">
+    <div class="presupuesto-ver-modal" role="dialog" aria-modal="true" aria-label="Ver presupuesto">
+      <div class="presupuesto-ver-head">
+        <strong>👁 VER PRESUPUESTO</strong>
+        <div class="presupuesto-ver-actions">
+          <button type="button" class="btn btn-secondary" id="volverGestionPresupuesto">↩ VOLVER A GESTIÓN</button>
+          <button type="button" class="presupuesto-ver-close" id="closePresupuestoVer" aria-label="Cerrar">×</button>
+        </div>
+      </div>
+      <div id="presupuestoVerContenido" style="flex:1;overflow:auto;background:#f3f4f6"></div>
+    </div>
+  </div>
+
+
 </body>
 </html>
