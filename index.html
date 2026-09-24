@@ -202,8 +202,8 @@ th{font-size:12px;text-transform:uppercase;color:#666;background:#fafafa}
 .quote-payment-option{display:inline-flex;align-items:center;gap:2mm;color:#344954}
 .quote-check{width:4mm;height:4mm;border:1.3px solid #183746;border-radius:.8mm;display:inline-block;box-sizing:border-box}
 .quote-payment-selected{display:none}
-.quote-detail{margin-top:3mm}
-.quote-table{width:100%;min-width:0;border-collapse:collapse;table-layout:fixed}
+.quote-detail{margin-top:3mm;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.quote-table{width:100%;min-width:760px;border-collapse:collapse;table-layout:fixed}
 .quote-table th{background:#183746;color:#fff;padding:3mm 2mm;border:1px solid #183746;font-size:3.1mm;font-weight:800;text-transform:uppercase}
 .quote-table td{padding:2.5mm 2mm;border:1px solid #d7dde0;font-size:3.1mm;color:#263f4b;vertical-align:middle}
 .quote-table tbody tr:nth-child(even){background:#f4f6f7}
@@ -255,6 +255,8 @@ th{font-size:12px;text-transform:uppercase;color:#666;background:#fafafa}
   .add-btn{width:100%}
   .actions{flex-direction:column}
   .actions button{width:100%}
+  .historical-actions{flex-direction:column;align-items:stretch;gap:8px}
+  .historical-actions button{width:100%}
   .quote-head{grid-template-columns:1fr;gap:5mm}
   .quote-presentation{border-left:0;border-top:2px solid #BE000F;padding:4mm 0 0;align-items:flex-start;text-align:left}
   .quote-meta{text-align:left}
