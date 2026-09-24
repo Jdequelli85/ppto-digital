@@ -1658,46 +1658,57 @@ async function guardarPresupuesto(){
     const numero=rNumero.numero;
 
     // ==================================================
-    // POR AHORA:
-    // mostramos el presupuesto inmediatamente.
-    //
-    // EL GUARDADO TODAVÍA NO SE MODIFICA.
+    // GUARDAR PRESUPUESTO
+    // ==================================================
+    // Primero se guarda en Google Sheets.
+    // Luego se vuelve a consultar el presupuesto recién
+    // guardado para obtener la VALIDEZ real almacenada.
+    // Así el PDF de un presupuesto nuevo utiliza el mismo
+    // valor que quedó registrado en Google Sheets.
     // ==================================================
 
-// MOSTRAR EL PRESUPUESTO INMEDIATAMENTE
-mostrarPresupuestoGuardado(numero, datos);
+    const rGuardado = await jsonp({
+      accion: "guardar",
+      token,
+      numero: numero,
+      datos: JSON.stringify(datos)
+    });
 
-// GUARDAR EN SEGUNDO PLANO
-jsonp({
-  accion: "guardar",
-  token,
-  numero: numero,
-  datos: JSON.stringify(datos)
-})
-.then(rGuardado => {
+    if (!rGuardado?.ok) {
+      throw new Error(
+        rGuardado?.error || "No se pudo guardar el presupuesto."
+      );
+    }
 
-  if (!rGuardado?.ok) {
-    console.error(
-      "No se pudo guardar el presupuesto:",
-      rGuardado?.error || "Error desconocido"
+    // ==================================================
+    // OBTENER VALIDEZ REAL DESDE GOOGLE SHEETS
+    // ==================================================
+
+    const rPresupuesto = await jsonp({
+      accion: "presupuesto",
+      numero,
+      token
+    });
+
+    if (!rPresupuesto?.ok) {
+      throw new Error(
+        rPresupuesto?.error ||
+        "El presupuesto fue guardado, pero no se pudo obtener su validez."
+      );
+    }
+
+    const presupuestoGuardado = rPresupuesto.presupuesto || {};
+    const validezGuardada = Number(
+      presupuestoGuardado["Validez (días)"] || 0
     );
-    return;
-  }
 
-  console.log(
-    "Presupuesto guardado correctamente:",
-    rGuardado.numero
-  );
+    datos.validez = validezGuardada;
 
-})
-.catch(error => {
+    // ==================================================
+    // MOSTRAR EL PRESUPUESTO CON LA VALIDEZ REAL
+    // ==================================================
 
-  console.error(
-    "Error al guardar el presupuesto:",
-    error
-  );
-
-});
+    mostrarPresupuestoGuardado(numero, datos);
     
   }catch(e){
 
