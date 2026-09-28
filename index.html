@@ -443,6 +443,15 @@ th{font-size:12px;text-transform:uppercase;color:#666;background:#fafafa}
 .gestion-modal-head strong{font-size:17px}
 .gestion-close{border:0;background:transparent;font-size:30px;line-height:1;cursor:pointer;color:#555;padding:0 6px}
 #gestionFrame{width:100%;height:100%;border:0;background:#f3f4f6;display:block}
+.gestion-loading{position:absolute;inset:58px 0 0 0;background:rgba(255,255,255,.94);z-index:6;display:flex;align-items:center;justify-content:center;text-align:center;padding:25px}
+.gestion-loading-inner{max-width:360px}
+.gestion-loading-title{font-size:19px;font-weight:800;color:#183746;margin-bottom:7px}
+.gestion-loading-text{font-size:13px;color:#6b7280;line-height:1.45}
+.gestion-spinner{width:34px;height:34px;margin:18px auto;border:4px solid #e5e7eb;border-top-color:#BE000F;border-radius:50%;animation:spin .8s linear infinite}
+.gestion-loading.ok{background:rgba(255,255,255,.82)}
+.gestion-loading.ok .gestion-spinner{display:none}
+.gestion-loading.ok .gestion-loading-title{color:#176b2c}
+@media(max-width:700px){.gestion-loading{inset:48px 0 0 0}}
 @media(max-width:700px){.gestion-backdrop{padding:0}.gestion-modal{border-radius:0}.gestion-modal-head{height:48px;flex-basis:48px}}
 
 
@@ -1965,11 +1974,34 @@ function enviarSesionGestion(){
   },"*");
 }
 
+function mostrarCargaGestion(){
+  const overlay=$("gestionLoading");
+  if(!overlay)return;
+  overlay.classList.remove("ok");
+  overlay.hidden=false;
+  const titulo=$("gestionLoadingTitle");
+  const texto=$("gestionLoadingText");
+  if(titulo)titulo.textContent="Cargando Gestión...";
+  if(texto)texto.textContent="Estamos cargando el histórico de presupuestos. Esperá unos segundos.";
+}
+
+function ocultarCargaGestion(){
+  const overlay=$("gestionLoading");
+  if(!overlay)return;
+  overlay.classList.add("ok");
+  const titulo=$("gestionLoadingTitle");
+  const texto=$("gestionLoadingText");
+  if(titulo)titulo.textContent="✓ Gestión cargada";
+  if(texto)texto.textContent="El histórico ya está disponible.";
+  setTimeout(()=>{ if(overlay)overlay.hidden=true; },300);
+}
+
 function abrirGestion(){
   if(!token){ mostrarLogin(); return; }
 
   const frame=$("gestionFrame");
   $("gestionBackdrop").classList.add("open");
+  mostrarCargaGestion();
 
   // PRUEBA 4: además del postMessage, enviamos la sesión en el
   // fragmento (#) de la URL. El fragmento NO se envía al servidor.
@@ -1983,6 +2015,7 @@ function abrirGestion(){
     frame.addEventListener("load",function(){
       enviarSesionGestion();
       setTimeout(enviarSesionGestion,250);
+      ocultarCargaGestion();
     });
     frame.dataset.listenerAttached="1";
   }
@@ -2183,6 +2216,13 @@ if(token) renderApp(); else mostrarLogin();
         <button type="button" class="gestion-close" id="closeGestion" aria-label="Cerrar">×</button>
       </div>
       <iframe id="gestionFrame" title="Gestión de presupuestos" src="about:blank"></iframe>
+      <div class="gestion-loading" id="gestionLoading" hidden aria-live="polite">
+        <div class="gestion-loading-inner">
+          <div class="gestion-loading-title" id="gestionLoadingTitle">Cargando Gestión...</div>
+          <div class="gestion-spinner" aria-hidden="true"></div>
+          <div class="gestion-loading-text" id="gestionLoadingText">Estamos cargando el histórico de presupuestos. Esperá unos segundos.</div>
+        </div>
+      </div>
     </div>
   </div>
 
