@@ -1997,7 +1997,7 @@ function cerrarGestion(){
   $("gestionBackdrop").classList.remove("open");
 }
 
-function abrirPresupuestoEnVentana(numero){
+function abrirPresupuestoEnVentana(numero, presupuestoPrecargado, productosPrecargados){
   if(!numero || !token) return;
 
   const backdrop=$("presupuestoVerBackdrop");
@@ -2013,19 +2013,30 @@ function abrirPresupuestoEnVentana(numero){
   // V13: NO abrimos otro PPTO dentro de un iframe.
   // El PPTO principal ya tiene la sesión válida, por lo que consulta
   // directamente el presupuesto y lo renderiza dentro de este modal.
-  cargarPresupuestoEnModal(numero);
+  cargarPresupuestoEnModal(numero, presupuestoPrecargado, productosPrecargados);
 }
 
-async function cargarPresupuestoEnModal(numero){
+async function cargarPresupuestoEnModal(numero, presupuestoPrecargado, productosPrecargados){
   const contenido=$("presupuestoVerContenido");
   if(!contenido) return;
 
   try{
-    const r=await jsonp({accion:"presupuesto",numero,token});
-    if(!r?.ok) throw new Error(r?.error || "No se pudo cargar el presupuesto.");
+    let p;
+    let productosFuente;
 
-    const p=r.presupuesto || {};
-    const productosHistoricos=(r.productos||[]).map(x=>{
+    if(presupuestoPrecargado && Array.isArray(productosPrecargados)){
+      // Histórico ya tiene los datos de los últimos 45 días.
+      // Evitamos una segunda consulta a Google Sheets.
+      p=presupuestoPrecargado || {};
+      productosFuente=productosPrecargados;
+    }else{
+      const r=await jsonp({accion:"presupuesto",numero,token});
+      if(!r?.ok) throw new Error(r?.error || "No se pudo cargar el presupuesto.");
+      p=r.presupuesto || {};
+      productosFuente=r.productos || [];
+    }
+
+    const productosHistoricos=productosFuente.map(x=>{
       const id=String(x["ID Producto"]||x["ID"]||"").trim();
       const idUpper=id.toUpperCase();
       const cantidadComercialRaw=x["Cantidad comercial"];
@@ -2132,7 +2143,11 @@ window.addEventListener("message",function(event){
   if(event.origin===GESTION_ORIGIN && event.data?.type==="GT_VER_PRESUPUESTO"){
     const numero=String(event.data.numero||"").trim();
     if(!numero || !token) return;
-    abrirPresupuestoEnVentana(numero);
+    abrirPresupuestoEnVentana(
+      numero,
+      event.data.presupuesto || null,
+      Array.isArray(event.data.productos) ? event.data.productos : null
+    );
     return;
   }
 
