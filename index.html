@@ -526,12 +526,6 @@ const LOGO_URL = "https://raw.githubusercontent.com/Jdequelli85/qr-corralon/main
 const CATALOGO_CACHE_KEY = "gt_catalogo_cache_v1";
 const CATALOGO_CACHE_MAX_AGE = 24 * 60 * 60 * 1000; // 24 horas
 
-// Caché local de presupuestos recientes para acelerar VER.
-const PRESUPUESTOS_RECIENTES_CACHE_KEY = "gt_presupuestos_recientes45_v1";
-const PRESUPUESTOS_RECIENTES_CACHE_MAX_AGE = 30 * 60 * 1000; // 30 minutos
-const PRESUPUESTOS_RECIENTES_REFRESH_AGE = 5 * 60 * 1000; // refresco en segundo plano cada 5 minutos
-const PRESUPUESTOS_RECIENTES_DIAS = 45;
-
 
 const gtHashParams = new URLSearchParams(String(location.hash || "").replace(/^#/, ""));
 const gtHashToken = gtHashParams.get("gt_session") || "";
@@ -659,139 +653,6 @@ function cargarCatalogoDesdeCache(){
     try{localStorage.removeItem(CATALOGO_CACHE_KEY)}catch(_e){}
     return false;
   }
-}
-
-function guardarPresupuestosRecientesCache(data){
-  try{
-    if(!data || !Array.isArray(data.presupuestos)) return false;
-
-    localStorage.setItem(PRESUPUESTOS_RECIENTES_CACHE_KEY, JSON.stringify({
-      fecha: Date.now(),
-      desde: data.desde || "",
-      hasta: data.hasta || "",
-      presupuestos: data.presupuestos
-    }));
-    return true;
-  }catch(e){
-    console.warn("No se pudo guardar el caché de presupuestos recientes:", e.message);
-    return false;
-  }
-}
-
-function cargarPresupuestosRecientesDesdeCache(){
-  try{
-    const raw = localStorage.getItem(PRESUPUESTOS_RECIENTES_CACHE_KEY);
-    if(!raw) return null;
-
-    const cache = JSON.parse(raw);
-    if(!cache || !Array.isArray(cache.presupuestos)){
-      localStorage.removeItem(PRESUPUESTOS_RECIENTES_CACHE_KEY);
-      return null;
-    }
-
-    const antiguedad = Date.now() - Number(cache.fecha || 0);
-    if(antiguedad > PRESUPUESTOS_RECIENTES_CACHE_MAX_AGE){
-      return null;
-    }
-
-    return cache;
-  }catch(e){
-    try{localStorage.removeItem(PRESUPUESTOS_RECIENTES_CACHE_KEY)}catch(_e){}
-    return null;
-  }
-}
-
-function obtenerPresupuestoDesdeCache(numero){
-  const buscado = String(numero || "").trim();
-  if(!buscado) return null;
-
-  const cache = cargarPresupuestosRecientesDesdeCache();
-  if(!cache) return null;
-
-  return cache.presupuestos.find(x=>String(x?.numero || "").trim()===buscado) || null;
-}
-
-function guardarPresupuestoRecienteEnCache(numero, presupuesto, productos){
-  const buscado = String(numero || "").trim();
-  if(!buscado || !presupuesto) return false;
-
-  try{
-    let cache = cargarPresupuestosRecientesDesdeCache();
-
-    if(!cache){
-      cache = {
-        fecha: Date.now(),
-        desde: "",
-        hasta: "",
-        presupuestos: []
-      };
-    }
-
-    const item = {
-      numero: buscado,
-      presupuesto: presupuesto,
-      productos: Array.isArray(productos) ? productos : []
-    };
-
-    const indice = cache.presupuestos.findIndex(
-      x=>String(x?.numero || "").trim()===buscado
-    );
-
-    if(indice>=0) cache.presupuestos[indice]=item;
-    else cache.presupuestos.unshift(item);
-
-    // Conservamos solamente presupuestos cuya fecha esté dentro
-    // de los últimos 45 días, más el recién guardado.
-    const limite = Date.now() - (PRESUPUESTOS_RECIENTES_DIAS * 24 * 60 * 60 * 1000);
-    cache.presupuestos = cache.presupuestos.filter(x=>{
-      if(String(x?.numero || "").trim()===buscado) return true;
-      const valor=x?.presupuesto?.["Fecha"];
-      const fecha=new Date(valor || 0).getTime();
-      return isFinite(fecha) && fecha >= limite;
-    });
-
-    cache.fecha = Date.now();
-    localStorage.setItem(PRESUPUESTOS_RECIENTES_CACHE_KEY, JSON.stringify(cache));
-    return true;
-  }catch(e){
-    console.warn("No se pudo actualizar el caché del presupuesto:", e.message);
-    return false;
-  }
-}
-
-async function actualizarPresupuestosRecientesServidor(){
-  const r = await jsonp({
-    accion: "presupuestosRecientes45",
-    token
-  });
-
-  if(!r?.ok){
-    throw new Error(r?.error || "No se pudieron cargar los presupuestos recientes.");
-  }
-
-  guardarPresupuestosRecientesCache(r);
-  return r;
-}
-
-function mostrarCargaInicial(etapaCatalogo, etapaRecientes){
-  const estadoCatalogo = etapaCatalogo === "ok"
-    ? "✓ Catálogo de productos"
-    : "⏳ Catálogo de productos";
-
-  const estadoRecientes = etapaRecientes === "ok"
-    ? "✓ Presupuestos recientes (45 días)"
-    : "⏳ Presupuestos recientes (45 días)";
-
-  $("app").innerHTML = `
-    <main class="wrap">
-      <section class="card login-card loading-catalogo">
-        <img class="logo-login" src="${LOGO_URL}" alt="G&T S.R.L.">
-        <h1>Preparando el sistema...</h1>
-        <div class="subtitle">${estadoCatalogo}<br>${estadoRecientes}</div>
-        <div class="catalog-spinner" aria-label="Cargando"></div>
-        <div class="calc-info" style="margin-top:14px">Esto puede tardar unos segundos la primera vez.</div>
-      </section>
-    </main>`;
 }
 
 function construirCatalogo(productos){
@@ -996,45 +857,28 @@ function header(){
 async function renderApp(){
   if(!token){mostrarLogin();return;}
   if(verNumero){renderLoadingHistorico();cargarHistorico(verNumero);return;}
+  if(!catalogoOpciones.length){
+    try{
+      /*
+       * Primero intenta el catálogo local. Si existe,
+       * la pantalla se construye inmediatamente y la
+       * actualización al servidor continúa en segundo plano.
+       */
+      const teniaCache = cargarCatalogoDesdeCache();
 
-  // ==================================================
-  // CARGA INICIAL
-  // ==================================================
-  // Catálogo y últimos 45 días se cargan desde caché cuando
-  // existe. Si no existe, se muestran ambas etapas visualmente
-  // y se consultan al servidor una sola vez.
-  // ==================================================
-
-  try{
-    const teniaCatalogo = cargarCatalogoDesdeCache();
-
-    if(!teniaCatalogo){
-      mostrarCargaInicial("cargando","cargando");
-      await actualizarCatalogoServidor();
-    }
-
-    const cacheRecientes = cargarPresupuestosRecientesDesdeCache();
-
-    if(!cacheRecientes){
-      mostrarCargaInicial("ok","cargando");
-      await actualizarPresupuestosRecientesServidor();
-    }else{
-      // El usuario puede seguir trabajando inmediatamente.
-      // Solo actualizamos en segundo plano cuando el caché ya tiene
-      // algunos minutos, evitando consultas repetidas al volver a
-      // la pantalla de nuevo presupuesto.
-      const edadCache = Date.now() - Number(cacheRecientes.fecha || 0);
-      if(edadCache >= PRESUPUESTOS_RECIENTES_REFRESH_AGE){
-        actualizarPresupuestosRecientesServidor().catch(err=>{
-          console.warn("No se pudieron actualizar los presupuestos recientes:", err.message);
+      if(!teniaCache){
+        mostrarCargaCatalogo();
+        await actualizarCatalogoServidor();
+      }else{
+        actualizarCatalogoServidor().catch(err=>{
+          console.warn("No se pudo actualizar el catálogo en segundo plano:", err.message);
         });
       }
+    }catch(e){
+      mostrarLogin("No se pudo cargar el catálogo: " + e.message);
+      return;
     }
-  }catch(e){
-    mostrarLogin("No se pudo preparar la información inicial: " + e.message);
-    return;
   }
-
   document.title="G&T S.R.L. — Presupuesto Digital";
   $("app").innerHTML = header()+`
   <main class="wrap">
@@ -1850,15 +1694,6 @@ async function guardarPresupuesto(){
 
     datos.validez = validezGuardada;
 
-    // Guardamos en el caché local el presupuesto recién creado.
-    // Así también queda disponible para VER sin volver a consultar
-    // Google Sheets durante esta sesión.
-    guardarPresupuestoRecienteEnCache(
-      numero,
-      rPresupuesto.presupuesto || {},
-      rPresupuesto.productos || []
-    );
-
     // ==================================================
     // MOSTRAR EL PRESUPUESTO CON LA VALIDEZ REAL
     // ==================================================
@@ -2186,28 +2021,8 @@ async function cargarPresupuestoEnModal(numero){
   if(!contenido) return;
 
   try{
-    // Primero buscamos el presupuesto en el caché local de los
-    // últimos 45 días. En condiciones normales esto evita por
-    // completo la consulta individual a Google Sheets.
-    const cacheItem = obtenerPresupuestoDesdeCache(numero);
-    let r;
-
-    if(cacheItem){
-      r = {
-        ok: true,
-        presupuesto: cacheItem.presupuesto || {},
-        productos: Array.isArray(cacheItem.productos) ? cacheItem.productos : []
-      };
-    }else{
-      // Si no está en caché (por antigüedad, presupuesto antiguo
-      // o acceso directo), conservamos el comportamiento actual.
-      r=await jsonp({accion:"presupuesto",numero,token});
-      if(!r?.ok) throw new Error(r?.error || "No se pudo cargar el presupuesto.");
-
-      // Si la consulta individual fue necesaria y el presupuesto
-      // todavía está dentro de los 45 días, lo dejamos cacheado.
-      guardarPresupuestoRecienteEnCache(numero,r.presupuesto || {},r.productos || []);
-    }
+    const r=await jsonp({accion:"presupuesto",numero,token});
+    if(!r?.ok) throw new Error(r?.error || "No se pudo cargar el presupuesto.");
 
     const p=r.presupuesto || {};
     const productosHistoricos=(r.productos||[]).map(x=>{
