@@ -1642,26 +1642,12 @@ async function guardarPresupuesto(){
   try{
 
     // ==================================================
-    // PASO 1 — RESERVAR NÚMERO
-    // ==================================================
-
-    const rNumero=await jsonp({
-      accion:"nuevoNumero",
-      token
-    });
-
-    if(!rNumero?.ok){
-      throw new Error(
-        rNumero?.error ||
-        "No se pudo reservar el número de presupuesto."
-      );
-    }
-
-    const numero=rNumero.numero;
-
-    // ==================================================
     // GUARDAR PRESUPUESTO
     // ==================================================
+    // El número ya NO se reserva previamente.
+    // Google Apps Script lo asigna dentro del mismo proceso
+    // que guarda el presupuesto, evitando saltos si la
+    // respuesta de una solicitud se pierde o vence.
     // Primero se guarda en Google Sheets.
     // Luego se vuelve a consultar el presupuesto recién
     // guardado para obtener la VALIDEZ real almacenada.
@@ -1672,7 +1658,6 @@ async function guardarPresupuesto(){
     const rGuardado = await jsonp({
       accion: "guardar",
       token,
-      numero: numero,
       datos: JSON.stringify(datos)
     });
 
@@ -1681,6 +1666,9 @@ async function guardarPresupuesto(){
         rGuardado?.error || "No se pudo guardar el presupuesto."
       );
     }
+
+    // El número fue asignado por el guardado atómico.
+    const numero = rGuardado.numero;
 
     // ==================================================
     // OBTENER VALIDEZ REAL DESDE GOOGLE SHEETS
