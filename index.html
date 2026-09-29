@@ -203,8 +203,9 @@ th{font-size:12px;text-transform:uppercase;color:#666;background:#fafafa}
 .quote-check{width:4mm;height:4mm;border:1.3px solid #183746;border-radius:.8mm;display:inline-block;box-sizing:border-box}
 .quote-payment-selected{display:none}
 .quote-detail{margin-top:3mm;overflow-x:auto;-webkit-overflow-scrolling:touch}
-.quote-table-wrap{position:relative;min-width:760px}
-.sello-pagado{position:absolute;left:50%;top:60%;transform:translate(-50%,-50%);width:58mm;max-width:55%;height:auto;z-index:5;pointer-events:none}
+.quote-table-wrap{position:relative}
+.sello-pagado-wrap{display:flex;justify-content:center;align-items:center;margin-top:3mm}
+.sello-pagado{display:block;width:48mm;max-width:45%;height:auto;pointer-events:none}
 .quote-table{width:100%;min-width:760px;border-collapse:collapse;table-layout:fixed}
 .quote-table th{background:#183746;color:#fff;padding:3mm 2mm;border:1px solid #183746;font-size:3.1mm;font-weight:800;text-transform:uppercase}
 .quote-table td{padding:2.5mm 2mm;border:1px solid #d7dde0;font-size:3.1mm;color:#263f4b;vertical-align:middle}
@@ -277,8 +278,12 @@ th{font-size:12px;text-transform:uppercase;color:#666;background:#fafafa}
   .card{border:0;box-shadow:none;padding:0;margin:0}
   .quote-preview{width:210mm;min-height:297mm;margin:0;padding:8mm;box-sizing:border-box;border:0}
   .quote-head,.quote-customer,.quote-payment,.quote-detail,.quote-total,.quote-foot{page-break-inside:avoid}
-  .quote-table{page-break-inside:auto}
+  .quote-detail{overflow:visible!important}
+  .quote-table-wrap{min-width:0!important;width:100%!important}
+  .quote-table{width:100%!important;min-width:0!important;page-break-inside:auto}
   .quote-table tr{page-break-inside:avoid;page-break-after:auto}
+  .sello-pagado-wrap{page-break-inside:avoid}
+  .sello-pagado{max-width:45%;}
 }
 
 /* =========================================================
@@ -430,8 +435,12 @@ th{font-size:12px;text-transform:uppercase;color:#666;background:#fafafa}
   .card{border:0;box-shadow:none;padding:0;margin:0}
   .quote-preview{width:210mm;min-height:297mm;margin:0;padding:8mm;box-sizing:border-box;border:0}
   .quote-head,.quote-customer,.quote-payment,.quote-detail,.quote-total,.quote-foot{page-break-inside:avoid}
-  .quote-table{page-break-inside:auto}
+  .quote-detail{overflow:visible!important}
+  .quote-table-wrap{min-width:0!important;width:100%!important}
+  .quote-table{width:100%!important;min-width:0!important;page-break-inside:auto}
   .quote-table tr{page-break-inside:avoid;page-break-after:auto}
+  .sello-pagado-wrap{page-break-inside:avoid}
+  .sello-pagado{max-width:45%;}
 }
 
 
@@ -1867,14 +1876,14 @@ const rows=d.productos.map(p=>{
       <div class="quote-section-title">Detalle del Presupuesto</div>
 
       <div class="quote-table-wrap">
-        ${String(d.estado||"").trim()==="Pagado" ? `<img class="sello-pagado" src="${PAGADO_STAMP_URL}" alt="Pagado">` : ""}
-
         <table class="quote-table">
           <thead>
           <tr><th>Producto</th><th>Medida</th><th>Cantidad</th><th>Cajas</th><th>Precio Unit.</th><th>Importe</th></tr>
           </thead>
           <tbody>${rows}</tbody>
         </table>
+
+        ${String(d.estado||"").trim()==="Pagado" ? `<div class="sello-pagado-wrap"><img class="sello-pagado" src="${PAGADO_STAMP_URL}" alt="Pagado"></div>` : ""}
       </div>
     </div>
 
