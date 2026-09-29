@@ -203,6 +203,8 @@ th{font-size:12px;text-transform:uppercase;color:#666;background:#fafafa}
 .quote-check{width:4mm;height:4mm;border:1.3px solid #183746;border-radius:.8mm;display:inline-block;box-sizing:border-box}
 .quote-payment-selected{display:none}
 .quote-detail{margin-top:3mm;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.quote-table-wrap{position:relative;min-width:760px}
+.sello-pagado{position:absolute;left:50%;top:60%;transform:translate(-50%,-50%);width:58mm;max-width:55%;height:auto;z-index:5;pointer-events:none}
 .quote-table{width:100%;min-width:760px;border-collapse:collapse;table-layout:fixed}
 .quote-table th{background:#183746;color:#fff;padding:3mm 2mm;border:1px solid #183746;font-size:3.1mm;font-weight:800;text-transform:uppercase}
 .quote-table td{padding:2.5mm 2mm;border:1px solid #d7dde0;font-size:3.1mm;color:#263f4b;vertical-align:middle}
@@ -515,6 +517,7 @@ const API_URL = "https://script.google.com/macros/s/AKfycby_3DebaIbZZW2qZ7ShkePB
   }catch(e){}
 })();
 const LOGO_URL = "https://raw.githubusercontent.com/Jdequelli85/qr-corralon/main/logo.png";
+const PAGADO_STAMP_URL = "https://historico.gytsrl.com/Pagado.png";
 
 /*
  * CARGA OPTIMIZADA DEL CATÁLOGO
@@ -1863,12 +1866,16 @@ const rows=d.productos.map(p=>{
       <div class="quote-section-line"></div>
       <div class="quote-section-title">Detalle del Presupuesto</div>
 
-      <table class="quote-table">
-        <thead>
+      <div class="quote-table-wrap">
+        ${String(d.estado||"").trim()==="Pagado" ? `<img class="sello-pagado" src="${PAGADO_STAMP_URL}" alt="Pagado">` : ""}
+
+        <table class="quote-table">
+          <thead>
           <tr><th>Producto</th><th>Medida</th><th>Cantidad</th><th>Cajas</th><th>Precio Unit.</th><th>Importe</th></tr>
-        </thead>
-        <tbody>${rows}</tbody>
-      </table>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
     </div>
 
     ${d.productos.some(p => String(p.id||"").toUpperCase().startsWith("ENV-") || String(p.unidad||"").toUpperCase()==="FLETE")
@@ -1997,7 +2004,7 @@ function cerrarGestion(){
   $("gestionBackdrop").classList.remove("open");
 }
 
-function abrirPresupuestoEnVentana(numero, presupuestoPrecargado, productosPrecargados){
+function abrirPresupuestoEnVentana(numero, presupuestoPrecargado, productosPrecargados, estadoPrecargado){
   if(!numero || !token) return;
 
   const backdrop=$("presupuestoVerBackdrop");
@@ -2013,10 +2020,10 @@ function abrirPresupuestoEnVentana(numero, presupuestoPrecargado, productosPreca
   // V13: NO abrimos otro PPTO dentro de un iframe.
   // El PPTO principal ya tiene la sesión válida, por lo que consulta
   // directamente el presupuesto y lo renderiza dentro de este modal.
-  cargarPresupuestoEnModal(numero, presupuestoPrecargado, productosPrecargados);
+  cargarPresupuestoEnModal(numero, presupuestoPrecargado, productosPrecargados, estadoPrecargado);
 }
 
-async function cargarPresupuestoEnModal(numero, presupuestoPrecargado, productosPrecargados){
+async function cargarPresupuestoEnModal(numero, presupuestoPrecargado, productosPrecargados, estadoPrecargado){
   const contenido=$("presupuestoVerContenido");
   if(!contenido) return;
 
@@ -2073,6 +2080,7 @@ async function cargarPresupuestoEnModal(numero, presupuestoPrecargado, productos
       formaPago:p["Forma de pago"]||"",
       total:Number(p["Total"]||0),
       validez:Number(p["Validez (días)"]||0),
+        estado:String(estadoPrecargado || p["Estado"] || "").trim(),
       productos:productosHistoricos
     };
 
@@ -2146,7 +2154,8 @@ window.addEventListener("message",function(event){
     abrirPresupuestoEnVentana(
       numero,
       event.data.presupuesto || null,
-      Array.isArray(event.data.productos) ? event.data.productos : null
+      Array.isArray(event.data.productos) ? event.data.productos : null,
+      event.data.estado || ""
     );
     return;
   }
