@@ -456,6 +456,16 @@ th{font-size:12px;text-transform:uppercase;color:#666;background:#fafafa}
 #gestionFrame{width:100%;height:100%;border:0;background:#f3f4f6;display:block}
 @media(max-width:700px){.gestion-backdrop{padding:0}.gestion-modal{border-radius:0}.gestion-modal-head{height:48px;flex-basis:48px}}
 
+/* MAPA DE REPARTO — visor integrado */
+.mapa-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.58);z-index:9100;display:none;padding:18px}
+.mapa-backdrop.open{display:flex;align-items:stretch;justify-content:center}
+.mapa-modal{width:min(1500px,100%);height:100%;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.35);display:flex;flex-direction:column}
+.mapa-modal-head{height:54px;flex:0 0 54px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid #ddd;background:#fff}
+.mapa-modal-head strong{font-size:17px}
+.mapa-close{border:0;background:transparent;font-size:30px;line-height:1;cursor:pointer;color:#555;padding:0 6px}
+#mapaFrame{width:100%;height:100%;border:0;background:#f3f4f6;display:block}
+@media(max-width:700px){.mapa-backdrop{padding:0}.mapa-modal{border-radius:0}.mapa-modal-head{height:48px;flex-basis:48px}.mapa-modal-head strong{font-size:14px}}
+
 
 /* =========================================================
    V11 — VISOR DE PRESUPUESTO DENTRO DE PPTO
@@ -914,6 +924,7 @@ async function renderApp(){
         <div class="productos-toolbar-left">
           <button class="btn btn-secondary catalogo-consulta-btn" id="openConsultaCatalogo">📦 CATÁLOGO</button>
           <button class="btn btn-secondary" id="openGestion">📋 GESTIÓN</button>
+          <button class="btn btn-secondary" id="openMapaReparto" title="Abrir mapa de reparto">🗺️ MAPA</button>
         </div>
         <div class="productos-toolbar-right">
           <button class="btn btn-primary add-btn" id="add">＋ AGREGAR PRODUCTO</button>
@@ -2184,7 +2195,9 @@ window.addEventListener("message",function(event){
 
 document.addEventListener("click",function(event){
   if(event.target.id==="openGestion") abrirGestion();
+  if(event.target.id==="openMapaReparto") abrirMapaReparto();
   if(event.target.id==="closeGestion" || event.target.id==="gestionBackdrop") cerrarGestion();
+  if(event.target.id==="closeMapaReparto" || event.target.id==="mapaBackdrop") cerrarMapaReparto();
   if(event.target.id==="closePresupuestoVer") cerrarPresupuestoEnVentana();
   if(event.target.id==="imprimirPresupuestoVer") imprimirPresupuestoDesdeVentana();
   if(event.target.id==="volverGestionPresupuesto") volverGestionDesdePresupuesto();
@@ -2197,8 +2210,30 @@ document.addEventListener("keydown",function(event){
     cerrarPresupuestoEnVentana();
     return;
   }
+  if($("mapaBackdrop")?.classList.contains("open")){
+    cerrarMapaReparto();
+    return;
+  }
   if($("gestionBackdrop")?.classList.contains("open")) cerrarGestion();
 });
+
+const MAPA_REPARTO_URL = "https://jdequelli85.github.io/MapaReparto/";
+
+function abrirMapaReparto(){
+  if(!token){ mostrarLogin(); return; }
+  const backdrop=$("mapaBackdrop");
+  const frame=$("mapaFrame");
+  if(!backdrop || !frame) return;
+  backdrop.classList.add("open");
+  if(frame.src !== MAPA_REPARTO_URL){
+    frame.src = MAPA_REPARTO_URL;
+  }
+}
+
+function cerrarMapaReparto(){
+  const backdrop=$("mapaBackdrop");
+  if(backdrop) backdrop.classList.remove("open");
+}
 
 // V13: el presupuesto se renderiza directamente en el PPTO principal.
 // No existe un segundo iframe PPTO ni una segunda sesión.
@@ -2216,6 +2251,17 @@ if(token) renderApp(); else mostrarLogin();
         <button type="button" class="gestion-close" id="closeGestion" aria-label="Cerrar">×</button>
       </div>
       <iframe id="gestionFrame" title="Gestión de presupuestos" src="about:blank"></iframe>
+    </div>
+  </div>
+
+  <!-- Mapa de reparto integrado -->
+  <div class="mapa-backdrop" id="mapaBackdrop">
+    <div class="mapa-modal" role="dialog" aria-modal="true" aria-label="Mapa de reparto">
+      <div class="mapa-modal-head">
+        <strong>🗺️ MAPA DE REPARTO</strong>
+        <button type="button" class="mapa-close" id="closeMapaReparto" aria-label="Cerrar">×</button>
+      </div>
+      <iframe id="mapaFrame" title="Mapa de reparto" src="about:blank" loading="lazy"></iframe>
     </div>
   </div>
 
