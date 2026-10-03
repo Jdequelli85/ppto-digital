@@ -252,11 +252,11 @@ th{font-size:12px;text-transform:uppercase;color:#666;background:#fafafa}
 .quote-total{display:flex;justify-content:flex-end;align-items:center;gap:5mm;margin-top:4mm;font-size:5mm;font-weight:900;color:#183746}
 .quote-total-value{min-width:45mm;padding:3mm 4mm;text-align:right;border:2px solid #183746;border-radius:2mm;background:#f2f5f6;color:#BE000F}
 .quote-finance{margin-top:3mm;padding:3mm 4mm;border:1px solid #cbdceb;border-left:2mm solid #245a7a;border-radius:2mm;background:#f5f9fc;color:#183746;page-break-inside:avoid}
-.quote-finance-heading{font-size:3.2mm;font-weight:900;text-transform:uppercase;letter-spacing:.2mm}
-.quote-finance-plan{font-size:3.5mm;font-weight:900;margin-top:1mm}
-.quote-finance-note{font-size:2.8mm;color:#68727c;margin-top:.5mm;line-height:1.3}
-.quote-finance-values{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:2mm;margin-top:2mm}
-.quote-finance-values>div{min-width:0;padding:2mm;background:#fff;border:1px solid #dfe7ed;border-radius:1.5mm}
+.quote-finance-heading{font-size:3.2mm;font-weight:900;text-transform:uppercase;letter-spacing:.2mm;margin-bottom:2mm}
+.quote-finance-values{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:2mm}
+.quote-finance-values>div{min-width:0;padding:2.5mm;background:#fff;border:1px solid #dfe7ed;border-radius:1.5mm;box-sizing:border-box}
+.quote-finance-plan{font-size:3.5mm;font-weight:900;line-height:1.25}
+.quote-finance-note{font-size:2.8mm;color:#68727c;margin-top:.7mm;line-height:1.3}
 .quote-finance-values small{display:block;font-size:2.5mm;color:#68727c;font-weight:800;text-transform:uppercase;margin-bottom:1mm}
 .quote-finance-values strong{display:block;font-size:3.4mm;color:#183746;overflow-wrap:anywhere}
 @media(max-width:560px){.quote-finance-values{grid-template-columns:1fr}}
@@ -2166,11 +2166,12 @@ const rows=d.productos.map(p=>{
     ${tieneSnapshotFinanciacion(d) ? `
       <div class="quote-finance">
         <div class="quote-finance-heading">Información de financiación</div>
-        <div class="quote-finance-plan">${esc(d.financiacionPlan)}</div>
-        ${d.financiacionObservacion ? `<div class="quote-finance-note">${esc(d.financiacionObservacion)}</div>` : ""}
-        ${d.financiacionTarjeta ? `<div class="quote-finance-note">Tarjetas: ${esc(d.financiacionTarjeta)}</div>` : ""}
         <div class="quote-finance-values">
-          <div><small>Interés aplicado</small><strong>${formatearPorcentaje(d.financiacionInteresPorcentaje)}</strong></div>
+          <div>
+            <div class="quote-finance-plan">${esc(d.financiacionPlan)}</div>
+            ${d.financiacionObservacion ? `<div class="quote-finance-note">${esc(d.financiacionObservacion)}</div>` : ""}
+            ${d.financiacionTarjeta ? `<div class="quote-finance-note">Tarjetas: ${esc(d.financiacionTarjeta)}</div>` : ""}
+          </div>
           <div><small>Total financiado</small><strong>$ ${fmt(d.financiacionTotal)}</strong></div>
           <div><small>Valor de cada cuota</small><strong>$ ${fmt(d.financiacionCuota)}</strong></div>
         </div>
