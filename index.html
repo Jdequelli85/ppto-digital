@@ -72,6 +72,36 @@ th{font-size:12px;text-transform:uppercase;color:#666;background:#fafafa}
 .money{text-align:right;white-space:nowrap}
 .total-box{text-align:right;margin-top:15px;font-size:22px;font-weight:800}
 .total-box small{display:block;font-size:12px;color:#777;font-weight:400;margin-bottom:3px}
+/* Selector dinámico de medios de pago: usable con mouse y pantalla táctil. */
+.payment-selector{position:relative;width:100%;z-index:8}
+.payment-trigger{width:100%;min-height:54px;padding:10px 13px;border:1px solid #cfd2d7;border-radius:9px;background:#fff;display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;color:var(--texto)}
+.payment-trigger:focus{outline:none;border-color:var(--rojo);box-shadow:0 0 0 3px rgba(190,0,15,.10)}
+.payment-trigger-main{min-width:0;display:flex;flex-direction:column;gap:3px}
+.payment-trigger-title{font-weight:800;font-size:14px;overflow-wrap:anywhere}
+.payment-trigger-sub{font-size:11px;color:#6b7280;font-weight:400;line-height:1.25}
+.payment-trigger-arrow{flex:0 0 auto;color:#6b7280;font-size:18px}
+.payment-menu{position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:50;max-height:min(58vh,520px);overflow-y:auto;overscroll-behavior:contain;background:#fff;border:1px solid #d9dce1;border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,.18);padding:7px}
+.payment-menu[hidden]{display:none}
+.payment-option{display:flex;flex-direction:column;align-items:flex-start;gap:3px;width:100%;min-height:48px;padding:10px 11px;border:1px solid transparent;border-radius:8px;background:#fff;text-align:left;color:#222}
+.payment-option:hover,.payment-option:focus{outline:none;background:#fff7f7;border-color:#f0c4c8}
+.payment-option.selected{background:#fff4f4;border-color:#e8aeb4}
+.payment-option-title{font-size:14px;font-weight:800;line-height:1.3}
+.payment-option-note,.payment-option-cards{font-size:11px;color:#737b84;line-height:1.35;font-weight:400;white-space:normal}
+.payment-option-cards{color:#626b74}
+.payment-divider{height:1px;background:#e5e7eb;margin:6px 4px}
+.payment-group-label{padding:5px 10px 2px;color:#8a929a;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px}
+.payment-sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+.finance-summary{margin-top:12px;padding:14px;border:1px solid #cbdceb;border-left:4px solid #245a7a;border-radius:10px;background:#f5f9fc;color:#183746}
+.finance-summary-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.finance-summary-title{font-size:13px;font-weight:900;text-transform:uppercase;letter-spacing:.3px}
+.finance-summary-plan{font-size:14px;font-weight:800;margin-top:3px}
+.finance-summary-note,.finance-summary-cards{display:block;color:#68727c;font-size:11px;line-height:1.4;margin-top:3px}
+.finance-summary-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.finance-summary-item{min-width:0;padding:9px;background:#fff;border:1px solid #dfe7ed;border-radius:8px}
+.finance-summary-item small{display:block;color:#68727c;font-size:10px;font-weight:800;text-transform:uppercase;line-height:1.25;margin-bottom:5px}
+.finance-summary-item strong{display:block;color:#183746;font-size:15px;line-height:1.25;overflow-wrap:anywhere}
+.finance-summary-error{font-size:12px;color:#9d0010;margin-top:8px}
+@media(max-width:560px){.payment-menu{max-height:58vh}.payment-option{min-height:54px;padding:11px}.finance-summary{padding:12px}.finance-summary-grid{grid-template-columns:1fr}.finance-summary-item{display:flex;justify-content:space-between;align-items:center;gap:10px}.finance-summary-item small{margin:0}.finance-summary-item strong{text-align:right}}
 .actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}
 .modal-backdrop{
   position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:100;
@@ -221,6 +251,15 @@ th{font-size:12px;text-transform:uppercase;color:#666;background:#fafafa}
 .money{text-align:right;white-space:nowrap}
 .quote-total{display:flex;justify-content:flex-end;align-items:center;gap:5mm;margin-top:4mm;font-size:5mm;font-weight:900;color:#183746}
 .quote-total-value{min-width:45mm;padding:3mm 4mm;text-align:right;border:2px solid #183746;border-radius:2mm;background:#f2f5f6;color:#BE000F}
+.quote-finance{margin-top:3mm;padding:3mm 4mm;border:1px solid #cbdceb;border-left:2mm solid #245a7a;border-radius:2mm;background:#f5f9fc;color:#183746;page-break-inside:avoid}
+.quote-finance-heading{font-size:3.2mm;font-weight:900;text-transform:uppercase;letter-spacing:.2mm}
+.quote-finance-plan{font-size:3.5mm;font-weight:900;margin-top:1mm}
+.quote-finance-note{font-size:2.8mm;color:#68727c;margin-top:.5mm;line-height:1.3}
+.quote-finance-values{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:2mm;margin-top:2mm}
+.quote-finance-values>div{min-width:0;padding:2mm;background:#fff;border:1px solid #dfe7ed;border-radius:1.5mm}
+.quote-finance-values small{display:block;font-size:2.5mm;color:#68727c;font-weight:800;text-transform:uppercase;margin-bottom:1mm}
+.quote-finance-values strong{display:block;font-size:3.4mm;color:#183746;overflow-wrap:anywhere}
+@media(max-width:560px){.quote-finance-values{grid-template-columns:1fr}}
 .quote-footer-line{height:2px;background:#BE000F;margin-top:5mm;margin-bottom:3mm}
 .quote-foot{margin:0;padding:0;border:0;font-size:3mm;line-height:1.5;color:#59666c;display:grid;grid-template-columns:1fr 1.5fr;gap:8mm;align-items:center}
 .quote-thanks{font-size:4mm;font-weight:800;color:#183746}
@@ -277,7 +316,7 @@ th{font-size:12px;text-transform:uppercase;color:#666;background:#fafafa}
   .wrap{width:210mm;max-width:none;margin:0;padding:0}
   .card{border:0;box-shadow:none;padding:0;margin:0}
   .quote-preview{width:210mm;min-height:297mm;margin:0;padding:8mm;box-sizing:border-box;border:0}
-  .quote-head,.quote-customer,.quote-payment,.quote-detail,.quote-total,.quote-foot{page-break-inside:avoid}
+  .quote-head,.quote-customer,.quote-payment,.quote-detail,.quote-total,.quote-finance,.quote-foot{page-break-inside:avoid}
   .quote-detail{overflow:visible!important}
   .quote-table-wrap{min-width:0!important;width:100%!important}
   .quote-table{width:100%!important;min-width:0!important;page-break-inside:auto}
@@ -434,7 +473,7 @@ th{font-size:12px;text-transform:uppercase;color:#666;background:#fafafa}
   .wrap{width:210mm;max-width:none;margin:0;padding:0}
   .card{border:0;box-shadow:none;padding:0;margin:0}
   .quote-preview{width:210mm;min-height:297mm;margin:0;padding:8mm;box-sizing:border-box;border:0}
-  .quote-head,.quote-customer,.quote-payment,.quote-detail,.quote-total,.quote-foot{page-break-inside:avoid}
+  .quote-head,.quote-customer,.quote-payment,.quote-detail,.quote-total,.quote-finance,.quote-foot{page-break-inside:avoid}
   .quote-detail{overflow:visible!important}
   .quote-table-wrap{min-width:0!important;width:100%!important}
   .quote-table{width:100%!important;min-width:0!important;page-break-inside:auto}
@@ -567,6 +606,15 @@ let catalogoOpciones = [];
 let productoActual = null;
 let verNumero = new URLSearchParams(location.search).get("ver") || "";
 let gtViewer = new URLSearchParams(location.search).get("gt_viewer") === "1";
+
+// Planes de financiación: una sola lectura por sesión de página.
+// El GS conserva su propio caché de seis horas, por lo que esta carga
+// no consulta repetidamente Google Sheets.
+let planesCuotas = [];
+let planesCuotasPromise = null;
+let planesCuotasDisponibles = false;
+let planesCuotasEstado = "sin-cargar";
+let pagoSeleccionadoKey = "Contado";
 
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
@@ -913,8 +961,15 @@ async function renderApp(){
         <div><label>Teléfono</label><input id="telefono"></div>
         <div><label>Email</label><input id="email" type="email"></div>
         <div><label>Dirección</label><input id="direccion"></div>
-        <div><label>Forma de pago</label>
-          <select id="forma"><option value="Contado">Contado</option><option value="Tarjeta">Tarjeta</option><option value="Otro">Otro</option></select>
+        <div><label id="formaLabel">Forma de pago</label>
+          <div class="payment-selector" id="formaSelector">
+            <button type="button" class="payment-trigger" id="formaTrigger" aria-haspopup="listbox" aria-expanded="false">
+              <span class="payment-trigger-main"><span class="payment-trigger-title" id="formaSelectedTitle">Contado</span><span class="payment-trigger-sub" id="formaSelectedSub">Precio de contado</span></span>
+              <span class="payment-trigger-arrow" aria-hidden="true">⌄</span>
+            </button>
+            <div class="payment-menu" id="formaMenu" role="listbox" aria-label="Modalidades de pago" hidden></div>
+          </div>
+          <select id="forma" class="payment-sr-only" tabindex="-1" aria-hidden="true"><option value="Contado">Contado</option><option value="Otro">Otro</option><option value="Tarjeta">Tarjeta</option></select>
         </div>
       </div>
     </section>
@@ -946,6 +1001,7 @@ async function renderApp(){
   <tbody id="rows"></tbody>
 </table></div>
       <div class="total-box"><small>Total presupuesto</small>$ <span id="total">0,00</span></div>
+      <div id="financiacionActual" hidden></div>
       <div class="actions">
         <button class="btn btn-secondary" id="cancel">CANCELAR</button>
         <button class="btn btn-primary" id="generate">GENERAR PRESUPUESTO</button>
@@ -1037,6 +1093,11 @@ async function renderApp(){
     </div>
   </div>`;
   $("forma").onchange=recalcularPreciosPorFormaPago;
+  renderSelectorPago();
+  cargarPlanesCuotas().then(()=>renderSelectorPago()).catch(err=>{
+    console.warn("No se pudieron cargar los planes de financiación:",err.message);
+    renderSelectorPago();
+  });
   $("openConsultaCatalogo").onclick=abrirConsultaCatalogo;
   $("closeConsultaV7").onclick=cerrarConsultaCatalogo;
   $("consultaV7Buscar").oninput=renderConsultaV7Catalogo;
@@ -1052,9 +1113,137 @@ async function renderApp(){
   renderProductos();
 }
 
+function formatearPorcentaje(valor){
+  return Number(valor||0).toLocaleString("es-AR",{minimumFractionDigits:2,maximumFractionDigits:2})+"%";
+}
+
+function tituloPlanCuotas(plan){
+  const nombre=String(plan?.cantidadCuotas||"").trim();
+  const interes=Number(plan?.interesPorcentaje||0);
+  return interes===0 ? `${nombre} (sin interés)` : `${nombre} (${formatearPorcentaje(interes)})`;
+}
+
+function obtenerCantidadCuotas(plan){
+  const texto=String(plan?.observacion||"")+" "+String(plan?.cantidadCuotas||"");
+  const match=texto.match(/(\d+)\s*cuotas?/i);
+  return match ? Math.max(1,Number(match[1])) : null;
+}
+
+function redondearDinero(valor){
+  return Math.round((Number(valor||0)+Number.EPSILON)*100)/100;
+}
+
+function calcularFinanciacion(total,plan){
+  if(!plan)return null;
+  const interes=Number(plan.interesPorcentaje||0);
+  const cuotas=obtenerCantidadCuotas(plan);
+  if(!Number.isFinite(interes)||interes<0||!cuotas)return null;
+  const totalFinanciado=redondearDinero(Number(total||0)*(1+interes/100));
+  return {
+    plan:String(plan.cantidadCuotas||"").trim(),
+    interesPorcentaje:interes,
+    observacion:String(plan.observacion||"").trim(),
+    tarjeta:String(plan.tarjeta||"").trim(),
+    cuotas,
+    total:totalFinanciado,
+    cuota:redondearDinero(totalFinanciado/cuotas)
+  };
+}
+
+function obtenerPlanSeleccionado(){
+  if(!pagoSeleccionadoKey.startsWith("PLAN_"))return null;
+  const indice=Number(pagoSeleccionadoKey.slice(5));
+  return Number.isInteger(indice) ? (planesCuotas[indice]||null) : null;
+}
+
+function descripcionPagoSeleccionado(){
+  if(pagoSeleccionadoKey==="Contado")return {titulo:"Contado",sub:"Precio de contado"};
+  if(pagoSeleccionadoKey==="Otro")return {titulo:"Otro",sub:"Mismo criterio de precios que contado"};
+  if(pagoSeleccionadoKey==="Tarjeta")return {titulo:"Tarjeta",sub:"Precio de tarjeta"};
+  const plan=obtenerPlanSeleccionado();
+  return plan ? {titulo:tituloPlanCuotas(plan),sub:[plan.observacion,plan.tarjeta].filter(Boolean).join(" · ")} : {titulo:"Contado",sub:"Precio de contado"};
+}
+
+function renderSelectorPago(){
+  const menu=$("formaMenu");
+  const forma=$("forma");
+  if(!menu||!forma)return;
+
+  const efectivo=[
+    {key:"Contado",title:"Contado",sub:"Precio de contado"}
+  ];
+  const planes=planesCuotas.map((plan,i)=>({
+    key:"PLAN_"+i,
+    title:tituloPlanCuotas(plan),
+    note:String(plan.observacion||"").trim(),
+    cards:String(plan.tarjeta||"").trim()
+  }));
+  const otro={key:"Otro",title:"Otro",sub:"Mismo criterio de precios que contado"};
+  const legacyTarjeta={key:"Tarjeta",title:"Tarjeta",sub:"Precio de tarjeta"};
+
+  let html=efectivo.map(x=>`<button type="button" class="payment-option ${pagoSeleccionadoKey===x.key?"selected":""}" data-payment-key="${x.key}" role="option" aria-selected="${pagoSeleccionadoKey===x.key}"><span class="payment-option-title">${esc(x.title)}</span><span class="payment-option-note">${esc(x.sub)}</span></button>`).join("");
+  html+=`<div class="payment-divider" role="separator"></div>`;
+  if(planes.length){
+    html+=planes.map(plan=>`<button type="button" class="payment-option ${pagoSeleccionadoKey===plan.key?"selected":""}" data-payment-key="${plan.key}" role="option" aria-selected="${pagoSeleccionadoKey===plan.key}"><span class="payment-option-title">${esc(plan.title)}</span>${plan.note?`<span class="payment-option-note">${esc(plan.note)}</span>`:""}${plan.cards?`<span class="payment-option-cards">${esc(plan.cards)}</span>`:""}</button>`).join("");
+  }else if(planesCuotasEstado==="cargando"){
+    html+=`<div class="payment-option" aria-disabled="true"><span class="payment-option-note">Cargando modalidades de cuotas…</span></div>`;
+  }else{
+    html+=`<div class="payment-group-label">Planes no disponibles</div><button type="button" class="payment-option ${pagoSeleccionadoKey==="Tarjeta"?"selected":""}" data-payment-key="Tarjeta" role="option" aria-selected="${pagoSeleccionadoKey==="Tarjeta"}"><span class="payment-option-title">${esc(legacyTarjeta.title)}</span><span class="payment-option-note">${esc(legacyTarjeta.sub)} · No se pudieron cargar las cuotas</span></button>`;
+  }
+  html+=`<div class="payment-divider" role="separator"></div><button type="button" class="payment-option ${pagoSeleccionadoKey==="Otro"?"selected":""}" data-payment-key="Otro" role="option" aria-selected="${pagoSeleccionadoKey==="Otro"}"><span class="payment-option-title">${esc(otro.title)}</span><span class="payment-option-note">${esc(otro.sub)}</span></button>`;
+  menu.innerHTML=html;
+
+  // El select oculto mantiene el punto de integración con la lógica existente.
+  const opciones=["Contado","Otro","Tarjeta",...planes.map(x=>x.key)];
+  forma.innerHTML=opciones.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join("");
+  if(!opciones.includes(pagoSeleccionadoKey))pagoSeleccionadoKey="Contado";
+  forma.value=pagoSeleccionadoKey;
+  const desc=descripcionPagoSeleccionado();
+  $("formaSelectedTitle").textContent=desc.titulo;
+  $("formaSelectedSub").textContent=desc.sub||"";
+}
+
+async function cargarPlanesCuotas(){
+  if(planesCuotasDisponibles)return planesCuotas;
+  if(planesCuotasPromise)return planesCuotasPromise;
+  planesCuotasEstado="cargando";
+  planesCuotasPromise=(async()=>{
+    const respuesta=await jsonp({accion:"planesCuotas",token},15000);
+    if(!respuesta?.ok)throw new Error(respuesta?.error||"No se pudieron cargar los planes de cuotas.");
+    planesCuotas=Array.isArray(respuesta.planes)?respuesta.planes:[];
+    planesCuotasDisponibles=true;
+    planesCuotasEstado="cargado";
+    if(pagoSeleccionadoKey==="Tarjeta"){
+      const indiceSinInteres=planesCuotas.findIndex(plan=>Number(plan.interesPorcentaje||0)===0);
+      pagoSeleccionadoKey=indiceSinInteres>=0 ? "PLAN_"+indiceSinInteres : "Contado";
+    }
+    return planesCuotas;
+  })();
+  try{return await planesCuotasPromise;}
+  catch(error){planesCuotasEstado="error";throw error;}
+  finally{planesCuotasPromise=null;}
+}
+
+function seleccionarPago(key){
+  const existe=key==="Contado"||key==="Otro"||key==="Tarjeta"||key.startsWith("PLAN_");
+  if(!existe)return;
+  pagoSeleccionadoKey=key;
+  const forma=$("forma");
+  if(forma){forma.value=key;}
+  const menu=$("formaMenu");
+  if(menu)menu.hidden=true;
+  const trigger=$("formaTrigger");
+  if(trigger)trigger.setAttribute("aria-expanded","false");
+  renderSelectorPago();
+  recalcularPreciosPorFormaPago();
+}
+
 function limpiarFormulario(){
   ["cliente","dni","telefono","email","direccion"].forEach(id=>{if($(id))$(id).value=""});
+  pagoSeleccionadoKey="Contado";
   if($("forma"))$("forma").value="Contado";
+  renderSelectorPago();
+  const menu=$("formaMenu");if(menu)menu.hidden=true;
 }
 
 /* =========================================================
@@ -1245,17 +1434,10 @@ function mostrarProducto(){
   $("fechaEntregaArea").hidden=true;
   $("fechaEntrega").value="";
 
-  const oferta=Number(p["OFERTA"]||0);
-  const tieneOferta=Number.isFinite(oferta)&&oferta>0;
-
-  const precioContado=Number(p["Precio Contado"]||0);
-  const precioTarjeta=Number(p["Precio Tarjeta"]||0);
   const forma=$("forma")?.value||"Contado";
-
-  const precio=
-    forma==="Tarjeta"&&precioTarjeta>0
-      ? precioTarjeta
-      : (tieneOferta?oferta:precioContado);
+  const datosPrecio=precioSegunFormaPago(p,forma);
+  const precio=datosPrecio.precio;
+  const tieneOferta=datosPrecio.tieneOferta;
 
   /* =========================
      ENVÍO / FLETE
@@ -1365,6 +1547,11 @@ function unidadesPorCaja(p){
   return unidades > 0 ? unidades : null;
 }
 
+function esPagoConPrecioTarjeta(forma){
+  const valor=String(forma||"Contado");
+  return valor!=="Contado" && valor!=="Otro";
+}
+
 function precioSegunFormaPago(p, forma){
   const id=String(p?.id||p?.["ID"]||"").trim();
   const catalogo=catalogoProductos.find(x=>String(x?.["ID"]||"").trim()===id) || p;
@@ -1389,7 +1576,7 @@ function precioSegunFormaPago(p, forma){
    * precio = precioContado * (1 + porcentajeOtro / 100);
    */
 
-  if(forma==="Tarjeta" && precioTarjeta>0){
+  if(esPagoConPrecioTarjeta(forma) && precioTarjeta>0){
     return {
       precio:precioTarjeta,
       tieneOferta:false,
@@ -1432,11 +1619,11 @@ function recalcularPreciosPorFormaPago(){
 function calcularActual(){
   if(!productoActual)return null;
   const crrl=esMaterialCorralon(productoActual);
-  const oferta=Number(productoActual["OFERTA"]||0);
-  const tieneOferta=Number.isFinite(oferta)&&oferta>0;
-  const forma=$("forma").value||"Contado";
-  const precioTarjeta=Number(productoActual["Precio Tarjeta"]||0);
-  const precio=(forma==="Tarjeta"&&precioTarjeta>0)?precioTarjeta:(tieneOferta?oferta:Number(productoActual["Precio Contado"]||0));
+  const forma=$("forma")?.value||"Contado";
+  const datosPrecio=precioSegunFormaPago(productoActual,forma);
+  const precio=datosPrecio.precio;
+  const tieneOferta=datosPrecio.tieneOferta;
+  const oferta=datosPrecio.oferta;
 
   const esENV = categoriaProducto(productoActual) === "ENV";
 
@@ -1481,6 +1668,27 @@ function calcularActual(){
   const subtotal=reales*precio;
   $("calcInfo").textContent=`${conZ?"Con zócalo (+10%) · ":""}${cajas} cajas · ${fmt(reales)} m² reales · Subtotal: $ ${fmt(subtotal)}`;
   return {unidad:"m²",cantidad:m2,m2Solicitados:m2,conZocalo:conZ,porcentajeAdicional:extra,m2Calculados:m2Calc,cajas,m2Reales:reales,precioM2:precio,precioCaja:precio*caja,subtotal,tieneOferta,oferta};
+}
+
+function renderFinanciacionActual(total){
+  const contenedor=$("financiacionActual");
+  if(!contenedor)return;
+  const plan=obtenerPlanSeleccionado();
+  if(!plan||!productos.length){contenedor.hidden=true;contenedor.innerHTML="";return;}
+  const datos=calcularFinanciacion(total,plan);
+  contenedor.hidden=false;
+  if(!datos){
+    contenedor.innerHTML=`<div class="finance-summary"><div class="finance-summary-title">Financiación seleccionada</div><div class="finance-summary-plan">${esc(tituloPlanCuotas(plan))}</div><div class="finance-summary-error">No se pudo identificar la cantidad de cuotas. Revisá el texto de CANT. CUOTAS u OBSERVACIÓN en NOVA CUOTAS.</div></div>`;
+    return;
+  }
+  contenedor.innerHTML=`<div class="finance-summary">
+    <div class="finance-summary-head"><div><div class="finance-summary-title">Detalle de financiación</div><div class="finance-summary-plan">${esc(tituloPlanCuotas(plan))}</div>${plan.observacion?`<span class="finance-summary-note">${esc(plan.observacion)}</span>`:""}${plan.tarjeta?`<span class="finance-summary-cards">Tarjetas: ${esc(plan.tarjeta)}</span>`:""}</div></div>
+    <div class="finance-summary-grid">
+      <div class="finance-summary-item"><small>Interés</small><strong>${formatearPorcentaje(datos.interesPorcentaje)}</strong></div>
+      <div class="finance-summary-item"><small>Total financiado</small><strong>$ ${fmt(datos.total)}</strong></div>
+      <div class="finance-summary-item"><small>${datos.cuotas===1?"Valor cuota":"Valor de cada cuota"}</small><strong>$ ${fmt(datos.cuota)}</strong></div>
+    </div>
+  </div>`;
 }
 
 function formatearFechaCorta(fechaISO){
@@ -1572,6 +1780,7 @@ function renderProductos(){
   });
 
   $("total").textContent=fmt(total);
+  renderFinanciacionActual(total);
   $("empty").hidden=productos.length>0;
   $("table").hidden=productos.length===0;
 }
@@ -1579,6 +1788,14 @@ function renderProductos(){
 $("cantidad")?.addEventListener("input",calcularActual);
 
 $("app").addEventListener("click",e=>{
+  if(e.target.closest("#formaTrigger")){
+    const menu=$("formaMenu");
+    const trigger=$("formaTrigger");
+    if(menu&&trigger){menu.hidden=!menu.hidden;trigger.setAttribute("aria-expanded",String(!menu.hidden));}
+    return;
+  }
+  const opcionPago=e.target.closest("[data-payment-key]");
+  if(opcionPago){seleccionarPago(opcionPago.dataset.paymentKey);return;}
   const item=e.target.closest("[data-catalogo-index]");
   if(item){
     seleccionarProductoCatalogo(Number(item.dataset.catalogoIndex));
@@ -1640,18 +1857,32 @@ async function guardarPresupuesto(){
     0
   );
 
+  const planSeleccionado=obtenerPlanSeleccionado();
+  const datosFinanciacion=planSeleccionado ? calcularFinanciacion(total,planSeleccionado) : null;
+  if(planSeleccionado && !datosFinanciacion){
+    return alert("No se pudo determinar la cantidad de cuotas de este plan. Revisá NOVA CUOTAS antes de generar el presupuesto.");
+  }
+  const descripcionPago=descripcionPagoSeleccionado();
   const datos={
     cliente,
     dniCuit:$("dni").value.trim(),
     telefono:$("telefono").value.trim(),
     email:$("email").value.trim(),
     direccion:$("direccion").value.trim(),
-    formaPago:$("forma").value,
+    formaPago:planSeleccionado ? String(planSeleccionado.cantidadCuotas||"").trim() : descripcionPago.titulo,
     subtotal:total,
     descuento:0,
     total,
     observaciones:"",
-    productos
+    productos,
+    ...(datosFinanciacion ? {
+      financiacionPlan:String(planSeleccionado.cantidadCuotas||"").trim(),
+      financiacionInteresPorcentaje:datosFinanciacion.interesPorcentaje,
+      financiacionObservacion:datosFinanciacion.observacion,
+      financiacionTarjeta:datosFinanciacion.tarjeta,
+      financiacionTotal:datosFinanciacion.total,
+      financiacionCuota:datosFinanciacion.cuota
+    } : {})
   };
 
   const btn=$("generate");
@@ -1717,6 +1948,20 @@ async function guardarPresupuesto(){
 
     datos.validez = validezGuardada;
 
+    // Recuperamos también la fotografía de financiación guardada.
+    // No se recalculan tasas ni importes después del guardado.
+    if(datos.financiacionPlan){
+      datos.financiacionPlan=presupuestoGuardado["Plan financiación"] || datos.financiacionPlan;
+      const interesGuardado=presupuestoGuardado["Interés financiación (%)"];
+      const totalFinanciadoGuardado=presupuestoGuardado["Total financiado"];
+      const cuotaGuardada=presupuestoGuardado["Valor cuota"];
+      datos.financiacionInteresPorcentaje=interesGuardado===""||interesGuardado==null?datos.financiacionInteresPorcentaje:Number(interesGuardado);
+      datos.financiacionObservacion=presupuestoGuardado["Observación financiación"] || datos.financiacionObservacion;
+      datos.financiacionTarjeta=presupuestoGuardado["Tarjeta financiación"] || datos.financiacionTarjeta;
+      datos.financiacionTotal=totalFinanciadoGuardado===""||totalFinanciadoGuardado==null?datos.financiacionTotal:Number(totalFinanciadoGuardado);
+      datos.financiacionCuota=cuotaGuardada===""||cuotaGuardada==null?datos.financiacionCuota:Number(cuotaGuardada);
+    }
+
     // ==================================================
     // MOSTRAR EL PRESUPUESTO CON LA VALIDEZ REAL
     // ==================================================
@@ -1749,6 +1994,16 @@ function mostrarPresupuestoGuardado(numero,datos){
   </main>`;
   $("printQuote").onclick=()=>window.print();
   $("newQuote").onclick=nuevoPresupuesto;
+}
+
+function tieneSnapshotFinanciacion(d){
+  if(!d || !String(d.financiacionPlan||"").trim())return false;
+  const total=d.financiacionTotal;
+  const cuota=d.financiacionCuota;
+  const interes=d.financiacionInteresPorcentaje;
+  return total!==null && total!==undefined && total!=="" && Number.isFinite(Number(total)) &&
+    cuota!==null && cuota!==undefined && cuota!=="" && Number.isFinite(Number(cuota)) &&
+    interes!==null && interes!==undefined && interes!=="" && Number.isFinite(Number(interes));
 }
 
 function quoteHtml(numero,fecha,d){
@@ -1876,10 +2131,9 @@ const rows=d.productos.map(p=>{
 
     <div class="quote-payment">
       <div class="quote-payment-title">Condición de Venta:</div>
-      <div class="quote-payment-option"><span>${check("Contado")}</span> Contado</div>
-      <div class="quote-payment-option"><span>${check("Tarjeta")}</span> Tarjeta</div>
-      <div class="quote-payment-option"><span>${check("Otro")}</span> Otro</div>
-      <div class="quote-payment-selected">Seleccionada: ${esc(formaPago)}</div>
+      ${["Contado","Tarjeta","Otro"].includes(formaPago)
+        ? `<div class="quote-payment-option"><span>${check("Contado")}</span> Contado</div><div class="quote-payment-option"><span>${check("Tarjeta")}</span> Tarjeta</div><div class="quote-payment-option"><span>${check("Otro")}</span> Otro</div>`
+        : `<div class="quote-payment-selected" style="display:block">Seleccionada: ${esc(formaPago)}</div>`}
     </div>
 
     <div class="quote-detail">
@@ -1908,6 +2162,20 @@ const rows=d.productos.map(p=>{
       <div>TOTAL</div>
       <div class="quote-total-value">$ ${fmt(d.total)}</div>
     </div>
+
+    ${tieneSnapshotFinanciacion(d) ? `
+      <div class="quote-finance">
+        <div class="quote-finance-heading">Información de financiación</div>
+        <div class="quote-finance-plan">${esc(d.financiacionPlan)}</div>
+        ${d.financiacionObservacion ? `<div class="quote-finance-note">${esc(d.financiacionObservacion)}</div>` : ""}
+        ${d.financiacionTarjeta ? `<div class="quote-finance-note">Tarjetas: ${esc(d.financiacionTarjeta)}</div>` : ""}
+        <div class="quote-finance-values">
+          <div><small>Interés aplicado</small><strong>${formatearPorcentaje(d.financiacionInteresPorcentaje)}</strong></div>
+          <div><small>Total financiado</small><strong>$ ${fmt(d.financiacionTotal)}</strong></div>
+          <div><small>Valor de cada cuota</small><strong>$ ${fmt(d.financiacionCuota)}</strong></div>
+        </div>
+      </div>
+    ` : ""}
 
     <div class="quote-footer-line"></div>
 
@@ -1943,7 +2211,14 @@ async function cargarHistorico(numero){
       cajas:Number(x["Cajas"]||0),precioM2:Number(x["Precio/m²"]||0),subtotal:Number(x["Subtotal"]||0),
       conZocalo:String(x["Con zócalo"]||"")==="Sí",tieneOferta:Number(x["Oferta"]||0)>0
     }));
-    const datos={cliente:p["Cliente"]||"",dniCuit:p["DNI/CUIT"]||"",telefono:p["Teléfono"]||"",email:p["Email"]||"",direccion:p["Dirección"]||"",formaPago:p["Forma de pago"]||"",total:Number(p["Total"]||0),validez:Number(p["Validez (días)"]||0),productos:productosHistoricos};
+    const datos={cliente:p["Cliente"]||"",dniCuit:p["DNI/CUIT"]||"",telefono:p["Teléfono"]||"",email:p["Email"]||"",direccion:p["Dirección"]||"",formaPago:p["Forma de pago"]||"",total:Number(p["Total"]||0),validez:Number(p["Validez (días)"]||0),productos:productosHistoricos,
+      financiacionPlan:p["Plan financiación"]||"",
+      financiacionInteresPorcentaje:p["Interés financiación (%)"]===""||p["Interés financiación (%)"]==null?null:Number(p["Interés financiación (%)"]),
+      financiacionObservacion:p["Observación financiación"]||"",
+      financiacionTarjeta:p["Tarjeta financiación"]||"",
+      financiacionTotal:p["Total financiado"]===""||p["Total financiado"]==null?null:Number(p["Total financiado"]),
+      financiacionCuota:p["Valor cuota"]===""||p["Valor cuota"]==null?null:Number(p["Valor cuota"])
+    };
     const fecha=p["Fecha"]?new Date(p["Fecha"]).toLocaleDateString("es-AR"):new Date().toLocaleDateString("es-AR");
     $("app").innerHTML=header()+`<main class="wrap"><div class="historical-actions no-print"><button class="btn btn-secondary" id="returnGestion">↩ VOLVER A GESTIÓN</button><button class="btn btn-primary" id="printQuote">🖨 IMPRIMIR / GUARDAR PDF</button><button class="btn btn-secondary" id="newQuote">NUEVO PRESUPUESTO</button></div>${quoteHtml(numero,fecha,datos)}</main>`;
     $("returnGestion").onclick=()=>{
@@ -1961,6 +2236,10 @@ async function cargarHistorico(numero){
 }
 
 document.addEventListener("click",e=>{
+  if(!e.target.closest("#formaSelector")){
+    const menu=$("formaMenu");const trigger=$("formaTrigger");
+    if(menu&&!menu.hidden){menu.hidden=true;trigger?.setAttribute("aria-expanded","false");}
+  }
   const item=e.target.closest("[data-consulta-v7-index]");
   if(item){
     consultaV7Seleccionar(Number(item.dataset.consultaV7Index));
@@ -1970,8 +2249,10 @@ document.addEventListener("click",e=>{
 });
 
 document.addEventListener("keydown",e=>{
-  if(e.key==="Escape" && $("consultaV7Modal")?.classList.contains("open")){
-    cerrarConsultaCatalogo();
+  if(e.key==="Escape"){
+    const menu=$("formaMenu");const trigger=$("formaTrigger");
+    if(menu&&!menu.hidden){menu.hidden=true;trigger?.setAttribute("aria-expanded","false");}
+    if($("consultaV7Modal")?.classList.contains("open"))cerrarConsultaCatalogo();
   }
 });
 
@@ -2100,8 +2381,14 @@ async function cargarPresupuestoEnModal(numero, presupuestoPrecargado, productos
       formaPago:p["Forma de pago"]||"",
       total:Number(p["Total"]||0),
       validez:Number(p["Validez (días)"]||0),
-        estado:String(estadoPrecargado || p["Estado"] || "").trim(),
-      productos:productosHistoricos
+      estado:String(estadoPrecargado || p["Estado"] || "").trim(),
+      productos:productosHistoricos,
+      financiacionPlan:p["Plan financiación"]||"",
+      financiacionInteresPorcentaje:p["Interés financiación (%)"]===""||p["Interés financiación (%)"]==null?null:Number(p["Interés financiación (%)"]),
+      financiacionObservacion:p["Observación financiación"]||"",
+      financiacionTarjeta:p["Tarjeta financiación"]||"",
+      financiacionTotal:p["Total financiado"]===""||p["Total financiado"]==null?null:Number(p["Total financiado"]),
+      financiacionCuota:p["Valor cuota"]===""||p["Valor cuota"]==null?null:Number(p["Valor cuota"])
     };
 
     const fecha=p["Fecha"]
